@@ -10,8 +10,8 @@ import { useLocation } from "react-router-dom";
 import numberToWords from "number-to-words";
 
 const bookmanFont = {
-  fontFamily: 'Bookman Old Style, serif',
-  fontSize: 14
+  fontFamily: "Bookman Old Style, serif",
+  fontSize: 14,
 };
 
 const FeeReceiptDetailsPDFNew = () => {
@@ -234,8 +234,6 @@ const FeeReceiptDetailsPDFNew = () => {
   //   }, 100);
   // };
 
-
-
   return (
     <Container>
       <Paper
@@ -264,22 +262,22 @@ const FeeReceiptDetailsPDFNew = () => {
           }}
         />
         <Box>
-            <Box
-              sx={{
-                display: hideButtons ? 'none' : "flex",
-                justifyContent: "flex-end",
-                gap: 2,
-                mb: 2,
-              }}
+          <Box
+            sx={{
+              display: hideButtons ? "none" : "flex",
+              justifyContent: "flex-end",
+              gap: 2,
+              mb: 2,
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleDownloadPdf}
             >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleDownloadPdf}
-              >
-                Print
-              </Button>
-            </Box>
+              Print
+            </Button>
+          </Box>
           <Typography
             variant="h6"
             align="center"
@@ -299,7 +297,6 @@ const FeeReceiptDetailsPDFNew = () => {
               container
               sx={{ flexDirection: "row", justifyContent: "space-between" }}
             >
-
               <Grid
                 container
                 sx={{
@@ -309,12 +306,18 @@ const FeeReceiptDetailsPDFNew = () => {
                 columnSpacing={1}
               >
                 <Grid item xs={1.7}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     Name
                   </Typography>
                 </Grid>
                 <Grid item xs={0.2}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
@@ -325,26 +328,40 @@ const FeeReceiptDetailsPDFNew = () => {
                 </Grid>
 
                 <Grid item xs={1.7}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     AUID
                   </Typography>
                 </Grid>
                 <Grid item xs={0.2}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
                 <Grid item xs={9.8}>
-                  <Typography variant="body1" sx={bookmanFont}>{studentData?.auid}</Typography>
+                  <Typography variant="body1" sx={bookmanFont}>
+                    {studentData?.auid}
+                  </Typography>
                 </Grid>
 
                 <Grid item xs={1.7}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     USN
                   </Typography>
                 </Grid>
                 <Grid item xs={0.2}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
@@ -361,26 +378,40 @@ const FeeReceiptDetailsPDFNew = () => {
                 columnSpacing={1}
               >
                 <Grid item xs={4.6}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     Receipt No.
                   </Typography>
                 </Grid>
                 <Grid item xs={0.1}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
                 <Grid item xs={7}>
-                  <Typography variant="body1" sx={bookmanFont}>G - {feeReceipt}</Typography>
+                  <Typography variant="body1" sx={bookmanFont}>
+                    G - {feeReceipt}
+                  </Typography>
                 </Grid>
 
                 <Grid item xs={4.6}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     Receipt Date
                   </Typography>
                 </Grid>
                 <Grid item xs={0.1}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
@@ -391,12 +422,18 @@ const FeeReceiptDetailsPDFNew = () => {
                 </Grid>
 
                 <Grid item xs={4.6}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     FC Year
                   </Typography>
                 </Grid>
                 <Grid item xs={0.1}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
@@ -415,12 +452,18 @@ const FeeReceiptDetailsPDFNew = () => {
                 columnSpacing={1}
               >
                 <Grid item xs={4.7}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     Fee Category
                   </Typography>
                 </Grid>
                 <Grid item xs={0.1}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
@@ -431,12 +474,18 @@ const FeeReceiptDetailsPDFNew = () => {
                 </Grid>
 
                 <Grid item xs={4.7}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     Created By
                   </Typography>
                 </Grid>
                 <Grid item xs={0.1}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
@@ -447,12 +496,18 @@ const FeeReceiptDetailsPDFNew = () => {
                 </Grid>
 
                 <Grid item xs={4.7}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     Mobile
                   </Typography>
                 </Grid>
                 <Grid item xs={0.1}>
-                  <Typography variant="body1" sx={{ fontWeight: "600", ...bookmanFont }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "600", ...bookmanFont }}
+                  >
                     :
                   </Typography>
                 </Grid>
@@ -480,7 +535,7 @@ const FeeReceiptDetailsPDFNew = () => {
                       border: "1px solid black",
                       padding: "3px 5px",
                       lineHeight: "1.6",
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     Particulars
@@ -491,7 +546,7 @@ const FeeReceiptDetailsPDFNew = () => {
                         border: "1px solid black",
                         padding: "3px 5px",
                         lineHeight: "1.6",
-                        ...bookmanFont
+                        ...bookmanFont,
                       }}
                       key={i}
                     >{`Sem-${year}`}</th>
@@ -501,7 +556,7 @@ const FeeReceiptDetailsPDFNew = () => {
                       border: "1px solid black",
                       padding: "3px 5px",
                       lineHeight: "1.2",
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     Total (₹)
@@ -511,7 +566,13 @@ const FeeReceiptDetailsPDFNew = () => {
               <tbody>
                 {voucherHeadNames?.map((voucher, i) => (
                   <tr key={i} style={{ textAlign: "left" }}>
-                    <td style={{ padding: "3px", border: "1px solid black", ...bookmanFont }}>
+                    <td
+                      style={{
+                        padding: "3px",
+                        border: "1px solid black",
+                        ...bookmanFont,
+                      }}
+                    >
                       {voucher?.voucher_head}
                     </td>
                     {noOfYears?.map((year) => (
@@ -521,7 +582,7 @@ const FeeReceiptDetailsPDFNew = () => {
                           textAlign: "end",
                           padding: "3px",
                           border: "1px solid black",
-                          ...bookmanFont
+                          ...bookmanFont,
                         }}
                       >
                         {tableData?.[
@@ -534,7 +595,7 @@ const FeeReceiptDetailsPDFNew = () => {
                         textAlign: "end",
                         padding: "3px",
                         border: "1px solid black",
-                        ...bookmanFont
+                        ...bookmanFont,
                       }}
                     >
                       {voucherHeads?.[voucher?.voucher_head_new_id]?.reduce(
@@ -550,7 +611,7 @@ const FeeReceiptDetailsPDFNew = () => {
                       fontWeight: "bold",
                       padding: "3px",
                       border: "1px solid black",
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     Total
@@ -563,7 +624,7 @@ const FeeReceiptDetailsPDFNew = () => {
                         padding: "3px",
                         border: "1px solid black",
                         fontWeight: 600,
-                        ...bookmanFont
+                        ...bookmanFont,
                       }}
                     >
                       {yearSemTotal?.[year]}
@@ -575,7 +636,7 @@ const FeeReceiptDetailsPDFNew = () => {
                       padding: "3px",
                       border: "1px solid black",
                       fontWeight: 600,
-                      ...bookmanFont
+                      ...bookmanFont,
                     }}
                   >
                     {grandTotal}
@@ -594,11 +655,16 @@ const FeeReceiptDetailsPDFNew = () => {
                 }}
               >
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{ fontWeight: '600' }}>Transaction No. : </Box> {studentData?.transaction_no ?? ""}
+                  <Box component="span" sx={{ fontWeight: "600" }}>
+                    Transaction No. :{" "}
+                  </Box>{" "}
+                  {studentData?.transaction_no ?? ""}
                 </Typography>
 
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
+                  <Box component="span" sx={{ fontWeight: "600" }}>
+                    Payment Mode :{" "}
+                  </Box>
                   {studentData?.transaction_type === "ONLINE"
                     ? `${studentData?.transaction_mode}`
                     : studentData?.transaction_type}
@@ -610,7 +676,6 @@ const FeeReceiptDetailsPDFNew = () => {
                     ? moment(studentData?.transaction_date).format("DD-MM-YYYY")
                     : "NA"}
                 </Typography> */}
-
               </Box>
             )}
 
@@ -626,16 +691,30 @@ const FeeReceiptDetailsPDFNew = () => {
                     }}
                   >
                     <Typography variant="body1" sx={bookmanFont}>
-                      <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
+                      <Box component="span" sx={{ fontWeight: "600" }}>
+                        Payment Mode :{" "}
+                      </Box>
                       {studentData?.transaction_type === "ONLINE"
                         ? `${studentData?.transaction_mode}`
                         : studentData?.transaction_type}
                     </Typography>
                     <Typography variant="body1" sx={bookmanFont}>
-                      <Box component="span" sx={{ fontWeight: '600', ...bookmanFont }}>DD No. : </Box> {studentData?.dd_number ?? ""}
+                      <Box
+                        component="span"
+                        sx={{ fontWeight: "600", ...bookmanFont }}
+                      >
+                        DD No. :{" "}
+                      </Box>{" "}
+                      {studentData?.dd_number ?? ""}
                     </Typography>
                     <Typography variant="body1" sx={bookmanFont}>
-                      <Box component="span" sx={{ fontWeight: '600', ...bookmanFont }}>DD Date : </Box>  {moment(studentData?.dd_date).format("DD-MM-YYYY")}
+                      <Box
+                        component="span"
+                        sx={{ fontWeight: "600", ...bookmanFont }}
+                      >
+                        DD Date :{" "}
+                      </Box>{" "}
+                      {moment(studentData?.dd_date).format("DD-MM-YYYY")}
                     </Typography>
                   </Box>
                 )}
@@ -643,7 +722,10 @@ const FeeReceiptDetailsPDFNew = () => {
 
             {studentData?.transaction_type === "DD" && (
               <Typography variant="body1" sx={bookmanFont}>
-                <Box component="span" sx={{ fontWeight: '600' }}>Bank Name : </Box> {studentData?.dd_bank_name ?? ""}
+                <Box component="span" sx={{ fontWeight: "600" }}>
+                  Bank Name :{" "}
+                </Box>{" "}
+                {studentData?.dd_bank_name ?? ""}
               </Typography>
             )}
 
@@ -651,26 +733,37 @@ const FeeReceiptDetailsPDFNew = () => {
               !studentData.transaction_date &&
               studentData?.transaction_type !== "DD" && (
                 <Typography variant="body1" sx={bookmanFont}>
-                  <Box component="span" sx={{ fontWeight: '600' }}>Payment Mode : </Box>
+                  <Box component="span" sx={{ fontWeight: "600" }}>
+                    Payment Mode :{" "}
+                  </Box>
                   {studentData?.transaction_type === "ONLINE"
                     ? `${studentData?.transaction_mode}`
                     : studentData?.transaction_type}
                 </Typography>
               )}
             <Typography variant="body1" sx={bookmanFont}>
-              <Box component="span" sx={{ fontWeight: '600', ...bookmanFont }}>Remarks : </Box> {studentData?.remarks ?? ""}
+              <Box component="span" sx={{ fontWeight: "600", ...bookmanFont }}>
+                Remarks :{" "}
+              </Box>{" "}
+              {studentData?.remarks ?? ""}
             </Typography>
-            <Typography variant="body1" sx={{ fontWeight: '600', ...bookmanFont }}>
-              Received a sum of Rs.{" "}
+            <Typography
+              variant="body1"
+              sx={{ fontWeight: "600", ...bookmanFont }}
+            >
+              Received a sum of Rupees{" "}
               {toUpperCamelCaseWithSpaces(
                 numberToWords.toWords(Number(grandTotal) ?? "")
               )}{" "}
-              /-
             </Typography>
           </Box>
           <Box sx={{ mt: 4, textAlign: "right", right: 20, bottom: 20 }}>
-            <Typography variant="body1" sx={bookmanFont}>Signature</Typography>
-            <Typography variant="body1" sx={bookmanFont}>(cashier)</Typography>
+            <Typography variant="body1" sx={bookmanFont}>
+              Signature
+            </Typography>
+            <Typography variant="body1" sx={bookmanFont}>
+              (cashier)
+            </Typography>
           </Box>
         </Box>
       </Paper>

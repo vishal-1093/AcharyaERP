@@ -59,9 +59,7 @@ function BudgetIncrementIndex() {
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     previousDesignation: false,
     dateofJoining: false,
-    previousSalaryStructure: false,
-    previousBasic: false,
-    previousSplPay: false,
+    experience: false,
     previousMedicalReimburesment: false,
     previousCtc: false,
     proposedDesignation: false,
@@ -343,39 +341,11 @@ function BudgetIncrementIndex() {
       valueGetter: (value, row) =>
         row.previousDepartment ? row.previousDepartment : "--",
     },
-
-    {
-      field: "previousSalaryStructure",
-      headerName: "Current Salary Structure",
-      flex: 1,
-      hide: true,
-      renderCell: (params) => (
-        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
-          {params.row?.previousSalaryStructure
-            ? params.row?.previousSalaryStructure
-            : "--"}
-        </Typography>
-      ),
-    },
-
-    {
-      field: "experience",
-      headerName: "Experience",
-      flex: 1,
-      renderCell: (params) => (
-        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
-          {params.row?.experience ? params.row?.experience : "-"}
-        </Typography>
-      ),
-    },
-
     {
       field: "previousBasic",
       headerName: "Current Basic",
       flex: 1,
-      hide: true,
     },
-
     {
       field: "previousSplPay",
       headerName: "Current SplPay",
@@ -387,7 +357,61 @@ function BudgetIncrementIndex() {
         </Typography>
       ),
     },
-
+    {
+      field: "previousSalaryStructure",
+      headerName: "Salary Structure",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.previousSalaryStructure
+            ? params.row?.previousSalaryStructure
+            : "--"}
+        </Typography>
+      ),
+    },
+    {
+      field: "Month",
+      headerName: "From Month",
+      flex: 1,
+      // type: "date",
+      valueGetter: (value, row) =>
+        row.month ? `${row.month}/${row.year}` : "--",
+    },
+    {
+      field: "experience",
+      headerName: "Experience",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.experience ? params.row?.experience : "-"}
+        </Typography>
+      ),
+    },
+    {
+      field: "proposedBasic",
+      headerName: "Prop Basic",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "proposedSplPay",
+      headerName: "Prop SplPay",
+      flex: 1,
+      hide: true,
+    },
+    { field: "proposedGrosspay", headerName: "Proposed Gross", flex: 1 },
+    { field: "proposedCtc", headerName: "Proposed CTC", flex: 1, hide: true },
+    { field: "grossDifference", headerName: "Gross Difference ", flex: 1 },
+    { field: "ctcDifference", headerName: " CTC Difference", flex: 1 },
+    {
+      field: "month",
+      headerName: "MM/YY",
+      flex: 1,
+      renderCell: (params) => {
+        return <>{formatMonthYear(params?.row?.month, params?.row?.year)}</>;
+      },
+    },
     {
       field: "previousGrosspay",
       headerName: "Current Gross",
@@ -432,38 +456,14 @@ function BudgetIncrementIndex() {
       headerName: "Salary Structure",
       flex: 1,
     },
+    { field: "createdBy", headerName: "Created By", flex: 1 },
     {
-      field: "Month",
-      headerName: "From Month",
+      field: "created_date",
+      headerName: "Created Date",
       flex: 1,
-      // type: "date",
-      valueGetter: (value, row) =>
-        row.month ? `${row.month}/${row.year}` : "--",
-    },
-    {
-      field: "proposedBasic",
-      headerName: "Proposed Basic",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "proposedSplPay",
-      headerName: "Proposed SplPay",
-      flex: 1,
-      hide: true,
-    },
-    { field: "proposedGrosspay", headerName: "Proposed Gross", flex: 1 },
-    { field: "proposedCtc", headerName: "Proposed CTC", flex: 1, hide: true },
-
-    { field: "grossDifference", headerName: "Gross Difference ", flex: 1 },
-    { field: "ctcDifference", headerName: " CTC Difference", flex: 1 },
-    {
-      field: "month",
-      headerName: "MM/YY",
-      flex: 1,
-      renderCell: (params) => {
-        return <>{formatMonthYear(params?.row?.month, params?.row?.year)}</>;
-      },
+      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "edit",
@@ -506,15 +506,6 @@ function BudgetIncrementIndex() {
           </IconButton>
         ),
       ],
-    },
-    { field: "createdBy", headerName: "Created By", flex: 1 },
-    {
-      field: "created_date",
-      headerName: "Created Date",
-      flex: 1,
-      valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
-      renderCell: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     // {
     //   field: "cancel",

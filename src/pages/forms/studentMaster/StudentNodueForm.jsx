@@ -168,7 +168,7 @@ function StudentNodueForm() {
                   <StudentDetails id={id} />
                 </Grid>
                 <Grid item xs={12} align="right">
-                  {dueYear > 0 ? (
+                  {dueYear === "No Dues" ? (
                     <Button
                       variant="contained"
                       endIcon={<LocalPrintshopIcon />}

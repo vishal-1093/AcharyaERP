@@ -213,31 +213,37 @@ const CreateGrn = () => {
   };
 
   const handleChangeItems = (e, index) => {
+    const inputValue = Number(e.target.value);
+
     setValuesTwo((prev) =>
       prev.map((obj, i) => {
         if (index === i) {
-          const gstValue = e.target.value * obj.rate * (obj.gst / 100);
-          const actualValue = e.target.value * obj.rate;
-          const discountedValue = (actualValue * obj.discount) / 100;
+          const rate = Number(obj.rate) || 0;
+          const gst = Number(obj.gst) || 0;
+          const discount = Number(obj.discount) || 0;
+          const balanceQuantity = Number(obj.balanceQuantity) || 0;
+
+          const validQuantity = inputValue > balanceQuantity ? balanceQuantity : inputValue;
+
+          const actualValue = validQuantity * rate;
+          const discountedValue = (actualValue * discount) / 100;
+          const gstValue = (actualValue * gst) / 100;
           const finalAmount = actualValue - discountedValue + gstValue;
 
           return {
             ...obj,
-            [e.target.name]:
-              Number(e.target.value) > Number(obj.balanceQuantity)
-                ? obj.balanceQuantity
-                : e.target.value,
-            ["totalAmount"]: finalAmount,
-            ["gstValue"]: gstValue,
-            ["mainDiscount"]: discountedValue,
-            ["cost"]: actualValue ? actualValue : e.target.value,
+            [e.target.name]: validQuantity,
+            totalAmount: Math.round(finalAmount),
+            gstValue: Math.round(gstValue),
+            mainDiscount: Math.round(discountedValue),
+            cost: actualValue,
           };
-        } else {
-          return obj;
         }
+        return obj;
       })
     );
   };
+
 
   const handleChangeDescription = (e, index) => {
     setValuesTwo((prev) =>
@@ -257,29 +263,40 @@ const CreateGrn = () => {
     );
   };
 
+
   const handleChangeSRN = (e, index) => {
+    const rawValue = e.target.value;
+    const inputValue = Number(rawValue);
+
     setValuesTwo((prev) =>
       prev.map((obj, i) => {
         if (index === i) {
-          const gstValue = e.target.value * (obj.gst / 100);
-          const actualValue = e.target.value
-          const discountedValue = (actualValue * obj.discount) / 100;
-          const finalAmount = actualValue - discountedValue + gstValue;
+          const rate = Number(obj.rate) || 0;
+          const balanceQuantity = Number(obj.balanceQuantity) || 0;
+          const gstPercent = Number(obj.gst) || 0;
+          const discountPercent = Number(obj.discount) || 0;
+
+          let validValue;
+          if (inputValue > rate) {
+            validValue = balanceQuantity === 1 ? rate : balanceQuantity;
+          } else {
+            validValue = inputValue;
+          }
+
+          const gstValue = Math.round(validValue * (gstPercent / 100));
+          const discountValue = Math.round(validValue * (discountPercent / 100));
+          const finalAmount = Math.round(validValue - discountValue + gstValue);
 
           return {
             ...obj,
-            [e.target.name]:
-              Number(e.target.value) > Number(obj.rate)
-                ? obj?.balanceQuantity === 1 ? obj?.rate : obj?.balanceQuantity
-                : e.target.value,
-            ["totalAmount"]: finalAmount,
-            ["gstValue"]: gstValue,
-            ["mainDiscount"]: discountedValue,
-            ["cost"]: actualValue ? actualValue : e.target.value,
+            [e.target.name]: validValue,
+            totalAmount: finalAmount,
+            gstValue: gstValue,
+            mainDiscount: discountValue,
+            cost: validValue,
           };
-        } else {
-          return obj;
         }
+        return obj;
       })
     );
   };

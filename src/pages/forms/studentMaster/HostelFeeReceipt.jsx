@@ -709,10 +709,10 @@ function HostelFeeReceipt() {
         });
         setAlertOpen(true);
         setLoading(false);
-      } else if (total < Number(values.ddAmount)) {
+      } else if (total < Number(values.receivedAmount)) {
         setAlertMessage({
           severity: "error",
-          message: "Total amount is not matching to DD Amount",
+          message: "Total amount is not matching to received Amount",
         });
         setAlertOpen(true);
         setLoading(false);
@@ -974,6 +974,24 @@ function HostelFeeReceipt() {
                           value={values.bankId}
                           handleChangeAdvance={handleChangeAdvanceOne}
                           options={bankOptions}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={2.4} mt={4}>
+                        <CustomTextField
+                          name="receivedAmount"
+                          label="Received Amount"
+                          value={values.receivedAmount}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={2.4} mt={4}>
+                        <CustomTextField
+                          rows={2}
+                          multiline
+                          name="narration"
+                          label="Narration"
+                          value={values.narration}
+                          handleChange={handleChange}
                         />
                       </Grid>
                     </>

@@ -15,26 +15,14 @@ import useAlert from "../../../hooks/useAlert";
 import { useParams } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-
+import StudentDetailsByAuid from "../../../components/StudentDetailsByAuid";
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
-const StudentFeeDetails = lazy(() =>
-  import("../../../components/StudentFeeDetails")
+const StudentRefundDetails = lazy(() =>
+  import("../../../components/StudentRefundDetails")
 );
 
 const initialValues = {
   auid: "",
-};
-
-const bookmanFont = {
-  // fontFamily: 'Bookman Old Style, serif',
-  fontFamily:"Roboto",
-  fontSize: '13px !important'
-};
-
-const bookmanFontPrint = {
-  fontFamily: 'Roboto',
-  color: "black",
-  fontSize: '20px !important'
 };
 
 function StudentLedger() {
@@ -42,7 +30,7 @@ function StudentLedger() {
   const [id, setId] = useState();
   const [loading, setLoading] = useState(false);
   const [allExpand, setAllExpand] = useState({});
-  const [isPrintClick, setIsPrintClick] = useState(false)
+  const [isPrintClick, setIsPrintClick] = useState(false);
 
   const { auid } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -63,11 +51,11 @@ function StudentLedger() {
     ],
   };
 
-  useEffect(() => {
-    if (auid) {
-      setValues((prev) => ({ ...prev, ["auid"]: auid }));
-    }
-  }, [auid]);
+  //   useEffect(() => {
+  //     if (auid) {
+  //       setValues((prev) => ({ ...prev, ["auid"]: auid }));
+  //     }
+  //   }, [auid]);
 
   useEffect(() => {
     handleSubmit();
@@ -111,61 +99,13 @@ function StudentLedger() {
     }
   };
 
-  const handleDownloadPdf = () => {
-    setIsPrintClick(true);
-
-    setTimeout(() => {
-      const receiptElement = document.getElementById("ledger");
-      if (receiptElement) {
-        html2canvas(receiptElement, {
-          scale: 1.5, // Increased scale for better quality
-        }).then((canvas) => {
-          const imgData = canvas.toDataURL("image/png");
-
-          const pdf = new jsPDF("p", "mm", "a4"); // a4 = 210mm x 297mm
-          const imgProps = pdf.getImageProperties(imgData);
-          const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // 10px margin left and right
-          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-          pdf.addImage(imgData, "PNG", 10, 10, pdfWidth, pdfHeight);
-
-          const pdfBlob = pdf.output("blob");
-          const pdfUrl = URL.createObjectURL(pdfBlob);
-
-          const printWindow = window.open(pdfUrl, "_blank");
-          if (printWindow) {
-            printWindow.addEventListener("load", () => {
-              printWindow.focus();
-              printWindow.print();
-            });
-          }
-          setIsPrintClick(false);
-        });
-      }
-    }, 100);
-  };
-
-
   return (
     <Box sx={{ margin: { xs: 1, md: 2, lg: 2, xl: 4 } }}>
-      <Box display="flex" justifyContent="flex-end" mb={2}>
-        <Button variant="contained" onClick={handleDownloadPdf} disabled={isPrintClick}>
-          {isPrintClick ? (
-            <CircularProgress
-              size={25}
-              color="blue"
-              style={{ margin: "2px 13px" }}
-            />
-          ) : (
-            <strong>Print</strong>
-          )}
-        </Button>
-      </Box>
       <Grid container justifyContent="center">
         <Grid item xs={12}>
           <Card elevation={4}>
             <CardHeader
-              title="Student Ledger"
+              title="Student Refund"
               titleTypographyProps={{
                 variant: "subtitle2",
               }}
@@ -218,25 +158,18 @@ function StudentLedger() {
 
                 {id && (
                   <Grid item xs={12} id="ledger">
-                    <Box
-                      sx={{ display: "flex", flexDirection: "column" }}
-                    >
-                      <StudentDetails id={id} header={isPrintClick ? "Student Ledger" : "Student Details"} isPrintClick={isPrintClick} />
-                      <StudentFeeDetails id={id} isPrintClick={isPrintClick} />
-                    </Box>
-                    <Box p={2}>
-                      <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                        Note:
-                      </Typography>
-                      <Typography variant="body2" gutterBottom sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                        * Fee fixed is applicable only if the student completes his course in prescribed <strong>Academic Batch</strong> only.
-                      </Typography>
-                      <Typography variant="body2" gutterBottom sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                        * Students should contact accounts section in case if <strong>YB</strong> for fee details.
-                      </Typography>
-                      <Typography variant="body2" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                        * It is mandatory to take <strong>No dues</strong> from accounts section for taking marks cards back after course completion.
-                      </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                      <StudentDetailsByAuid
+                        id={values.auid}
+                        // header={
+                        //   isPrintClick ? "Student Ledger" : "Student Details"
+                        // }
+                        isPrintClick={isPrintClick}
+                      />
+                      <StudentRefundDetails
+                        id={id}
+                        isPrintClick={isPrintClick}
+                      />
                     </Box>
                   </Grid>
                 )}

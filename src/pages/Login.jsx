@@ -118,7 +118,7 @@ const API_ENDPOINT = `https://www.stageapi-acharyainstitutes.in/Acharya_Universi
 // const API_ENDPOINT = `https://api-dev-acharyainstitutes.com`;
 
 // Production
-// const API_ENDPOINT = `https://acerp.acharyaerptech.in`;
+//  const API_ENDPOINT = `https://acerp.acharyaerptech.in`;
 
 function LoginNew() {
   const numberOfDigits = 6;
@@ -140,7 +140,7 @@ function LoginNew() {
     capitalLetterValidation: false,
     specialCharacterValidation: false,
   });
-  const [otpSentPhno, setOtpSentPhno] = useState("")
+  const [otpSentPhno, setOtpSentPhno] = useState("");
 
   useEffect(() => {
     const checkSessionStorage = () => {
@@ -216,8 +216,12 @@ function LoginNew() {
         body: JSON.stringify(values),
       })
       .then((response) => {
-        if (!response.data || response.data === null || response.data === undefined){
-          throw new Error("Something went wrong, Please try again.")
+        if (
+          !response.data ||
+          response.data === null ||
+          response.data === undefined
+        ) {
+          throw new Error("Something went wrong, Please try again.");
         }
         if (values.username === response.data.data.userName) {
           axios
@@ -361,12 +365,12 @@ function LoginNew() {
       .then((res) => {
         const input = res.data.data;
         const phoneNumber = input.match(/\d{10,}/)[0];
-        const maskedPhoneNumber = phoneNumber.replace(/\d(?=\d{3})/g, '*');
+        const maskedPhoneNumber = phoneNumber.replace(/\d(?=\d{3})/g, "*");
         const updatedString = input.replace(phoneNumber, maskedPhoneNumber);
         showAlert("success", updatedString);
         setUserModalOpen(true);
         setLoading(false);
-        setOtpSentPhno(phoneNumber)
+        setOtpSentPhno(phoneNumber);
       })
 
       .catch((err) => {
@@ -382,11 +386,14 @@ function LoginNew() {
       return showAlert("error", "Please Enter all the fileds");
     setLoading(true);
     axios
-      .post(`${API_ENDPOINT}/api/whatsapp/verifyOtp?phone=${otpSentPhno}&otp=${enteredOTP}`)
+      .post(
+        `${API_ENDPOINT}/api/whatsapp/verifyOtp?phone=${otpSentPhno}&otp=${enteredOTP}`
+      )
       .then((res) => {
         setLoading(false);
-        setOtpSentPhno("")
-        if (res.data.success && res.data.data === "otp verified successfully!") setIsValidOtp(true);
+        setOtpSentPhno("");
+        if (res.data.success && res.data.data === "otp verified successfully!")
+          setIsValidOtp(true);
         else showAlert("error", "Incorrect OTP, Please try again!!!");
       })
       .catch((err) => {

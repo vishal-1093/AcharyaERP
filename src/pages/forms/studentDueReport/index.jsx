@@ -75,18 +75,18 @@ const StudentDueReport = () => {
                     },
                 ]
 
-                const rows = schoolWiseDueReportLists.map(obj => {
-                    const { schoolId, schoolName, collegeDue, addOn, hostelFee, total } = obj
-                    if (total > 0)
+                const dataRows = schoolWiseDueReportLists?.map(obj => {
+                    const { schoolId, schoolName,schoolShortName, collegeDue, addOn, hostelFee, total } = obj
+                     if (total > 0)
                         return {
                             id: schoolId, inst: schoolName, collegeDue, addOn, isLastRow: false,
                             hostelFee: hostelFee ? hostelFee : 0, total, isClickable: total > 0 ? true : false
                         }
-                    else return {}
+                     else return {}
                 })
-
-                rows.push({
-                    id: schoolWiseDueReportLists.length + 1, inst: "",
+                dataRows.push({
+                    id: Date.now(),
+                    inst: "",
                     collegeDue: grantDueTotal ? grantDueTotal : 0,
                     addOn: grantAddOnTotal ? grantAddOnTotal : 0,
                     hostelFee: grantHostelFeeTotal ? grantHostelFeeTotal : 0,
@@ -95,7 +95,7 @@ const StudentDueReport = () => {
                 })
 
                 setColumns(columns)
-                setRows(rows.filter(obj => Object.keys(obj).length > 0))
+                setRows(dataRows?.filter(obj => Object.keys(obj).length > 0))
                 setLoading(false)
             })
             .catch(err => {
@@ -170,7 +170,7 @@ const StudentDueReport = () => {
                 })
 
                 setColumns(columns)
-                setRows(rows.filter(obj => Object.keys(obj).length > 0))
+                setRows(dataRows.filter(obj => Object.keys(obj).length > 0))
                 setLoading(false)
             })
             .catch(err => {
@@ -460,7 +460,7 @@ const StudentDueReport = () => {
             >
                 <Box sx={{ display: "flex", justifyContent: 'space-between', marginBottom: '10px' }}>
                     <CustomBreadCrumbs arr={breadCrumbs} />
-                    {showButton ? (
+                    {/* {showButton ? (
                         <Button
                             style={{ borderRadius: 7 }}
                             variant="contained"
@@ -469,7 +469,7 @@ const StudentDueReport = () => {
                         >
                             New Admissions
                         </Button>
-                    ) : <></>}
+                    ) : <></>} */}
                 </Box>
                 <GridIndex
                     initialState={{
