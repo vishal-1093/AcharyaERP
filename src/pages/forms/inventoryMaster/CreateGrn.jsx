@@ -159,7 +159,7 @@ const CreateGrn = () => {
       (row) => row.enterQuantity && row.description
     );
 
-    const isMainFormValid = values.invoiceNo;
+    const isMainFormValid = values.invoiceNo && values.invoiceDate;
 
     const isFileValid = values.fileName && values.fileName !== null && values.fileName.name.endsWith(".pdf") && values.fileName.size < 2000000;
     setIsFormValid(isRowsValid && isMainFormValid && isFileValid);
