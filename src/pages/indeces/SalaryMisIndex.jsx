@@ -119,14 +119,14 @@ const initialState = {
   esimTotal:0,
   esiGrossEarningTotal:0,
   schoolNetPayTotal:0,
-  schoolShortName:""
-
+  schoolShortName:"",
+  epfRows:[]
 };
 
 const SalaryMisIndex = () => {
   const [{ schoolId, loading, schoolList,schoolShortName, bank, salaryReportType, date, rows, attendanceRows, earningRows, deductionRows,
     schoolRows,bankTotalNetPay,licTotal,esiTotal,advanceTotal,tdsTotal,ptTotal,grossEarningTotal,totalEarning ,
-    esimTotal,esiGrossEarningTotal,schoolNetPayTotal}, setState] = useState(initialState);
+    esimTotal,esiGrossEarningTotal,schoolNetPayTotal,epfRows}, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const [reportPath, setReportPath] = useState(null);
@@ -204,6 +204,19 @@ const SalaryMisIndex = () => {
             grossEarningTotal : res.data.data?.filter((ele) => ele.tds !== null && ele.tds !== 0)?.reduce((acc, curr) => acc + curr.gross_pay, 0),
             ptTotal: res.data.data?.filter((ele) => ele.pt !== 0)?.reduce((acc, curr) => acc + curr.pt, 0),
             totalEarning :  res.data.data?.filter((ele) => ele.pt !== 0)?.reduce((acc, curr) => acc + curr.total_earning, 0),
+
+            epfRows : res.data.data.map((ep,index)=>({
+              id:index+1,
+              grossWages: ep.pf_earnings,
+              edliWages: ep.pf_earnings,
+              epfWages: ep.pf_earnings,
+              epsWages: ep.pf_earnings,
+              epscontriRemitted : ep.pension_fund,
+              epfContriRemitted : ep.pf,
+              epfEpsDiffRemitted : ep.epf_difference,
+              ...ep
+            }))
+
           }));
         }
       } else if (date && (type !== "school" && type == "summary")) {
@@ -292,6 +305,7 @@ const SalaryMisIndex = () => {
     setState((prevState) => ({
       ...prevState,
       rows:[],
+      epfRows:[],
       earningRows:[],
       deductionRows:[],
       attendanceRows:[],
@@ -430,35 +444,38 @@ const SalaryMisIndex = () => {
     { field: "esi_contribution_employee", headerName: "ESIM", type: "number", flex: 1 ,  hide:false},
   ];
   const epfColumns = [
-    { field: "uan_no", headerName: "UAN", flex: 1 },
-    { field: "empcode", headerName: "Emp Code", flex: 1 },
-    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1 },
-    { field: "employee_name", headerName: "Name", flex: 2 },
-    { field: "date_of_joining", headerName: "DOJ", flex: 1 },
+    { field: "uan_no", headerName: "UAN", flex: 1,hide:true },
+    { field: "empcode", headerName: "Emp Code", flex: 1,hide:false  },
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1,hide:true },
+    { field: "employee_name", headerName: "Name", flex: 2,hide:false },
+    { field: "date_of_joining", headerName: "DOJ", flex: 1,hide:true },
     {
       field: "schoolShortName",
       headerName: "Inst",
       flex: 1,
+      hide:true
     },
     {
       field: "departmentShortName",
       headerName: "Dept",
-      flex: 1
+      flex: 1,
+      hide:true
     },
     {
       field: "designationShortName",
       headerName: "Desig",
-      flex: 1
+      flex: 1,
+      hide:true
     },
-    { field: "gross", headerName: "Gross Wages", flex: 1 },
-    { field: "EPF_wages", headerName: "EPF Wages", flex: 1 },
-    { field: "EPS_wages", headerName: "EPS Wages", flex: 1 },
-    { field: "EDLI", headerName: "EDLI Wages", flex: 1 },
-    { field: "EPF", headerName: "EPF Contri remitted", flex: 1 },
-    { field: "EPS", headerName: "EPS Contri remitted", flex: 1 },
-    { field: "EPF_EPS", headerName: "EPF EPS Diff remitted", flex: 1 },
-    { field: "NCP", headerName: "NCP Days", flex: 1 },
-    { field: "Refund", headerName: "Refund Of Advances", flex: 1 }
+    { field: "grossWages", headerName: "Gross Wages", flex: 1,type:"number", hide:false },
+    { field: "epfWages", headerName: "EPF Wages", flex: 1,type:"number", hide:false },
+    { field: "epsWages", headerName: "EPS Wages", flex: 1,type:"number", hide:false },
+    { field: "edliWages", headerName: "EDLI Wages", flex: 1,type:"number", hide:false },
+    { field: "epfContriRemitted", headerName: "EPF Contri remitted", flex: 1,type:"number", hide:false },
+    { field: "epscontriRemitted", headerName: "EPS Contri remitted", flex: 1,type:"number", hide:false },
+    { field: "epfEpsDiffRemitted", headerName: "EPF EPS Diff remitted", flex: 1,type:"number", hide:false },
+    { field: "NCP", headerName: "NCP Days", flex: 1,type:"number", hide:false },
+    { field: "Refund", headerName: "Refund Of Advances", flex: 1,type:"number", hide:false }
   ];
   const ptColumns = [
     { field: "empcode", headerName: "Emp Code", flex: 1,hide:false },
@@ -563,10 +580,10 @@ const SalaryMisIndex = () => {
         array.slice(i * chunkSize, i * chunkSize + chunkSize)
       );
 
-    const list = (salaryReportType !=="school" && salaryReportType != "summary") ? rows :
-     (salaryReportType == "school" && salaryReportType != "summary") ? schoolRows : []; 
+    const list = salaryReportType == "school" ? schoolRows :
+      salaryReportType == "epf" ? epfRows : rows; 
 
-    const pageSNo = salaryReportType == "lic" ? 35 : 40;
+    const pageSNo = salaryReportType == "lic" ? 35 : salaryReportType == "epf" ? 30 : 40;
 
     const rowChunks = chunkArray(list, pageSNo);
     const pages = [];
@@ -583,7 +600,7 @@ const SalaryMisIndex = () => {
 
     const reportResponse = await GenerateSalaryMisReport(schoolShortName,pageSNo,salaryReportType, pages, date,(salaryReportType == "bank"? bankPrintColumns : 
       salaryReportType == "lic"? licColumns : salaryReportType == "tds"? tdsColumns: salaryReportType == "advance"? advanceColumns:
-      salaryReportType == "pt"? ptColumns : salaryReportType == "esi"? esiColumns: salaryReportType == "school" ? schoolColumns : []),grandTotal,earningTotal,esimTotal,
+      salaryReportType == "pt"? ptColumns : salaryReportType == "esi"? esiColumns: salaryReportType=="epf" ? epfColumns : salaryReportType == "school" ? schoolColumns : []),grandTotal,earningTotal,esimTotal,
     attendanceColumns,attendanceRows,particularsColumns,earningRows,deductionRows);
     if (!!reportResponse) {
       setReportPath(URL.createObjectURL(reportResponse));
@@ -643,22 +660,15 @@ const SalaryMisIndex = () => {
             variant="contained"
             disableElevation
             startIcon={<PrintIcon />}
-          disabled={loading}
+          disabled={loading || (rows?.length == 0 && salaryReportType !== "summary" && salaryReportType !=="school")} 
           onClick={onClickPrint}
           >
-            {/* {loading ? (
-              <CircularProgress
-                size={20}
-                style={{ margin: "2px 13px" }}
-              />
-            ) : ( */}
             Print
-            {/* )} */}
           </Button>
         </Grid>
       </Grid>
       {!(salaryReportType == "summary" || salaryReportType == "school") ? <Box mt={1} sx={{ position: "absolute", width: "100%" }}>
-        <GridIndex rows={rows}
+        <GridIndex rows={salaryReportType == "epf" ? epfRows: rows}
           columns={salaryReportType == "bank" ? bankReportColumns : salaryReportType == "lic" ? licColumns : salaryReportType == "esi" ? esiColumns :
             salaryReportType == "epf" ? epfColumns : salaryReportType == "pt" ? ptColumns : salaryReportType == "advance" ? advanceColumns :
               salaryReportType == "tds" ? tdsColumns : []}

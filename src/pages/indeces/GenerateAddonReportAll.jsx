@@ -109,7 +109,7 @@ export const GenerateAddonReportAll = (
     </View>
   );
 
-  const ReportData = ({ listData, pageIndex }) => (
+  const ReportData = ({data, listData, pageIndex }) => (
     <View style={{ ...styles.layout}}>
       <View style={{ marginBottom: "5px" }}>
         {!!date && <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 14, textAlign: "center",fontWeight:"heavy",fontFamily:"Times-Bold" }}>{`Acharya Research Incentive For The Month Of ${getMonthName(moment(date).format("MM"))}-${moment(date).format("YYYY")}`}</Text>}
@@ -325,7 +325,7 @@ export const GenerateAddonReportAll = (
             </DispayRow>
           );
         })}
-        <DispayRow>
+        {(pageIndex+1) == data.length && <DispayRow>
           <DisplayCells
             label=""
             style="Times-Bold"
@@ -415,7 +415,7 @@ export const GenerateAddonReportAll = (
             customWidth={2}
             labelType="text"
           />
-        </DispayRow>
+        </DispayRow>}
       </View>
       <View style={{ marginTop: "20px" }}>
         <Text style={{fontSize: 12}}>Approval Hierarchy :</Text>
@@ -469,7 +469,7 @@ export const GenerateAddonReportAll = (
               size="A4"
               style={{ ...styles.pageLayout }}
             >
-              <ReportData listData={ele} pageIndex={index} />
+              <ReportData data={data} listData={ele} pageIndex={index} />
               <View style={{ position: "absolute", bottom: 20, width: "100%" }}>
                 <Text style={{ textAlign: "center", fontSize: 8,fontFamily:"Times-Bold" }}>
                   Page {index + 1} of {data.length}
