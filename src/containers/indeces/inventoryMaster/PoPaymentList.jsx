@@ -38,7 +38,7 @@ const filterLists = [
 ];
 
 const initialValues = {
-  requestType: null,
+  paymentType: null,
   filterList: filterLists,
   filter: filterLists[2].value,
   startDate: "",
@@ -206,12 +206,12 @@ function PoPaymentList() {
     //   headerName: "Create GRN",
     //   flex: 1,
     //   renderCell: (params) => {
-    //     const { grnCreationStatus, status, purchaseOrderId, requestType, amount } = params.row;
+    //     const { grnCreationStatus, status, purchaseOrderId, paymentType, amount } = params.row;
     //     console.log();
 
     //     if (grnCreationStatus !== null && status === "COMPLETED") {
     //       return (
-    //         <IconButton onClick={() => handlePreview(purchaseOrderId, requestType, amount)}>
+    //         <IconButton onClick={() => handlePreview(purchaseOrderId, paymentType, amount)}>
     //           <Visibility fontSize="small" color="primary" />
     //         </IconButton>
     //       );
@@ -267,7 +267,7 @@ function PoPaymentList() {
 
   useEffect(() => {
     getData();
-  }, [values.school_Id, values?.grnDate, values?.requestType, values?.filter, values.startDate, values.endDate]);
+  }, [values.school_Id, values?.grnDate, values?.paymentType, values?.filter, values.startDate, values.endDate]);
 
   const getPoData = async (id, type) => {
     try {
@@ -329,36 +329,44 @@ function PoPaymentList() {
     //   ],
     // });
   };
-
-  const getData = async () => {
-    const requestData = {
-      pageNo: 0,
-      pageSize: 100000,
-      createdDate: null,
-      institute: null,
-      vendor: null,
-      ...(values.startDate && {
-        fromDate: moment(values.startDate).format("YYYY-MM-DD"),
-      }),
-      ...(values.endDate && {
-        toDate: moment(values.endDate).format("YYYY-MM-DD"),
-      }),
-      ...(values.school_Id && { instituteId: values.school_Id }),
-      ...(values.requestType && { requestType: values.requestType }),
-      ...(values.filter && values.filter !== "custom" && { poFilter: values.filter }),
-    };
-
-    await axios
-    .get(`/api/purchase/poReport`)
-      .then((res) => {
-        const rowId = res.data.data.map((obj, index) => ({
-          ...obj,
-          id: index + 1,
-        }));
-        setRows(rowId?.reverse());
-      })
-      .catch((err) => console.error(err));
+const getData = async () => {
+  const queryParams = {
+    ...(values.startDate && {
+      fromDate: moment(values.startDate).format("YYYY-MM-DD"),
+    }),
+    ...(values.endDate && {
+      toDate: moment(values.endDate).format("YYYY-MM-DD"),
+    }),
+    ...(values.school_Id && { schoolId: values.school_Id }),
+    ...(values.paymentType && { paymentType: values.paymentType }),
+    ...(values.filter && values.filter !== "custom" && {
+      poFilter: values.filter,
+    }),
   };
+
+  const queryString = new URLSearchParams(queryParams).toString();
+
+  const url = `/api/purchase/poReport?${queryString}`;
+
+  const requestBody = {
+    pageNo: 0,
+    pageSize: 100000,
+    createdDate: null,
+    institute: null,
+    vendor: null,
+  };
+
+  try {
+    const res = await axios.post(url, requestBody);
+    const rowId = res.data.data.map((obj, index) => ({
+      ...obj,
+      id: index + 1,
+    }));
+    setRows(rowId?.reverse());
+  } catch (err) {
+    console.error(err);
+  }
+};
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -412,7 +420,7 @@ function PoPaymentList() {
           buttons={modalPrintContent.buttons}
         />
       )}
-      {/* <Box>
+      <Box>
         <FormWrapper>
           <Grid
             container
@@ -467,19 +475,19 @@ function PoPaymentList() {
 
             <Grid item xs={12} md={2}>
               <CustomAutocomplete
-                name="requestType"
+                name="paymentType"
                 label="Type"
-                value={values.requestType}
+                value={values.paymentType}
                 options={[
-                  { value: "GRN", label: "GRN" },
-                  { value: "SRN", label: "SRN" },
+                  { value: "Advance", label: "Advance" },
+                  { value: "After GRN/SRN", label: "After GRN/SRN" },
                 ]}
                 handleChangeAdvance={handleChangeAdvance}
               />
             </Grid>
           </Grid>
         </FormWrapper>
-      </Box> */}
+      </Box>
 
       <Box sx={{ position: "relative", mt: 2 }}>
         <CustomModal

@@ -30,7 +30,7 @@ const bookmanFontLabel = {
 const bookmanFontPrint = {
   fontFamily: "Roboto",
   color: "black",
-  fontSize: "24px !important",
+  fontSize: "20px !important",
 };
 
 function StudentDetails({
