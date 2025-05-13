@@ -68,6 +68,9 @@ const EmpDocumentCollection = lazy(() =>
   import("./components/EmpDocumentCollectionPdf")
 );
 
+const PoPaymentList = lazy(() =>
+  import("./containers/indeces/inventoryMaster/PoPaymentList.jsx")
+);
 // Student Feedback Master Forms
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
@@ -1722,6 +1725,10 @@ const FeeReceiptIndex = lazy(() =>
 const FeeReceiptReportIndex = lazy(() =>
   import("./containers/indeces/studentMaster/StudentFeereceiptReportIndex")
 );
+const StudentRefund = lazy(() =>
+  import("./pages/forms/studentMaster/StudentRefund.jsx")
+);
+
 const DailyCounterSummaryIndex = lazy(() =>
   import("./containers/indeces/studentMaster/DailyCounterSummaryIndex")
 );
@@ -1941,9 +1948,19 @@ const SalarySheetMaster = lazy(() =>
 // LMS
 const LMS = lazy(() => import("./pages/indeces/LMS.jsx"));
 
-const RazorPaySettlementMaster = lazy(() => import("./pages/masters/RozarpaySettlementMaster.jsx"))
-const RazorPaySettlementDetail = lazy(()=> import("./containers/indeces/razorpaySettlementMaster/razorpaySettlementdetails.jsx"))
-const RazorPayReceiptDetail = lazy(()=> import("./containers/indeces/razorpaySettlementMaster/razorpayReceiptDetails.jsx"))
+const RazorPaySettlementMaster = lazy(() =>
+  import("./pages/masters/RozarpaySettlementMaster.jsx")
+);
+const RazorPaySettlementDetail = lazy(() =>
+  import(
+    "./containers/indeces/razorpaySettlementMaster/razorpaySettlementdetails.jsx"
+  )
+);
+const RazorPayReceiptDetail = lazy(() =>
+  import(
+    "./containers/indeces/razorpaySettlementMaster/razorpayReceiptDetails.jsx"
+  )
+);
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -3991,6 +4008,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AdvancePaymentVoucherIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/po-payment-history"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PoPaymentList />
               </Suspense>
             }
           />
@@ -8494,6 +8520,16 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/StudentRefund"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentRefund />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/FeeReceipt"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -9915,13 +9951,21 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           {/* RazarPay Settlements */}
+          {/* RazarPay Settlements */}
           <Route
             exact
             path={"/razorpay-settlement-master"}
-            element={<Navigate replace to="/razorpay-settlement-master/all-settlement" />}
+            element={
+              <Navigate
+                replace
+                to="/razorpay-settlement-master/all-settlement"
+              />
+            }
           />
-          {["/razorpay-settlement-master/all-settlement", "razorpay-settlement-master/pending-settlement"].map((path) => (
+          {[
+            "/razorpay-settlement-master/all-settlement",
+            "razorpay-settlement-master/pending-settlement",
+          ].map((path) => (
             <Route
               key={path}
               path={path}
@@ -9933,7 +9977,7 @@ function RouteConfig() {
             />
           ))}
 
-           <Route
+          <Route
             exact
             path="/razorpay-settlement-master/all-settlement/:settlementId"
             element={
@@ -9942,7 +9986,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/razorpay-settlement-master/settlement-receipt/:settlementId"
             element={
@@ -9951,7 +9995,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/razorpay-settlement-master/pending-settlement/:settlementId"
             element={

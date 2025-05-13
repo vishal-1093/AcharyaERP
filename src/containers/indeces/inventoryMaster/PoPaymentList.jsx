@@ -38,7 +38,7 @@ const filterLists = [
 ];
 
 const initialValues = {
-  requestType: null,
+  paymentType: null,
   filterList: filterLists,
   filter: filterLists[2].value,
   startDate: "",
@@ -49,7 +49,7 @@ const initialValues = {
 
 
 
-function AllPoList() {
+function PoPaymentList() {
   const [rows, setRows] = useState([]);
   const [rowData, setRowData] = useState({});
   const [poData, setPoRows] = useState([]);
@@ -73,9 +73,8 @@ function AllPoList() {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    approverName: false,
-    cancel: false,
     created_date: false,
+    createdUsername: false,
   });
 
   const onPrint = (rowValue) => {
@@ -132,134 +131,121 @@ function AllPoList() {
       })
       .catch((err) => console.error(err));
   };
-  const handleClick = (purchaseOrderId, approverStatus) => {
-    if (approverStatus === 0) {
-      setAlertMessage({
-        severity: "error",
-        message: "Approval is needed for the amended PO",
-      });
-      setAlertOpen(true);
-    } else {
-      navigate(`/CreateGrn/${purchaseOrderId}`)
-    }
-  }
-    const handleClickUpdate = (params) => {
-    if (params.row.approverStatus === 0) {
-      setAlertMessage({
-        severity: "error",
-        message: "Approval is needed for the amended PO",
-      });
-      setAlertOpen(true);
-    } else {
-      navigate(`/Poupdate/${params.row.purchaseOrderId}`)
-    }
-  }
+
   const columns = [
     { field: "institute", headerName: "Institute" },
-    {
-      field: "approvedDate",
-      headerName: "Approved Date",
-      flex: 1,
-      valueGetter: (value, row) =>
-        moment(row.approvedDate).format("DD-MM-YYYY"),
-    },
-    {
-      field: "approverName",
-      headerName: "Approver By",
-      flex: 1,
-    },
-    { field: "vendor", headerName: "Vendor", flex: 1 },
+    { field: "vendorName", headerName: "Vendor", flex: 1 },
     { field: "poNo", headerName: "Po No", flex: 1 },
     {
-      field: "amount",
+      field: "poDate",
+      headerName: "Po Date",
+      flex: 1,
+      valueGetter: (value, row) =>
+        moment(row.poDate).format("DD-MM-YYYY"),
+    },
+    {
+      field: "poAmount",
       headerName: "Po Amount",
       headerAlign: "right",
       align: "right",
       flex: 1,
       valueGetter: (value, row) =>
-        row.amount ? Math.round(row.amount) : "",
+        row.poAmount ? Math.round(row.poAmount) : "",
     },
-    { field: "requestType", headerName: "Po Type", flex: 1, hide: true },
-    // { field: "institute", headerName: "Institute" },
+    { field: "type", headerName: "Po Type", flex: 1, hide: true },
+    { field: "paymentType", headerName: "Payment Type", flex: 1, hide: true },
     {
-      field: "Print",
-      headerName: "Print PO",
+      field: "grnStatus",
+      headerName: "GRN",
+      headerAlign: "right",
+      align: "right",
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <IconButton
-            // onClick={() => navigate(`/PoPdf/${params.row.purchaseOrderId}`)}
-            onClick={() => onPrint(params.row)}
-          >
-            <PrintIcon fontSize="small" color="primary" />
-          </IconButton>
-        );
-      },
+      valueGetter: (value, row) =>
+        row.grnStatus ? Math.round(row.grnStatus) : "",
     },
+    { field: "jvStatus", headerName: "Journal", flex: 1, hide: true },
+    { field: "paymentStatus", headerName: "Payment", flex: 1, hide: true },
+    // {
+    //   field: "Print",
+    //   headerName: "Print PO",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     return (
+    //       <IconButton
+    //         // onClick={() => navigate(`/PoPdf/${params.row.purchaseOrderId}`)}
+    //         onClick={() => onPrint(params.row)}
+    //       >
+    //         <PrintIcon fontSize="small" color="primary" />
+    //       </IconButton>
+    //     );
+    //   },
+    // },
 
-    {
-      field: "Amend",
-      type: "actions",
-      flex: 1,
-      headerName: "Amend Po",
-      getActions: (params) => [
-        params.row.grnCreationStatus ? (
-          <IconButton>
-            <BeenhereIcon fontSize="small" color="success" />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={() => handleClickUpdate(params)}
-          >
-            <EditIcon fontSize="small" color="primary" />
-          </IconButton>
-        ),
-      ],
-    },
+    // {
+    //   field: "Amend",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "Amend Po",
+    //   getActions: (params) => [
+    //     params.row.grnCreationStatus ? (
+    //       <IconButton>
+    //         <BeenhereIcon fontSize="small" color="success" />
+    //       </IconButton>
+    //     ) : (
+    //       <IconButton
+    //         onClick={() => navigate(`/Poupdate/${params.row.purchaseOrderId}`)}
+    //       >
+    //         <EditIcon fontSize="small" color="primary" />
+    //       </IconButton>
+    //     ),
+    //   ],
+    // },
 
-    {
-      field: "GRN",
-      headerName: "Create GRN",
-      flex: 1,
-      renderCell: (params) => {
-        const { grnCreationStatus, status, purchaseOrderId, requestType, amount, approverStatus } = params.row;
-        if (grnCreationStatus !== null && status === "COMPLETED") {
-          return (
-            <IconButton onClick={() => handlePreview(purchaseOrderId, requestType, amount)}>
-              <Visibility fontSize="small" color="primary" />
-            </IconButton>
-          );
-        }
+    // {
+    //   field: "GRN",
+    //   headerName: "Create GRN",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     const { grnCreationStatus, status, purchaseOrderId, paymentType, amount } = params.row;
+    //     console.log();
 
-        const iconColor = (status === "PENDING" && grnCreationStatus !== null) ? "#fbc02d" : "#43a047";
+    //     if (grnCreationStatus !== null && status === "COMPLETED") {
+    //       return (
+    //         <IconButton onClick={() => handlePreview(purchaseOrderId, paymentType, amount)}>
+    //           <Visibility fontSize="small" color="primary" />
+    //         </IconButton>
+    //       );
+    //     }
 
-        return (
-          <IconButton onClick={() => handleClick(purchaseOrderId, approverStatus)}>
-            <AddCircleOutlineRoundedIcon fontSize="small" sx={{ color: iconColor }} />
-          </IconButton>
-        );
-      },
-    },
+    //     const iconColor = (status === "PENDING" && grnCreationStatus !== null) ? "#fbc02d" : "#43a047";
+
+    //     return (
+    //       <IconButton onClick={() => navigate(`/CreateGrn/${purchaseOrderId}`)}>
+    //         <AddCircleOutlineRoundedIcon fontSize="small" sx={{ color: iconColor }} />
+    //       </IconButton>
+    //     );
+    //   },
+    // },
 
 
-    {
-      field: "cancel",
-      headerName: "Cancel",
-      flex: 1,
-      renderCell: (params) => {
-        if (params.row.grnCreationStatus) {
-          return <IconButton>
-            <BeenhereIcon fontSize="small" color="success" />
-          </IconButton>
-        } else {
-          return (
-            <IconButton onClick={() => handleCancelPo(params)}>
-              <HighlightOff fontSize="small" color="error" />
-            </IconButton>
-          );
-        }
-      },
-    },
+    // {
+    //   field: "cancel",
+    //   headerName: "Cancel",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     if (params.row.grnCreationStatus) {
+    //       return <IconButton>
+    //         <BeenhereIcon fontSize="small" color="success" />
+    //       </IconButton>
+    //     } else {
+    //       return (
+    //         <IconButton onClick={() => handleCancelPo(params)}>
+    //           <HighlightOff fontSize="small" color="error" />
+    //         </IconButton>
+    //       );
+    //     }
+    //   },
+    // },
     {
       field: "created_date",
       headerName: "Created Date",
@@ -281,7 +267,7 @@ function AllPoList() {
 
   useEffect(() => {
     getData();
-  }, [values.school_Id, values?.grnDate, values?.requestType, values?.filter, values.startDate, values.endDate]);
+  }, [values.school_Id, values?.grnDate, values?.paymentType, values?.filter, values.startDate, values.endDate]);
 
   const getPoData = async (id, type) => {
     try {
@@ -343,36 +329,44 @@ function AllPoList() {
     //   ],
     // });
   };
-
-  const getData = async () => {
-    const requestData = {
-      pageNo: 0,
-      pageSize: 100000,
-      createdDate: null,
-      institute: null,
-      vendor: null,
-      ...(values.startDate && {
-        fromDate: moment(values.startDate).format("YYYY-MM-DD"),
-      }),
-      ...(values.endDate && {
-        toDate: moment(values.endDate).format("YYYY-MM-DD"),
-      }),
-      ...(values.school_Id && { instituteId: values.school_Id }),
-      ...(values.requestType && { requestType: values.requestType }),
-      ...(values.filter && values.filter !== "custom" && { poFilter: values.filter }),
-    };
-
-    await axios
-      .post(`/api/purchase/getPurchaseOrder`, requestData)
-      .then((res) => {
-        const rowId = res.data.data.content.map((obj, index) => ({
-          ...obj,
-          id: index + 1,
-        }));
-        setRows(rowId?.reverse());
-      })
-      .catch((err) => console.error(err));
+const getData = async () => {
+  const queryParams = {
+    ...(values.startDate && {
+      fromDate: moment(values.startDate).format("YYYY-MM-DD"),
+    }),
+    ...(values.endDate && {
+      toDate: moment(values.endDate).format("YYYY-MM-DD"),
+    }),
+    ...(values.school_Id && { schoolId: values.school_Id }),
+    ...(values.paymentType && { paymentType: values.paymentType }),
+    ...(values.filter && values.filter !== "custom" && {
+      poFilter: values.filter,
+    }),
   };
+
+  const queryString = new URLSearchParams(queryParams).toString();
+
+  const url = `/api/purchase/poReport?${queryString}`;
+
+  const requestBody = {
+    pageNo: 0,
+    pageSize: 100000,
+    createdDate: null,
+    institute: null,
+    vendor: null,
+  };
+
+  try {
+    const res = await axios.post(url, requestBody);
+    const rowId = res.data.data.map((obj, index) => ({
+      ...obj,
+      id: index + 1,
+    }));
+    setRows(rowId?.reverse());
+  } catch (err) {
+    console.error(err);
+  }
+};
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -481,12 +475,12 @@ function AllPoList() {
 
             <Grid item xs={12} md={2}>
               <CustomAutocomplete
-                name="requestType"
+                name="paymentType"
                 label="Type"
-                value={values.requestType}
+                value={values.paymentType}
                 options={[
-                  { value: "GRN", label: "GRN" },
-                  { value: "SRN", label: "SRN" },
+                  { value: "Advance", label: "Advance" },
+                  { value: "After GRN/SRN", label: "After GRN/SRN" },
                 ]}
                 handleChangeAdvance={handleChangeAdvance}
               />
@@ -506,7 +500,7 @@ function AllPoList() {
         <GridIndex rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel} />
       </Box>
-      <ModalWrapper title={`GRN Details`} open={modalPreview} setOpen={setModalPreview}>
+      {/* <ModalWrapper title={`GRN Details`} open={modalPreview} setOpen={setModalPreview}>
         <Grid container justifyContent="center" alignItems="center" marginTop={2}>
           <TableContainer component={Paper} sx={{ maxHeight: 500, borderRadius: 2, boxShadow: 3 }}>
             <Table stickyHeader size="small" aria-label="modern styled table">
@@ -521,6 +515,8 @@ function AllPoList() {
                     'Unit',
                     'Make',
                     'Serial No',
+                    'Available',
+                    'Issued',
                     'Description',
                     'Created Name',
                     'Created Date'
@@ -560,6 +556,8 @@ function AllPoList() {
                     <TableCell>{item.measureShortName}</TableCell>
                     <TableCell>{item.envItemsInStoresId?.make}</TableCell>
                     <TableCell>{item.envItemsInStoresId?.item_serial_no}</TableCell>
+                    <TableCell align="right">{item.balanceQuantity ?? 0}</TableCell>
+                    <TableCell align="right">{item.quantity ?? 0}</TableCell>
                     <TableCell>{item.envItemsInStoresId?.item_description}</TableCell>
                     <TableCell>{item.createdUsername}</TableCell>
                     <TableCell> {moment(item.created_date).format("DD-MM-YYYY")}</TableCell>
@@ -664,10 +662,10 @@ function AllPoList() {
             </Button>
           </Grid>
         </Grid>
-      </ModalWrapper>
+      </ModalWrapper> */}
 
     </>
   );
 }
 
-export default AllPoList;
+export default PoPaymentList;

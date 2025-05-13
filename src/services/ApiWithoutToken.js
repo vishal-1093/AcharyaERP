@@ -10,7 +10,7 @@ const apiUrl = `https://www.stageapi-acharyainstitutes.in/Acharya_University`;
 // const apiUrl = `https://api-dev-acharyainstitutes.com`;
 
 // Production
-// const apiUrl = `https://acerp.acharyaerptech.in`;
+//  const apiUrl = `https://acerp.acharyaerptech.in`;
 
 const axiosNoToken = Axios.create({
   baseURL: apiUrl,

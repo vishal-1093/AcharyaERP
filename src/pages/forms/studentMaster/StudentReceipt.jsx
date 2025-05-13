@@ -841,7 +841,7 @@ function StudentReceipt() {
         setAlertOpen(true);
       } else if (
         values.transactionType.toLowerCase() === "dd" &&
-        Number(values.ddAmount) === total
+        Number(values.receivedAmount) === total
       ) {
         const res = await axios.post(`/api/finance/feeReceipt`, payload);
         if (res.status === 200 || res.status === 201) {
@@ -1126,6 +1126,25 @@ function StudentReceipt() {
                           value={values.bankId}
                           handleChangeAdvance={handleChangeAdvanceOne}
                           options={bankOptions}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomTextField
+                          name="receivedAmount"
+                          label="Received Amount"
+                          value={values.receivedAmount}
+                          handleChange={handleChange}
+                          required
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomTextField
+                          multiline
+                          rows={2}
+                          name="narration"
+                          label="Narration"
+                          value={values.narration}
+                          handleChange={handleChange}
                         />
                       </Grid>
                     </>
