@@ -92,6 +92,10 @@ const FacultyFeedbackMaster = lazy(() =>
   import("./pages/masters/FacultyFeedbackMaster")
 );
 
+const FacultyFeedbackMasterCourse = lazy(()=>
+  import("./pages/forms/facultyFeedbackMasterCourse/FacultyFeedbackReportCourseForm.jsx")
+)
+
 const StudentRazorPayWindowUniform = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
 );
@@ -9429,6 +9433,16 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-course"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackMasterCourse />
+                </Suspense>
+              }
+            />
+
           </>
           <>
             <Route
