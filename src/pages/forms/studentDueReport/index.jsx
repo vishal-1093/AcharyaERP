@@ -330,16 +330,15 @@ const StudentDueReport = () => {
                             return <Typography>{year}/{sem}</Typography>;
                         }
                      },
-                     { field: "currencyType", headerName: "Currency", flex: 1, align: 'center',  headerAlign: 'center', headerClassName: "header-bg" },
-                      {
-                        field: "semDue", headerName: "Collage Due", flex: 1, type: "number", align: 'right', sortable: false,
-                        headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
-                        renderCell: (params) => {
-                            const total = Number(params?.row?.semDue) || 0;
-                            const formatted = new Intl.NumberFormat('en-IN').format(total);
-                            return <Typography>{formatted}</Typography>;
-                        }
-                    },
+                    //   {
+                    //     field: "semDue", headerName: "Collage Due", flex: 1, type: "number", align: 'right', sortable: false,
+                    //     headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
+                    //     renderCell: (params) => {
+                    //         const total = Number(params?.row?.semDue) || 0;
+                    //         const formatted = new Intl.NumberFormat('en-IN').format(total);
+                    //         return <Typography>{formatted}</Typography>;
+                    //     }
+                    // },
                     {
                         field: "inrValue", headerName: "Collage Due (₹)", type: "number", minWidth: 150, align: 'right', sortable: false,
                         headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
@@ -367,9 +366,7 @@ const StudentDueReport = () => {
                 const rows = semisterWiseStudentDueReports.map((obj, i) => {
                     const { semDue, auid, studentName, templateName, currentYear, currentSem, addOnDue,
                         currencyType, exchangeRate, inrValue, hostelDue } = obj
-                 //   const semesterDue= exchangeRate ? semDue*exchangeRate : semDue
                     const totalDue = Number(inrValue || 0) + Number(addOnDue || 0) + Number(hostelDue || 0)
-                    console.log("totalDue", totalDue)
                     return {
                         id: i, total: totalDue, auid, studentName, currencyType, exchangeRate,
                         templateName, currentYear, currentSem, inrValue, hostelDue: hostelDue || 0, addOn: addOnDue ? addOnDue : 0, semDue
