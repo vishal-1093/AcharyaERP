@@ -25,10 +25,8 @@ const RazorPayReceiptDetail = () => {
 
   const getSettlementData = () => {
     setLoading(true)
-    //  /api/getReceiptGeneratedSettlements?settlementId=${settlementId}
     axios.get(`/api/getReceiptGeneratedSettlements?settlementId=${settlementId}`)
       .then(res => {
-        console.log("res++++", res)
         const { data } = res?.data
         setRows([...data] || [])
         setLoading(false)
@@ -52,7 +50,7 @@ const RazorPayReceiptDetail = () => {
         //  hide: true,
       },
     {
-      field: "cheque_dd_no",
+      field: "order_id",
       headerName: "Reference No",
       flex: 1,
     },

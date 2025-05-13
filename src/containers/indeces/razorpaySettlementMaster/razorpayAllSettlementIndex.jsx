@@ -10,42 +10,45 @@ import CustomFilter from "../../../components/Inputs/CustomCommonFilter";
 const RazorPaySettlementIndex = () => {
     const [rows, setRows] = useState([])
     const [loading, setLoading] = useState(false)
-   //  const [date, setDate] = useState(new Date().toISOString().split("T")[0])
     const [date, setDate] = useState()
     const { pathname } = useLocation();
     const navigate = useNavigate()
     const roleShortName = JSON.parse(
         sessionStorage.getItem("AcharyaErpUser")
     )?.roleShortName;
-    
+
     useEffect(() => {
-        //  updateSettlementDataintoDB()
-        getAllSettlementData()
+        updateSettlementDataintoDB()
+        // getAllSettlementData()
     }, [])
 
     useEffect(() => {
         getAllSettlementData()
     }, [date])
 
-    // const updateSettlementDataintoDB= () =>{
-    //     setLoading(true)
-    //     axios.post("/api/razorPaySettlements?year=2025&month=0&day=28")
-    //         .then(res => {
-    //             getAllSettlementData()
-    //         })
-    // }
+    const updateSettlementDataintoDB = () => {
+        setLoading(true)
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1; // getMonth() returns 0-11
+        const day = today.getDate();
+        axios.post(`/api/razorPaySettlements?year=${year}&month=${month}&day=${day}`)
+            .then(res => {
+                getAllSettlementData()
+            })
+    }
 
     const getAllSettlementData = () => {
         setLoading(true)
 
         const tabName = pathname.split("/").filter(Boolean)[1]
         const formatedDate = moment(date).format("YYYY-MM-DD")
-            let params ={
-                ...(tabName !== 'pending-settlement' && date && { settledDate: formatedDate }),
-                ...(tabName === 'pending-settlement' && date && { date: formatedDate }),
-            }
+        let params = {
+            ...(tabName !== 'pending-settlement' && date && { settledDate: formatedDate }),
+            ...(tabName === 'pending-settlement' && date && { date: formatedDate }),
+        }
         const baseUrl = tabName === 'pending-settlement' ? `/api/allPendingSettlements` : `/api/settelmentSummary`
-        axios.get(baseUrl, {params})
+        axios.get(baseUrl, { params })
             .then(res => {
                 const { data } = res
                 setRows(data)
@@ -58,10 +61,10 @@ const RazorPaySettlementIndex = () => {
     }
 
     const getSettlementData = (rowData) => {
-        const {date, settlementId} = rowData
-        navigate(`${pathname}/${settlementId}`,{
+        const { date, settlementId } = rowData
+        navigate(`${pathname}/${settlementId}`, {
             state: {
-              settlementDate: date,
+                settlementDate: date,
             }
         })
     }
@@ -77,12 +80,13 @@ const RazorPaySettlementIndex = () => {
     };
 
     const columns = [
-        { field: "date", 
-          headerName: "Settlement date", 
-          flex: 1, 
-          align: 'left', 
-          headerAlign: 'left', 
-          headerClassName: "header-bg" 
+        {
+            field: "date",
+            headerName: "Settlement date",
+            flex: 1,
+            align: 'left',
+            headerAlign: 'left',
+            headerClassName: "header-bg"
         },
         {
             field: "settlementId",
@@ -97,54 +101,76 @@ const RazorPaySettlementIndex = () => {
                 </Button>)
             }
         },
-        { field: "totalCredit", 
-          headerName: "Settlement Amount", 
-          flex: 1, 
-          type: "number", 
-          align: 'right', 
-          headerAlign: 'center', 
-          headerClassName: "header-bg" 
+        {
+            field: "totalCredit",
+            headerName: "Settlement Amount",
+            flex: 1,
+            type: "number",
+            align: 'right',
+            headerAlign: 'center',
+            headerClassName: "header-bg"
         },
-        { field: "receiptAmount", 
-          headerName: "Receipt Amount",
-          flex: 1, type: "number", 
-          align: 'right', 
-          headerAlign: 'center', 
-          headerClassName: "header-bg",
-          renderCell: (params) => {
-            if(params?.row?.receiptAmount > 0){
-            return (<Button onClick={() => getReceiptData(params?.row?.settlementId)}>
-                {params?.row?.receiptAmount}
-            </Button>)
-            }else{
-                return params?.row?.receiptAmount
+        {
+            field: "receiptAmount",
+            headerName: "Receipt Amount",
+            flex: 1, type: "number",
+            align: 'right',
+            headerAlign: 'center',
+            headerClassName: "header-bg",
+            renderCell: (params) => {
+                if (params?.row?.receiptAmount > 0) {
+                    return (<Button onClick={() => getReceiptData(params?.row?.settlementId)}>
+                        {params?.row?.receiptAmount}
+                    </Button>)
+                } else {
+                    return params?.row?.receiptAmount
+                }
             }
-        }
         },
-        { field: "totalDebit", 
-            headerName: "Transfer Amount", 
-            flex: 1, 
-            type: "number", 
-            align: 'right', 
-            headerAlign: 'center', 
-            headerClassName: "header-bg" 
-          },
-        { field: "pendingAmount", 
-          headerName: "Pending Amount", 
-          flex: 1, 
-          type: "number", 
-          align: 'right', 
-          headerAlign: 'center', 
-          headerClassName: "header-bg",
-          renderCell: (params) => {
-            if(params?.row?.pendingAmount > 0){
-            return (<Button onClick={() => getPendingAmountData(params?.row?.settlementId)}>
-                {params?.row?.pendingAmount}
-            </Button>)
-            }else{
-                return params?.row?.pendingAmount
+        {
+            field: "totalDebit",
+            headerName: "Transfer Amount",
+            flex: 1,
+            type: "number",
+            align: 'right',
+            headerAlign: 'center',
+            headerClassName: "header-bg"
+        },
+        {
+            field: "uniformAmount",
+            headerName: "Uniform Amount",
+            flex: 1,
+            type: "number",
+            align: 'right',
+            headerAlign: 'center',
+            headerClassName: "header-bg"
+        },
+        {
+            field: "addOnAmount",
+            headerName: "Add On Amount",
+            flex: 1,
+            type: "number",
+            align: 'right',
+            headerAlign: 'center',
+            headerClassName: "header-bg"
+        },
+        {
+            field: "pendingAmount",
+            headerName: "Pending Amount",
+            flex: 1,
+            type: "number",
+            align: 'right',
+            headerAlign: 'center',
+            headerClassName: "header-bg",
+            renderCell: (params) => {
+                if (params?.row?.pendingAmount > 0) {
+                    return (<Button onClick={() => getPendingAmountData(params?.row?.settlementId)}>
+                        {params?.row?.pendingAmount}
+                    </Button>)
+                } else {
+                    return params?.row?.pendingAmount
+                }
             }
-        }
         }
     ]
 
