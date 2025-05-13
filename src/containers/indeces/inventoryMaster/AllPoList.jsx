@@ -132,7 +132,28 @@ function AllPoList() {
       })
       .catch((err) => console.error(err));
   };
-
+  const handleClick = (purchaseOrderId, approverStatus) => {
+    if (approverStatus === 0) {
+      setAlertMessage({
+        severity: "error",
+        message: "Approval is needed for the amended PO",
+      });
+      setAlertOpen(true);
+    } else {
+      navigate(`/CreateGrn/${purchaseOrderId}`)
+    }
+  }
+    const handleClickUpdate = (params) => {
+    if (params.row.approverStatus === 0) {
+      setAlertMessage({
+        severity: "error",
+        message: "Approval is needed for the amended PO",
+      });
+      setAlertOpen(true);
+    } else {
+      navigate(`/Poupdate/${params.row.purchaseOrderId}`)
+    }
+  }
   const columns = [
     { field: "institute", headerName: "Institute" },
     {
@@ -188,7 +209,7 @@ function AllPoList() {
           </IconButton>
         ) : (
           <IconButton
-            onClick={() => navigate(`/Poupdate/${params.row.purchaseOrderId}`)}
+            onClick={() => handleClickUpdate(params)}
           >
             <EditIcon fontSize="small" color="primary" />
           </IconButton>
@@ -201,9 +222,7 @@ function AllPoList() {
       headerName: "Create GRN",
       flex: 1,
       renderCell: (params) => {
-        const { grnCreationStatus, status, purchaseOrderId, requestType, amount } = params.row;
-        console.log();
-
+        const { grnCreationStatus, status, purchaseOrderId, requestType, amount, approverStatus } = params.row;
         if (grnCreationStatus !== null && status === "COMPLETED") {
           return (
             <IconButton onClick={() => handlePreview(purchaseOrderId, requestType, amount)}>
@@ -215,7 +234,7 @@ function AllPoList() {
         const iconColor = (status === "PENDING" && grnCreationStatus !== null) ? "#fbc02d" : "#43a047";
 
         return (
-          <IconButton onClick={() => navigate(`/CreateGrn/${purchaseOrderId}`)}>
+          <IconButton onClick={() => handleClick(purchaseOrderId, approverStatus)}>
             <AddCircleOutlineRoundedIcon fontSize="small" sx={{ color: iconColor }} />
           </IconButton>
         );
