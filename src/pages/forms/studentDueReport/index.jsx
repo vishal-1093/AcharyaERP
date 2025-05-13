@@ -60,8 +60,7 @@ const StudentDueReport = () => {
                     },
                     { field: "collegeDue", headerName: "College Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     { field: "addOn", headerName: "Add On", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "hostelFee", headerName: "Hostel Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "uniformAmount", headerName: "Uniform Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+                    { field: "hostelFee", headerName: "Hostel Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },                  
                     {
                         field: "total", headerName: "Total", flex: 1, align: 'right', headerAlign: 'right', headerClassName: "header-bg",
                         renderCell: (params) => {
@@ -107,7 +106,8 @@ const StudentDueReport = () => {
 
     const getNewAdmissionDues = () => {
         setLoading(true)
-        const baseUrl = "/api/student/newAddmissionsDueReport"
+        const baseUrl = (roleShortName === "SAA" || pathname === "/student-due-report") ? "/api/student/newAddmissionsDueReport" : "api/student/schoolWiseNewAddmissionsDueReport"
+       
         axios.get(baseUrl)
             .then(res => {
                 setShowButton(false)
@@ -309,7 +309,7 @@ const StudentDueReport = () => {
                     }
                 ])
                 const data = res.data.data
-                if (Object.keys(data)?.length == 0 || data?.studentWiseDueReports.length <= 0) {
+                if (data === null) {
                     setLoading(false)
                     setColumns([])
                     setRows([])
@@ -320,7 +320,7 @@ const StudentDueReport = () => {
                     { field: "studentName", headerName: "Student Name", flex: 1, headerClassName: "header-bg" },
                     { field: "auid", headerName: "AUID", flex: 1, headerClassName: "header-bg" },
                     { field: "templateName", headerName: "Fee Template", flex: 1, headerClassName: "header-bg" },
-                    { field: "year/sem", headerName: "Year/Sem", flex: 1, headerClassName: "header-bg",
+                    { field: "year/sem", headerName: "Year/Sem", flex: 1, align: 'center',  headerAlign: 'center', headerClassName: "header-bg",
                         renderCell: (params) => {
                             if(params?.row?.isLastRow){
                                 return <Typography></Typography>;
@@ -330,7 +330,7 @@ const StudentDueReport = () => {
                             return <Typography>{year}/{sem}</Typography>;
                         }
                      },
-                     { field: "currencyType", headerName: "Currency", flex: 1, headerClassName: "header-bg" },
+                     { field: "currencyType", headerName: "Currency", flex: 1, align: 'center',  headerAlign: 'center', headerClassName: "header-bg" },
                       {
                         field: "semDue", headerName: "Collage Due", flex: 1, type: "number", align: 'right', sortable: false,
                         headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
@@ -340,7 +340,17 @@ const StudentDueReport = () => {
                             return <Typography>{formatted}</Typography>;
                         }
                     },
+                    {
+                        field: "inrValue", headerName: "Collage Due (₹)", type: "number", minWidth: 150, align: 'right', sortable: false,
+                        headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
+                        renderCell: (params) => {
+                            const total = Number(params?.row?.inrValue) || 0;
+                            const formatted = new Intl.NumberFormat('en-IN').format(total);
+                            return <Typography>{formatted}</Typography>;
+                        }
+                    },
                     { field: "addOn", headerName: "Add On Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+                    { field: "hostelDue", headerName: "Hostel Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
                     {
                         field: "total", headerName: "Total Due", flex: 1, type: "number", align: 'right', sortable: false,
                         headerAlign: 'right', headerClassName: "header-bg", disableColumnMenu: true, pinned: true,
@@ -352,36 +362,23 @@ const StudentDueReport = () => {
                     }
                 ]
 
-                // const {
-                //     semisterWiseStudentDueReports, grantTotalDue, addOnTotal, semTotal } = data
-                // const rows = semisterWiseStudentDueReports.map((obj, i) => {
-                //     const { semDue, auid, studentName, templateName, currentYear, currentSem, addOnDue
-                //     } = obj
-                //     const semesterDue= exchangeRate ? semDue*exchangeRate : semDue
-                //     const totalDue = Number(semesterDue) + Number(addOnDue)
-                //     const grandTotal = exchangeRate ? grantTotalDue*exchangeRate : grantTotalDue
-
-                //     return {
-                //         id: i, total: totalDue, auid, studentName,
-                //         templateName, currentYear, currentSem, addOn: addOnDue ? addOnDue : 0, semDue: semesterDue
-                //     }
-                // })
                 const {
-                    semisterWiseStudentDueReports, grantTotalDue, addOnTotal, semTotal } = data
+                    semisterWiseStudentDueReports, grantTotalDue, addOnTotal, inrTotal, semTotal, hotstelTotal } = data
                 const rows = semisterWiseStudentDueReports.map((obj, i) => {
-                    const { semDue, auid, studentName, templateName, currentYear, currentSem, addOnDue
-                    } = obj
-                    const totalDue = Number(semDue) + Number(addOnDue)
-
+                    const { semDue, auid, studentName, templateName, currentYear, currentSem, addOnDue,
+                        currencyType, exchangeRate, inrValue, hostelDue } = obj
+                 //   const semesterDue= exchangeRate ? semDue*exchangeRate : semDue
+                    const totalDue = Number(inrValue || 0) + Number(addOnDue || 0) + Number(hostelDue || 0)
+                    console.log("totalDue", totalDue)
                     return {
-                        id: i, total: totalDue, auid, studentName,
-                        templateName, currentYear, currentSem, addOn: addOnDue ? addOnDue : 0, semDue
+                        id: i, total: totalDue, auid, studentName, currencyType, exchangeRate,
+                        templateName, currentYear, currentSem, inrValue, hostelDue: hostelDue || 0, addOn: addOnDue ? addOnDue : 0, semDue
                     }
                 })
 
                 rows.push({
-                    id: semisterWiseStudentDueReports?.length + 1, semDue: grantTotalDue,
-                    total: grantTotalDue + addOnTotal, isClickable: false, isLastRow: true, addOn: addOnTotal, auid: "", studentName: "", templateName: "", 
+                    id: Date.now(), semDue: semTotal, inrValue: inrTotal, hostelDue: hotstelTotal || 0,
+                    total: grantTotalDue, isClickable: false, isLastRow: true, addOn: addOnTotal, auid: "", studentName: "", templateName: "", 
                 })
 
 
@@ -466,7 +463,7 @@ const StudentDueReport = () => {
                 })
 
                 rows.push({
-                    id: studentWiseDueReports.length + 1, sem1: totalSem1, sem2: totalSem2, sem3: totalSem3,
+                    id: Date.now(), sem1: totalSem1, sem2: totalSem2, sem3: totalSem3,
                     sem4: totalSem4, sem5: totalSem5, sem6: totalSem6, sem7: totalSem7, sem8: totalSem8,
                     sem9: totalSem9, sem10: totalSem10, sem11: totalSem11, sem12: totalSem12,
                     total: grantTotalDue, isClickable: false, isLastRow: true, addOn: totalAddOn, hostelFee: totalhostelDue,
@@ -496,7 +493,7 @@ const StudentDueReport = () => {
             >
                 <Box sx={{ display: "flex", justifyContent: 'space-between', marginBottom: '10px' }}>
                     <CustomBreadCrumbs arr={breadCrumbs} />
-                    {/* {showButton ? (
+                    {showButton ? (
                         <Button
                             style={{ borderRadius: 7 }}
                             variant="contained"
@@ -505,7 +502,7 @@ const StudentDueReport = () => {
                         >
                             New Admissions
                         </Button>
-                    ) : <></>} */}
+                    ) : <></>}
                 </Box>
                 <GridIndex
                     initialState={{
