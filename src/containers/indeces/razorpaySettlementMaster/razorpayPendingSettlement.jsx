@@ -65,11 +65,11 @@ const RazorPayPendingSettlementDetail = () => {
       headerAlign: "center", 
       cellClassName: "rightAlignedCell" 
     },
-    {
-      field: "created_at",
-      headerName: "Created At",
-      flex: 1
-    },
+    // {
+    //   field: "created_at",
+    //   headerName: "Created At",
+    //   flex: 1
+    // },
   ];
 
   return (
