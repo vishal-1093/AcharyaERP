@@ -17,6 +17,8 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import moment from "moment/moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import EditIcon from "@mui/icons-material/Edit";
+import ForumIcon from "@mui/icons-material/Forum";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 
 const initialValues = {
   proctorId: null,
@@ -32,12 +34,16 @@ const initialValues = {
 const empID = JSON.parse(sessionStorage.getItem("userData"))?.emp_id;
 const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
 const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 function EmployeeProctorIndex() {
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
   const state = location.state;
   const { pathname } = useLocation();
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyData, setHistoryData] = useState([]);
 
   const navigate = useNavigate();
 
@@ -62,6 +68,18 @@ function EmployeeProctorIndex() {
   const [loading, setLoading] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [proctor, setProctor] = useState({});
+
+  const checks = {
+    meetingAgenda: [values.meetingAgenda !== ""],
+    description: [values.description !== ""],
+  };
+
+  const errorMessages = {
+    meetingAgenda: ["This field is required"],
+    description: ["This field is required"],
+  };
 
   useEffect(() => {
     // setCrumbs([{ name: "Proctor Master", link: "/ProctorMaster" }, { name: state?.concat_employee_name }]);
@@ -275,6 +293,125 @@ function EmployeeProctorIndex() {
       [name]: newValue,
     }));
   };
+  const handleHistory = async (params) => {
+    setHistoryOpen(true);
+    try {
+      const response = await axios.get(`api/getIvrCreationDataBasedOnEmp/${params.row.emp_id}`);
+      const sortedData = response.data.data.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+      setHistoryData(sortedData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleFeedback = async (params) => {
+    setValues((prev) => ({
+      ...prev,
+      "minutesOfMeeting": "",
+    }));
+    if (params?.row?.proctor_id) {
+      setFeedbackOpen(true);
+      setProctor(params?.row)
+    } else {
+
+    }
+  };
+  const callHistoryColumns = [
+    {
+      field: "studentName",
+      headerName: "Name",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          onClick={() =>
+            navigate(`/student-profile/${params.row.student_id}`, { state: true })
+          }
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            color: "primary.main",
+            textTransform: "capitalize",
+            cursor: "pointer",
+          }}
+        >
+          {params?.row?.studentName?.toLowerCase()}
+        </Typography>
+      ),
+    },
+    { field: "auid", headerName: "AUID", flex: 1, minWidth: 120 },
+    { field: "usn", headerName: "USN", flex: 1 },
+    { field: "callFrom", headerName: "Call From", flex: 1 },
+    { field: "relationship", headerName: "Call To", flex: 1 },
+    { field: "status", headerName: "status", flex: 1 },
+    {
+      field: "created_date",
+      headerName: "Call Time",
+      flex: 1,
+      valueFormatter: (value) =>
+        moment(value).format("DD-MM-YYYY HH:mm:ss"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY HH:mm:ss"),
+    },
+    { field: "customer", headerName: "Customer", flex: 1 },
+    {
+      field: "give feedback",
+      type: "actions",
+      flex: 1,
+      headerName: "Call Summarize",
+      getActions: (params) => {
+        return [
+          params?.row?.summarize ? (
+            <span>{params?.row?.summarize}</span>
+          ) : (
+            <IconButton label="" onClick={() => handleFeedback(params)}>
+              <ForumIcon />
+            </IconButton>
+          ),
+        ];
+      },
+    },
+    // {
+    //   field: "recording",
+    //   headerName: "Recording",
+    //   flex: 1,
+    //   minWidth: 300,
+    //   renderCell: (params) => (
+    //     <audio controls style={{ backgroundColor: 'transparent', border: 'none', width: '100%' }}>
+    //       <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3" />
+    //       Your browser does not support the audio element.
+    //     </audio>
+    //   ),
+    // },
+    {
+      field: "recording",
+      headerName: "Recording",
+      flex: 1,
+      minWidth: 300,
+      renderCell: (params) => {
+        const recordingUrl = params.row.recording;
+        if (!recordingUrl) {
+          return <span>No recording available</span>;
+        }
+        return (
+          <audio
+            controls
+            controlsList="nodownload"
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              width: '100%',
+              pointerEvents: roleId === 3 ? 'none' : 'auto'
+            }}
+          >
+            <source src={recordingUrl} type="audio/mp3" />
+            <source src={recordingUrl} type="audio/ogg" />
+            <source src={recordingUrl} type="audio/wav" />
+            Your browser does not support the audio element.
+          </audio>
+        );
+      },
+    }
+  ];
   const columns = [
     {
       field: "proctorHeadName",
@@ -314,6 +451,8 @@ function EmployeeProctorIndex() {
       field: "studentCount",
       headerName: "Mentees",
       flex: 1,
+      align: "right",
+      headerAlign: "right",
       hideable: false,
       renderCell: (params) => (
         <Typography
@@ -331,13 +470,34 @@ function EmployeeProctorIndex() {
         </Typography>
       ),
     },
-
+    {
+      field: "callCount",
+      type: "action",
+      align: "right",
+      headerAlign: "right",
+      flex: 1,
+      headerName: "IVR History",
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          onClick={() => handleHistory(params)}
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            color: "primary.main",
+            textTransform: "capitalize",
+            cursor: "pointer",
+          }}
+        >
+          {params.value}
+        </Typography>
+      )
+    },
     {
       field: "designation_short_name",
       headerName: "Designation",
       flex: 1,
     },
-    // { field: "email", headerName: "email", flex: 1, minWidth: 120 },
     // { field: "remarks", headerName: "remarks", flex: 1 },
     {
       field: "created_username",
@@ -389,6 +549,48 @@ function EmployeeProctorIndex() {
       });
       setModalOpen(true);
     }
+  };
+  const handleChange = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleCreateCall = async () => {
+    if (!values?.minutesOfMeeting) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all required fields",
+      });
+      setAlertOpen(true);
+      return
+    }
+    const temp = {};
+    temp.ivr_creation_id = proctor?.ivr_creation_id;
+    temp.summarize = values?.minutesOfMeeting;
+
+    await axios
+      .put(
+        `/api/updateIvrCreation/${proctor?.ivr_creation_id}`,
+        temp
+      )
+    await axios
+      .get(`/api/getIvrCreationData/${proctor.student_id}`)
+      .then((res) => {
+        setHistoryData(res.data.data);
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({ severity: "success", message: "Call summarize updated" });
+          setAlertOpen(true);
+          setFeedbackOpen(false);
+        }
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
   };
   return (
     <>
@@ -529,6 +731,48 @@ function EmployeeProctorIndex() {
             </Button>
           </Grid>
         </Grid>
+      </ModalWrapper>
+      <ModalWrapper open={historyOpen} setOpen={setHistoryOpen}
+        title={`History`}
+      >
+        <GridIndex rows={historyData} columns={callHistoryColumns} getRowId={row => row?.ivr_creation_id} />
+        <ModalWrapper
+          title="Call Summarize"
+          maxWidth={800}
+          open={feedbackOpen}
+          setOpen={setFeedbackOpen}
+        >
+          <Grid
+            container
+            justifyContent="flex-start"
+            alignItems="center"
+            rowSpacing={2}
+            columnSpacing={2}
+            marginTop={2}
+          >
+            <Grid item xs={12} md={8}>
+              <CustomTextField
+                multiline
+                rows={2}
+                name="minutesOfMeeting"
+                label="Minutes of meeting / Call output"
+                value={values.minutesOfMeeting}
+                handleChange={handleChange}
+                checks={checks.minutesOfMeeting}
+                errors={errorMessages.minutesOfMeeting}
+              />
+            </Grid>
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                onClick={handleCreateCall}
+                sx={{ borderRadius: 2 }}
+              >
+                Submit
+              </Button>
+            </Grid>
+          </Grid>
+        </ModalWrapper>
       </ModalWrapper>
     </>
   );
