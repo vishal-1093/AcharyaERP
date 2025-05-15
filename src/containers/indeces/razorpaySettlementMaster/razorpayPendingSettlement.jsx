@@ -59,17 +59,24 @@ const RazorPayPendingSettlementDetail = () => {
       headerName: "Settlement Utr",
       flex: 1,
     },
+    {
+      field: "bank_import_transaction_id",
+      headerName: "Bank Import",
+      flex: 1,
+      headerAlign: "center",
+      align:"center"
+    },
     { field: "credit", 
       headerName: "Amount", 
       flex: 1, 
       headerAlign: "center", 
       cellClassName: "rightAlignedCell" 
     },
-    {
-      field: "created_at",
-      headerName: "Created At",
-      flex: 1
-    },
+    // {
+    //   field: "created_at",
+    //   headerName: "Created At",
+    //   flex: 1
+    // },
   ];
 
   return (

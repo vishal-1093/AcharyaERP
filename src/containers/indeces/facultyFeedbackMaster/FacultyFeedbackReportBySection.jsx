@@ -153,6 +153,7 @@ const FacultyFeedbackReportBySection = () => {
 }
 
 const EmployeeDetails = ({ feedbackReportDetails, employeeImage, feedbackCount, sectionList }) => {
+  
     const Table = styled.table`
         width: 100%;
         border: 2px solid #000;
@@ -222,8 +223,9 @@ const EmployeeDetails = ({ feedbackReportDetails, employeeImage, feedbackCount, 
                     <TabelCell>Exp at Acharya : {feedbackReportDetails?.employeeDetails?.experience}</TabelCell>
                 </TableRow>
                 <TableRow>
-                    <TabelCell>Feedback Counts : {sectionList?.length < 2 ? feedbackCount : ""}</TabelCell>
+                    {/* <TabelCell>Feedback Counts : {sectionList?.length < 2 ? feedbackCount : ""}</TabelCell> */}
                     <TabelCell>Year/Sem : {`${feedbackReportDetails?.employeeDetails?.current_year}/${feedbackReportDetails?.employeeDetails?.current_sem}`}</TabelCell>
+                    <TabelCell>Course Name : {feedbackReportDetails?.employeeDetails?.course_name}</TabelCell>
                     <TabelCell>Subject Code : {feedbackReportDetails?.employeeDetails?.course_code}</TabelCell>
                 </TableRow>
             </tbody>
@@ -316,9 +318,9 @@ const QuestionList = ({ sectionList, feedbackReportDetails }) => {
                                                 </>
                                             )}
                                         </span>
-                                        {sectionList?.length > 1 && (
+                                        {/* {sectionList?.length > 1 && ( */}
                                             <span>Count: {section?.feedbackCount}</span>
-                                        )}
+                                        {/* )} */}
                                     </Box>
                                 </StyledTableCell>
                             })}

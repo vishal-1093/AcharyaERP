@@ -210,7 +210,7 @@ function RefreshmentBillingLockedIndex() {
           );
     
         // Chunk rows and columns into smaller arrays (e.g., 20 per page)
-        const rowChunks = chunkArray(list, 60); // 30 rows per page
+        const rowChunks = chunkArray(list, 25); // 30 rows per page
         const pages = [];
         rowChunks.forEach((rowChunk) => {
           pages.push({ rows: rowChunk});
