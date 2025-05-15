@@ -33,50 +33,11 @@ const bookmanFontPrint = {
   fontSize: "24px !important",
 };
 
-function StudentDetails({
-  id,
-  isStudentdataAvailable = () => {},
-  header = "",
-  isPrintClick = false,
-}) {
-  const [studentData, setStudentData] = useState(null);
-  const [loading, setLoading] = useState(true);
+function StudentDetailsByAuid({ isPrintClick, studentData }) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    getData();
-  }, [id]);
-
-  const getData = async () => {
-    try {
-      setLoading(true);
-
-      const url = `/api/student/studentDetailsByAuid/${id}`;
-
-      const response = await axios.get(url);
-
-      console.log("res", response);
-
-      setStudentData(response.data.data[0]);
-      isStudentdataAvailable(response.data.data[0]);
-    } catch (err) {
-      console.error("Error fetching student data:", err);
-      setError("Failed to fetch student details. Please try again later.");
-      isStudentdataAvailable({});
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getOrdinalSuffix = (number) => {
-    const suffixes = ["th", "st", "nd", "rd"];
-    const value = number % 100;
-
-    return (
-      number + (suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0])
-    );
-  };
+  console.log(studentData);
 
   const DisplayContent = ({ label, value }) => {
     return (
@@ -99,18 +60,6 @@ function StudentDetails({
     );
   };
 
-  if (loading) {
-    return (
-      <Typography
-        variant="subtitle2"
-        color="error"
-        sx={{ textAlign: "center" }}
-      >
-        Loading ....
-      </Typography>
-    );
-  }
-
   if (error) {
     return (
       <Typography
@@ -130,7 +79,7 @@ function StudentDetails({
         color="error"
         sx={{ textAlign: "center", marginBottom: 2 }}
       >
-        Admission is cancelled !!!
+        Student data not found
       </Typography>
     );
   }
@@ -139,441 +88,297 @@ function StudentDetails({
     navigate(`/student-ledger/${auid}`);
   };
 
-  return header ? (
+  return (
     <>
-      <Box
-        sx={{
-          border: "1px solid #e0e0e0",
-          borderRadius: 2,
-          overflow: "hidden",
-          mb: 2,
-        }}
-      >
-        <Box
-          sx={{
-            backgroundColor: "tableBg.main",
-            color: "tableBg.textColor",
-            textAlign: "center",
-            p: 1,
-            fontWeight: 500,
-            fontSize: "14px",
-          }}
-        >
-          <Typography
-            variant="subtitle2"
-            sx={isPrintClick ? bookmanFontPrint : bookmanFont}
-          >
-            {header ? header : "Student Details"}
-          </Typography>
-        </Box>
-
-        <Table size="small">
-          <TableBody>
-            <TableRow>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                AUID
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "15px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.auid || ""}
-                </span>
-              </TableCell>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                Student Name
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "15px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.student_name || ""}
-                </span>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                USN
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "12px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.usn ?? ""}
-                </span>
-              </TableCell>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                DOA
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "15px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.date_of_admission
-                    ? moment(studentData.date_of_admission).format("DD-MM-YYYY")
-                    : ""}
-                </span>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                Program
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "15px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.program_short_name} -{" "}
-                  {studentData.program_specialization_short_name}
-                </span>
-              </TableCell>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                Academic Batch
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "15px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.academic_batch || ""}
-                </span>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                Current Year/Sem
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "15px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.current_year}/{studentData.current_sem} -{" "}
-                  {studentData.section_name}
-                </span>
-              </TableCell>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                Fee Template
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "15px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.fee_template_name}
-                  {studentData?.program_type_name?.toLowerCase() === "semester"
-                    ? "S"
-                    : "Y"}{" "}
-                  - {studentData.fee_template_id}
-                </span>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                Nationality
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "15px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.nationalityName || ""}
-                </span>
-              </TableCell>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                Admission Category
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "15px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.fee_admission_category_short_name} -{" "}
-                  {studentData.fee_admission_sub_category_short_name}
-                </span>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                Acharya Email
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "15px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.acharya_email || ""}
-                </span>
-              </TableCell>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                }}
-              >
-                Mobile No.
-              </TableCell>
-              <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
-                <span>:</span>
-                <span
-                  style={{
-                    marginLeft: "15px",
-                    ...(isPrintClick ? bookmanFontPrint : bookmanFont),
-                  }}
-                >
-                  {studentData.mobile || ""}
-                </span>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </Box>
-    </>
-  ) : (
-    <Grid container>
-      <Grid item xs={12}>
-        <Card>
-          <CardHeader
-            title="Student Details"
-            titleTypographyProps={{
-              variant: "subtitle2",
-            }}
+      {studentData && (
+        <>
+          <Box
             sx={{
-              backgroundColor: "tableBg.main",
-              color: "tableBg.textColor",
-              textAlign: "center",
-              padding: 1,
+              border: "1px solid #e0e0e0",
+              borderRadius: 2,
+              overflow: "hidden",
+              mb: 2,
             }}
-          />
-          <CardContent>
-            <Grid container columnSpacing={2} rowSpacing={1}>
-              <DisplayContent label="AUID" value={studentData.auid} />
-              <DisplayContent
-                label="Student Name"
-                value={studentData.student_name}
-              />
-              <DisplayContent label="USN" value={studentData.usn ?? "-"} />
-              <DisplayContent
-                label="DOA"
-                value={moment(studentData.date_of_admission).format(
-                  "DD-MM-YYYY"
-                )}
-              />
-              {/* <DisplayContent label="School" value={studentData.school_name} /> */}
-              <DisplayContent
-                label="Program"
-                value={`${studentData.program_short_name} - ${studentData.program_specialization_short_name}`}
-              />
-              <DisplayContent
-                label="Academic Batch"
-                value={studentData.academic_batch}
-              />
-              <DisplayContent
-                label="Current Year/Sem"
-                value={`${studentData.current_year}/${studentData.current_sem} -     ${studentData.section_name} Section`}
-              />
-              <DisplayContent
-                label="Fee Template"
-                value={`${studentData.fee_template_name}${
-                  studentData?.program_type_name?.toLowerCase() === "semester"
-                    ? "S"
-                    : "Y"
-                } - ${studentData.fee_template_id}`}
-              />
-              <DisplayContent
-                label="Admission Category"
-                value={`${studentData.fee_admission_category_short_name} - ${studentData.fee_admission_sub_category_short_name}`}
-              />
-              <DisplayContent
-                label="Nationality"
-                value={studentData.nationalityName}
-              />
-              <DisplayContent
-                label="Proctor Name"
-                value={studentData.proctorName ?? "-"}
-              />
-              <DisplayContent
-                label="Reporting Status"
-                value={reportingStatus[studentData.eligible_reported_status]}
-              />
-              <DisplayContent
-                label="Acharya Email"
-                value={studentData.acharya_email}
-              />
-              <DisplayContent label="Mobile No." value={studentData.mobile} />
-              <Grid item xs={12} align="center" mt={2}>
-                {studentData.newStudentId ? (
-                  <Box
-                    sx={{ display: "flex", gap: 1, justifyContent: "center" }}
+          >
+            <Box
+              sx={{
+                backgroundColor: "tableBg.main",
+                color: "tableBg.textColor",
+                textAlign: "center",
+                p: 1,
+                fontWeight: 500,
+                fontSize: "14px",
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+              >
+                {"Student Details"}
+              </Typography>
+            </Box>
+
+            <Table size="small">
+              <TableBody>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
                   >
-                    <Typography
-                      variant="subtitle2"
-                      color="error"
-                      sx={{ fontSize: 13 }}
-                    >
-                      {`Student Re-Admitted, Current AUID is `}
-                    </Typography>
-                    <Typography
-                      variant="subtitle2"
-                      color="primary"
-                      onClick={() => handleAuid(studentData.newAuid)}
-                      sx={{
-                        fontSize: 13,
-                        cursor: "pointer",
-                        textDecoration: "underline",
-                        ...bookmanFont,
+                    AUID
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "15px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
                       }}
                     >
-                      {studentData.newAuid}
-                    </Typography>
-                  </Box>
-                ) : studentData.oldStudentId ? (
-                  <Box
-                    sx={{ display: "flex", gap: 1, justifyContent: "center" }}
+                      {studentData.auid || ""}
+                    </span>
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
                   >
-                    <Typography
-                      variant="subtitle2"
-                      color="error"
-                      sx={{ fontSize: 13 }}
-                    >
-                      {`Student Re-Admitted to ${getOrdinalSuffix(
-                        studentData.semOrYear
-                      )} ${
-                        studentData.program_type_name.toLowerCase() ===
-                        "semester"
-                          ? "Sem"
-                          : "Year"
-                      } in ${
-                        studentData.readmission_ac_year
-                      }. Previous AUID is `}
-                    </Typography>
-                    <Typography
-                      variant="subtitle2"
-                      color="primary"
-                      onClick={() => handleAuid(studentData.oldAuid)}
-                      sx={{
-                        fontSize: 13,
-                        cursor: "pointer",
-                        textDecoration: "underline",
-                        ...bookmanFont,
+                    Student Name
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "15px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
                       }}
                     >
-                      {studentData.oldAuid}
-                    </Typography>
-                  </Box>
-                ) : studentData.cancel_id ? (
-                  <Typography
-                    variant="subtitle2"
-                    color="error"
-                    sx={{ fontSize: 13 }}
+                      {studentData.student_name || ""}
+                    </span>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
                   >
-                    {`Admission Cancelled on  ${moment(
-                      studentData.approved_date
-                    ).format("DD-MM-YYYY")}.`}
-                  </Typography>
-                ) : (
-                  ""
-                )}
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
+                    USN
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "12px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                      }}
+                    >
+                      {studentData.usn ?? ""}
+                    </span>
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
+                  >
+                    DOA
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "15px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                      }}
+                    >
+                      {studentData.date_of_admission
+                        ? moment(studentData.date_of_admission).format(
+                            "DD-MM-YYYY"
+                          )
+                        : ""}
+                    </span>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
+                  >
+                    Program
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "15px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                      }}
+                    >
+                      {studentData.program_short_name} -{" "}
+                      {studentData.program_specialization_short_name}
+                    </span>
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
+                  >
+                    Academic Batch
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "15px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                      }}
+                    >
+                      {studentData.academic_batch || ""}
+                    </span>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
+                  >
+                    Current Year/Sem
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "15px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                      }}
+                    >
+                      {studentData.current_year}/{studentData.current_sem} -{" "}
+                      {studentData.section_name}
+                    </span>
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
+                  >
+                    Fee Template
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "15px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                      }}
+                    >
+                      {studentData.fee_template_name}
+                      {studentData?.program_type_name?.toLowerCase() ===
+                      "semester"
+                        ? "S"
+                        : "Y"}{" "}
+                      - {studentData.fee_template_id}
+                    </span>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
+                  >
+                    Nationality
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "15px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                      }}
+                    >
+                      {studentData.nationalityName || ""}
+                    </span>
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
+                  >
+                    Admission Category
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "15px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                      }}
+                    >
+                      {studentData.fee_admission_category_short_name} -{" "}
+                      {studentData.fee_admission_sub_category_short_name}
+                    </span>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
+                  >
+                    Acharya Email
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "15px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                      }}
+                    >
+                      {studentData.acharya_email || ""}
+                    </span>
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                    }}
+                  >
+                    Mobile No.
+                  </TableCell>
+                  <TableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                    <span>:</span>
+                    <span
+                      style={{
+                        marginLeft: "15px",
+                        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+                      }}
+                    >
+                      {studentData.mobile || ""}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </Box>
+        </>
+      )}
+    </>
   );
 }
 
-export default StudentDetails;
+export default StudentDetailsByAuid;
