@@ -452,7 +452,7 @@ function PoPdf() {
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Purchase Order", link: "/PoMaster" }]);
+    setCrumbs([{ name: location?.state?.pathName === "/Approvepo" ? "Approve PO" : "Purchase Order", link: location?.state?.pathName === "/Approvepo" ? "/Approvepo" : "/PoMaster" }]);
   }, []);
 
   useEffect(() => {
@@ -1400,7 +1400,7 @@ function PoPdf() {
 
   return (
     <>
-      <Box
+      {location.state.pathName !== "/Approvepo" && <Box
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -1417,7 +1417,7 @@ function PoPdf() {
         >
           <ForwardToInboxIcon fontSize="large" color="primary" />
         </IconButton>
-      </Box>
+      </Box>}
       <PDFViewer style={styles.viewer}>
         <Document title="Purchase Order">
           {paginatedData?.map((pageData, pageIndex) => (
