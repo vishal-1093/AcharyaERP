@@ -164,7 +164,7 @@ function LeaveApplyForm() {
   };
 
   const getTimeTableDetails = async () => {
-    if (leaveTypeData?.[values.leaveId]?.shortName === "OD" || values?.leaveType === "halfday" ) {
+    if (leaveTypeData?.[values.leaveId]?.shortName === "OD" || values?.leaveType === "halfday") {
       setTimeTableData([]);
       return null;
     }
@@ -285,10 +285,12 @@ function LeaveApplyForm() {
         }, {});
         const optionData = [];
         responseData.forEach((obj) => {
-          optionData.push({
-            value: obj.leave_id,
-            label: obj.leave_type,
-          });
+          if (![4, 5, 6].includes(obj.leave_id)) {
+            optionData.push({
+              value: obj.leave_id,
+              label: obj.leave_type,
+            });
+          }
         });
         setLeaveTypeOptions(optionData);
         setLeaveTypeData(createLeaveTypeData);
@@ -911,7 +913,7 @@ function LeaveApplyForm() {
                           handleChangeAdvance={handleChangeAdvance}
                           minDate={values.fromDate}
                           maxDate={
-                            ![3, 4,5,6].includes(values.leaveId)
+                            ![3, 4, 5, 6].includes(values.leaveId)
                               ? moment(values.fromDate).endOf("month").format()
                               : undefined
                           }

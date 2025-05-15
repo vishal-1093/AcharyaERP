@@ -47,6 +47,8 @@ function ProctorStudentAssignmentIndex() {
     pageSize: 100,
     total: 0,
   });
+    const [filterString, setFilterString] = useState("");
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
   const [proctorIds, setProctorIds] = useState([]);
@@ -74,7 +76,7 @@ function ProctorStudentAssignmentIndex() {
 
   useEffect(() => {
     getData();
-  }, [paginatedData.page, paginatedData.pageSize]);
+  }, [paginatedData.page, paginatedData.pageSize,filterString]);
 
   const checks = {
     meetingAgenda: [values.meetingAgenda !== ""],
@@ -93,6 +95,7 @@ function ProctorStudentAssignmentIndex() {
         page: page,
         page_size: pageSize,
         sort: "created_date",
+        ...(filterString && { keyword: filterString }),
       };
 
       if (proctorHeadID === undefined || proctorHeadID === null) {
@@ -183,7 +186,15 @@ function ProctorStudentAssignmentIndex() {
     setProctorIds(selectedRowsData.map((val) => val.id));
     setProctorData(selectedRowsData);
   };
-
+  const handleOnFilterChange = (value) => {
+    setFilterString(
+      value.items.length > 0
+        ? value.items[0].value === undefined
+          ? ""
+          : value.items[0].value
+        : value.quickFilterValues.join(" ")
+    );
+  };
   const handleAssign = async () => {
     const temp = [];
     const proctorAssignId = [];
@@ -681,6 +692,7 @@ function ProctorStudentAssignmentIndex() {
           loading={paginatedData.loading}
           checkboxSelection
           onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+          handleOnFilterChange={handleOnFilterChange}
         />
       </Box>
     </>
