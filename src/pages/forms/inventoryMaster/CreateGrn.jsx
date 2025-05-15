@@ -309,7 +309,7 @@ const CreateGrn = () => {
     temp.active = true;
     temp.vendorId = values.vendorId;
     temp.vendor = values.vendor;
-    temp.storeName = values.storeName;
+    // temp.storeName = values.storeName;
     temp.remarks = values.remarks;
     temp.quotationNo = values.quotationNo;
     temp.noOfDays = values.noOfDays;
@@ -322,7 +322,7 @@ const CreateGrn = () => {
     temp.institute = values.institute;
     temp.userId = userId;
     temp.userName = userName;
-    temp.storeId = values.storeId;
+    // temp.storeId = values.storeId;
     temp.poNo = values.poReferenceNo;
     temp.invoiceNo = values.invoiceNo;
     temp.invoiceDate = values.invoiceDate;
@@ -564,7 +564,7 @@ const CreateGrn = () => {
               handleChange={handleChangeRemarksInvoiceNO}
             />
           </Grid>
-          {values?.requestType === "GRN" ? (
+          {/* {values?.requestType === "GRN" ? (
             <Grid item xs={12} md={3}>
               <CustomAutocomplete
                 name="Store"
@@ -577,7 +577,7 @@ const CreateGrn = () => {
             </Grid>
           ) : (
             <></>
-          )}
+          )} */}
 
           <Grid item xs={12} md={3}>
             <CustomFileInput

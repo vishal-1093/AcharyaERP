@@ -803,6 +803,7 @@ function DirectPOCreation() {
                           label="Cost"
                           handleChange={(e) => handleChangeItems(e, i)}
                           required
+                          disabled
                         />
                       </Grid>
 
