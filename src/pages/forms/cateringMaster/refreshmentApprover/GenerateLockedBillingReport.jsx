@@ -10,7 +10,7 @@ import moment from "moment";
 
 const styles = StyleSheet.create({
   pageLayout: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: "Times-Roman",
   },
   layout: { margin: "20px 50px 0px 50px" },
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     margin: "50px"
   },
   userDetailStyle: {
-    fontSize: 16,
+    fontSize: 12,
     fontWight:"heavy",
     fontFamily: "Times-Bold",
   }
@@ -89,7 +89,7 @@ export const GenerateLockedBillingReport = (
         borderColor: "black",
         outline: "none",
         padding: "3px",
-        fontSize: type == "h" ? 16 : 10,
+        fontSize: 9,
         fontWeight: type == "h" ? "heavy":"",
         fontFamily: type == "h" ? "Times-Bold":"",
         marginRight: right === 0 ? 1 : 0,
@@ -104,9 +104,9 @@ export const GenerateLockedBillingReport = (
     </View>
   );
 
-  const BillData = ({ listData, pageIndex }) => (
+  const BillData = ({data, listData, pageIndex }) => (
     <View style={{ ...styles.layout}}>
-      <View style={{ marginBottom: "10px" }}><Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 18, textAlign: "center",fontWeight:"heavy",fontFamily:"Times-Bold" }}>{`${rowWiseData?.vendor_name} Bill For The Month Of ${getMonthName(rowWiseData?.month_year.slice(0, 2))}-${rowWiseData?.month_year.slice(3,)}`}</Text></View>
+      <View style={{ marginBottom: "10px" }}><Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 14, textAlign: "center",fontWeight:"heavy",fontFamily:"Times-Bold" }}>{`${rowWiseData?.vendor_name} Bill For The Month Of ${getMonthName(rowWiseData?.month_year.slice(0, 2))}-${rowWiseData?.month_year.slice(3,)}`}</Text></View>
       <View style={[styles.borderTable]}>
         <DispayRow>
           <DisplayCells
@@ -213,7 +213,7 @@ export const GenerateLockedBillingReport = (
             <DispayRow key={i}>
               <DisplayCells
                 key={i}
-                label={(pageIndex) * (60) + (i + 1)}
+                label={(pageIndex) * (25) + (i + 1)}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -313,7 +313,7 @@ export const GenerateLockedBillingReport = (
             </DispayRow>
           );
         })}
-        <DispayRow>
+        {(pageIndex+1) == data.length && <DispayRow>
           <DisplayCells
             label=""
             style="Times-Bold"
@@ -401,7 +401,7 @@ export const GenerateLockedBillingReport = (
             align="center"
             customWidth={3}
           />
-        </DispayRow>
+        </DispayRow>}
       </View>
     </View>
   );
@@ -430,20 +430,16 @@ export const GenerateLockedBillingReport = (
           {data.map((ele, index) => (
             <Page
               key={index}
-              size={type == "print" ? "A2" : "A3"}
+              size={"A3"}
               style={{ ...styles.pageLayout }}
             >
-              <BillData listData={ele} pageIndex={index} />
-
-              <View style={{ position: "absolute", bottom: 20, width: "100%" }}>
-                <Text style={{ textAlign: "center", fontSize: 12,fontFamily:"Times-Bold"}}>
+              <BillData data={data} listData={ele} pageIndex={index} />
+              <View style={{ position: "absolute", bottom: "25px", width: "100%" }}>
+                {type == "print" && index === data.length - 1 && <UserDetail />}
+                <Text style={{ textAlign: "center", fontSize: 12, fontFamily: "Times-Bold" }}>
                   Page {index + 1} of {data.length}
                 </Text>
               </View>
-
-              {type == "print" && index === data.length - 1 && <View style={{ position: "absolute", bottom: 100, width: "100%" }}>
-                <UserDetail />
-              </View>}
             </Page>
           ))}
         </Document>

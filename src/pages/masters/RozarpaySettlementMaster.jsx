@@ -2,9 +2,12 @@ import { useState, useEffect, lazy } from "react";
 import { Tabs, Tab } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
-//import RazarPaySettlementIndex from "../../containers/indeces/razorpaySettlementMaster/razorpayAllSettlementIndex";
+
 const RazorPaySettlementIndex = lazy(() =>
   import("../../containers/indeces/razorpaySettlementMaster/razorpayAllSettlementIndex")
+);
+const RazorPayMissingSettlement = lazy(() =>
+  import("../../containers/indeces/razorpaySettlementMaster/razorpayMissingSettlement")
 );
 
 function RazorPaySettlementMaster() {
@@ -37,7 +40,7 @@ function RazorPaySettlementMaster() {
         <Tab value="pending-settlement" label="Pending Settlement" />
       </Tabs>
       {tab === "all-settlement" && <RazorPaySettlementIndex />}
-      {tab === "pending-settlement" && <RazorPaySettlementIndex />}
+      {tab === "pending-settlement" && <RazorPayMissingSettlement />}
     </>
   );
 }

@@ -25,12 +25,14 @@ const initialValues = {
   auid: "",
 };
 
-function StudentLedger() {
+function StudentRefund() {
   const [values, setValues] = useState(initialValues);
   const [id, setId] = useState();
   const [loading, setLoading] = useState(false);
   const [allExpand, setAllExpand] = useState({});
   const [isPrintClick, setIsPrintClick] = useState(false);
+  const [studentData, setStudentData] = useState([]);
+  const [open, setOpen] = useState(false);
 
   const { auid } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -52,14 +54,8 @@ function StudentLedger() {
   };
 
   //   useEffect(() => {
-  //     if (auid) {
-  //       setValues((prev) => ({ ...prev, ["auid"]: auid }));
-  //     }
-  //   }, [auid]);
-
-  useEffect(() => {
-    handleSubmit();
-  }, [values.auid]);
+  //     handleSubmit();
+  //   }, [values.auid]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -67,23 +63,18 @@ function StudentLedger() {
   };
 
   const handleSubmit = async () => {
-    const { auid } = values;
     if (Object.values(checks).flat().includes(false)) return;
     try {
       setLoading(true);
-      const { data: response } = await axios.get(
-        `/api/student/getStudentDetailsByAuid/${values.auid}`
+      const response = await axios.get(
+        `/api/student/studentDetailsByAuidInactiveData/${values.auid}`
       );
-      const responseData = response.data;
-      if (Object.keys(responseData).length === 0) {
-        setAlertMessage({
-          severity: "error",
-          message: "AUID is not present !!",
-        });
-        setAlertOpen(true);
-        return;
+
+      if (response.data.data.length > 0) {
+        setOpen(true);
+        setStudentData(response.data.data[0]);
       } else {
-        setId(responseData.student_id);
+        setOpen(false);
       }
     } catch (err) {
       console.error(err);
@@ -156,7 +147,19 @@ function StudentLedger() {
                   </Button>
                 </Grid>
 
-                {id && (
+                {open && (
+                  <Grid item xs={12} id="ledger">
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                      <StudentDetailsByAuid studentData={studentData} />
+                      <StudentRefundDetails
+                        id={studentData?.student_id}
+                        studentDataResponse={studentData}
+                      />
+                    </Box>
+                  </Grid>
+                )}
+
+                {/* {id && (
                   <Grid item xs={12} id="ledger">
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                       <StudentDetailsByAuid
@@ -169,10 +172,11 @@ function StudentLedger() {
                       <StudentRefundDetails
                         id={id}
                         isPrintClick={isPrintClick}
+                        studentDataResponse={studentData}
                       />
                     </Box>
                   </Grid>
-                )}
+                )} */}
               </Grid>
             </CardContent>
           </Card>
@@ -182,4 +186,4 @@ function StudentLedger() {
   );
 }
 
-export default StudentLedger;
+export default StudentRefund;

@@ -1729,6 +1729,14 @@ const StudentRefund = lazy(() =>
   import("./pages/forms/studentMaster/StudentRefund.jsx")
 );
 
+const StudentRefundIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/StudentRefundIndex.jsx")
+);
+
+const StudentRefundPdf = lazy(() =>
+  import("./pages/forms/studentMaster/StudentRefundPdf.jsx")
+);
+
 const DailyCounterSummaryIndex = lazy(() =>
   import("./containers/indeces/studentMaster/DailyCounterSummaryIndex")
 );
@@ -8524,6 +8532,36 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentRefund />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/StudentRefundIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentRefundIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/StudentRefundIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentRefundIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/StudentRefundPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentRefundPdf />
               </Suspense>
             }
           />

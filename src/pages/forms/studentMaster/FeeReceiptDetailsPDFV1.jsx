@@ -670,12 +670,12 @@ const FeeReceiptDetailsPDFNew = () => {
                     : studentData?.transaction_type}
                 </Typography>
 
-                {/* <Typography variant="body1" sx={bookmanFont}>
+                <Typography variant="body1" sx={bookmanFont}>
                   <strong>Trn_date :</strong>{" "}
                   {studentData?.transaction_date
                     ? moment(studentData?.transaction_date).format("DD-MM-YYYY")
                     : "NA"}
-                </Typography> */}
+                </Typography>
               </Box>
             )}
 
