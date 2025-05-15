@@ -90,8 +90,8 @@ const salaryReportTypeList = [
 ];
 
 const bankList = [
-  { value: "yesbank", label: "Yes Bank" },
-  { value: "others", label: "Others" },
+  { value: "YES BANK", label: "Yes Bank" },
+  { value: "other", label: "Others" },
 ];
 
 const initialState = {
@@ -107,11 +107,26 @@ const initialState = {
   attendanceRows: [],
   earningRows: [],
   deductionRows: [],
-  schoolRows: []
+  schoolRows: [],
+  bankTotalNetPay:0,
+  licTotal:0,
+  esiTotal:0,
+  advanceTotal:0,
+  tdsTotal:0,
+  ptTotal:0,
+  grossEarningTotal:0,
+  totalEarning:0,
+  esimTotal:0,
+  esiGrossEarningTotal:0,
+  schoolNetPayTotal:0,
+  schoolShortName:"",
+  epfRows:[]
 };
 
 const SalaryMisIndex = () => {
-  const [{ schoolId, loading, schoolList, bank, salaryReportType, date, rows, attendanceRows, earningRows, deductionRows, schoolRows }, setState] = useState(initialState);
+  const [{ schoolId, loading, schoolList,schoolShortName, bank, salaryReportType, date, rows, attendanceRows, earningRows, deductionRows,
+    schoolRows,bankTotalNetPay,licTotal,esiTotal,advanceTotal,tdsTotal,ptTotal,grossEarningTotal,totalEarning ,
+    esimTotal,esiGrossEarningTotal,schoolNetPayTotal,epfRows}, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const [reportPath, setReportPath] = useState(null);
@@ -142,7 +157,7 @@ const SalaryMisIndex = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          schoolList: res.data.data.map((ele) => ({ value: ele.school_id, label: ele.school_name }))
+          schoolList: res.data.data.map((ele) => ({ value: ele.school_id, label: ele.school_name,schoolShortName:ele.school_name_short }))
         }))
       }
     } catch (error) {
@@ -163,9 +178,9 @@ const SalaryMisIndex = () => {
         setLoading(true);
         const apiUrl = `api/employee/employeePayHistoryReport`;
         const res = await axios.get((!schoolId && !bank && date) ? `${apiUrl}?month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` :
-          (schoolId && bank && date) ? `${apiUrl}?schoolId=${schoolId}&bank_id=${bank}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` :
+          (schoolId && bank && date) ? `${apiUrl}?schoolId=${schoolId}&bankId=${bank}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` :
             (schoolId && !bank && date) ? `${apiUrl}?schoolId=${schoolId}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` :
-              (!schoolId && bank && date) ? `${apiUrl}?bank_id=${bank}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` : "");
+              (!schoolId && bank && date) ? `${apiUrl}?bankId=${bank}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` : "");
         if (res.status == 200 || res.status == 201) {
           setState((prevState) => ({
             ...prevState,
@@ -176,7 +191,32 @@ const SalaryMisIndex = () => {
                     type == "tds" ? res.data.data?.filter((ele) => ele.tds !== null && ele.tds !== 0) :
                       type == "pt" ? res.data.data?.filter((ele) => ele.pt !== 0) :
                         res.data.data,
-            loading: false
+            loading: false,
+            bankTotalNetPay: res.data.data?.filter((ele) => ele.netpay !== 0)?.reduce((acc, curr) => acc + curr.netpay, 0),
+            licTotal: res.data.data?.filter((ele) => ele.lic !== 0)?.reduce((acc, curr) => acc + curr.lic, 0),
+
+            esiTotal: res.data.data?.filter((ele) => ele.esi !== 0)?.reduce((acc, curr) => acc + curr.esi, 0),
+            esiGrossEarningTotal: res.data.data?.filter((ele) => ele.esi !== 0)?.reduce((acc, curr) => acc + curr.gross_pay, 0),
+            esimTotal: res.data.data?.filter((ele) => ele.esi !== 0)?.reduce((acc, curr) => acc + curr.esi_contribution_employee, 0),
+            advanceTotal: res.data.data?.filter((ele) => ele.advance !== 0)?.reduce((acc, curr) => acc + curr.advance, 0),
+
+            tdsTotal: res.data.data?.filter((ele) => ele.tds !== null && ele.tds !== 0)?.reduce((acc, curr) => acc + curr.tds, 0),
+            grossEarningTotal : res.data.data?.filter((ele) => ele.tds !== null && ele.tds !== 0)?.reduce((acc, curr) => acc + curr.gross_pay, 0),
+            ptTotal: res.data.data?.filter((ele) => ele.pt !== 0)?.reduce((acc, curr) => acc + curr.pt, 0),
+            totalEarning :  res.data.data?.filter((ele) => ele.pt !== 0)?.reduce((acc, curr) => acc + curr.total_earning, 0),
+
+            epfRows : res.data.data.map((ep,index)=>({
+              id:index+1,
+              grossWages: ep.pf_earnings,
+              edliWages: ep.pf_earnings,
+              epfWages: ep.pf_earnings,
+              epsWages: ep.pf_earnings,
+              epscontriRemitted : ep.pension_fund,
+              epfContriRemitted : ep.pf,
+              epfEpsDiffRemitted : ep.epf_difference,
+              ...ep
+            }))
+
           }));
         }
       } else if (date && (type !== "school" && type == "summary")) {
@@ -226,6 +266,7 @@ const SalaryMisIndex = () => {
           setState((prevState) => ({
             ...prevState,
             schoolRows: res.data.data.map((ele, index) => ({ id: index + 1, ...ele })),
+            schoolNetPayTotal : res.data.data?.reduce((acc,curr)=>acc + curr?.totalNetPay,0),
             loading: false
           }));
         }
@@ -241,12 +282,22 @@ const SalaryMisIndex = () => {
   };
 
   const handleChangeAdvance = (name, newValue) => {
+    if(name == "schoolId"){
+      getSchoolShortName(newValue)
+    };
     if(name == "salaryReportType"){
       clearRow(newValue);
-    }
+    };
     setState((prevState) => ({
       ...prevState,
       [name]: newValue
+    }))
+  };
+
+  const getSchoolShortName = (newValue) => {
+    setState((prevState)=>({
+      ...prevState,
+      schoolShortName: schoolList.find((ele)=>ele.value == newValue)?.schoolShortName
     }))
   };
 
@@ -254,6 +305,7 @@ const SalaryMisIndex = () => {
     setState((prevState) => ({
       ...prevState,
       rows:[],
+      epfRows:[],
       earningRows:[],
       deductionRows:[],
       attendanceRows:[],
@@ -267,13 +319,13 @@ const SalaryMisIndex = () => {
       field: "bank_id",
       headerName: "Bank",
       flex: 1,
-      hide:false
+      hide:true
     },
     {
       field: "bank_ifsccode",
       headerName: "IFSC No",
       flex: 1,
-      hide:false
+      hide:true
     },
     {
       field: "bank_account_no",
@@ -282,7 +334,7 @@ const SalaryMisIndex = () => {
       hide:false
     },
     { field: "empcode", headerName: "Emp Code", flex: 1,hide:false },
-    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1,hide:false },
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1,hide:true },
     { field: "employee_name", headerName: "Name", flex: 2,hide:false },
     { field: "date_of_joining", headerName: "DOJ", flex: 1,hide:true },
     {
@@ -311,161 +363,216 @@ const SalaryMisIndex = () => {
       hide:false
     },
   ];
+
+  const bankPrintColumns = [
+
+    { field: "empcode", headerName: "Emp Code", flex: 1,hide:false },
+    { field: "employee_name", headerName: "Emp Name", flex: 2,hide:false },
+        {
+      field: "bank_account_no",
+      headerName: "Bank Account No.",
+      flex: 1,
+      hide:false
+    },
+    {
+      field: "netpay",
+      headerName: "Net Amount",
+      flex: 1,
+      type: "number",
+      hide:false
+    },
+  ];
+
   const licColumns = [
-    { field: "empcode", headerName: "Emp Code", flex: 1 },
-    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1 },
-    { field: "employee_name", headerName: "Name", flex: 2 },
-    { field: "date_of_joining", headerName: "DOJ", flex: 1 },
+    { field: "empcode", headerName: "Emp Code", flex: 1,hide:false },
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1,hide:true  },
+    { field: "employee_name", headerName: "Name", flex: 2,hide:false  },
+    { field: "date_of_joining", headerName: "DOJ", flex: 1,hide:true },
     {
       field: "schoolShortName",
       headerName: "Inst",
       flex: 1,
+      hide:true
     },
     {
       field: "departmentShortName",
       headerName: "Dept",
-      flex: 1
+      flex: 1,
+      hide:true 
     },
     {
       field: "designationShortName",
       headerName: "Desig",
-      flex: 1
+      flex: 1,
+      hide:true 
     },
-    { field: "lic_number", headerName: "LIC Policy No.", type: "number", flex: 1 },
+    { field: "lic_number", headerName: "LIC Policy No.", type: "number", flex: 1,hide:false },
     {
       field: "lic",
       headerName: "LIC Amount",
       type: "number",
       flex: 1,
+      hide:false
     },
   ];
   const esiColumns = [
-    { field: "empcode", headerName: "Emp Code", flex: 1 },
-    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1 },
-    { field: "employee_name", headerName: "Name", flex: 2 },
-    { field: "date_of_joining", headerName: "DOJ", flex: 1 },
+    { field: "empcode", headerName: "Emp Code", flex: 1,hide:false },
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1,hide:true },
+    { field: "employee_name", headerName: "Name", flex: 2,hide:false },
+    { field: "date_of_joining", headerName: "DOJ", flex: 1,hide:true },
     {
       field: "schoolShortName",
       headerName: "Inst",
       flex: 1,
+      hide:true
     },
     {
       field: "departmentShortName",
       headerName: "Dept",
-      flex: 1
+      flex: 1,
+      hide:true
     },
     {
       field: "designationShortName",
       headerName: "Desig",
-      flex: 1
+      flex: 1,
+      hide:true
     },
-    { field: "pay_days", headerName: "Pay Days", flex: 1 },
-    { field: "gross_pay", headerName: "ESI Earning", type: "number", flex: 1 },
-    { field: "esi", headerName: "ESIE", type: "number", flex: 1 },
-    { field: "esi_contribution_employee", headerName: "ESIM", type: "number", flex: 1 },
+    { field: "pay_days", headerName: "Pay Days", flex: 1 ,  hide:false},
+    { field: "gross_pay", headerName: "ESI Earning", type: "number", flex: 1,  hide:false },
+    { field: "esi", headerName: "ESIE", type: "number", flex: 1 ,  hide:false},
+    { field: "esi_contribution_employee", headerName: "ESIM", type: "number", flex: 1 ,  hide:false},
   ];
   const epfColumns = [
-    { field: "uan_no", headerName: "UAN", flex: 1 },
-    { field: "empcode", headerName: "Emp Code", flex: 1 },
-    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1 },
-    { field: "employee_name", headerName: "Name", flex: 2 },
-    { field: "date_of_joining", headerName: "DOJ", flex: 1 },
+    { field: "uan_no", headerName: "UAN", flex: 1,hide:true },
+    { field: "empcode", headerName: "Emp Code", flex: 1,hide:false  },
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1,hide:true },
+    { field: "employee_name", headerName: "Name", flex: 2,hide:false },
+    { field: "date_of_joining", headerName: "DOJ", flex: 1,hide:true },
     {
       field: "schoolShortName",
       headerName: "Inst",
       flex: 1,
+      hide:true
     },
     {
       field: "departmentShortName",
       headerName: "Dept",
-      flex: 1
+      flex: 1,
+      hide:true
     },
     {
       field: "designationShortName",
       headerName: "Desig",
-      flex: 1
+      flex: 1,
+      hide:true
     },
-    { field: "gross", headerName: "Gross Wages", flex: 1 },
-    { field: "EPF_wages", headerName: "EPF Wages", flex: 1 },
-    { field: "EPS_wages", headerName: "EPS Wages", flex: 1 },
-    { field: "EDLI", headerName: "EDLI Wages", flex: 1 },
-    { field: "EPF", headerName: "EPF Contri remitted", flex: 1 },
-    { field: "EPS", headerName: "EPS Contri remitted", flex: 1 },
-    { field: "EPF_EPS", headerName: "EPF EPS Diff remitted", flex: 1 },
-    { field: "NCP", headerName: "NCP Days", flex: 1 },
-    { field: "Refund", headerName: "Refund Of Advances", flex: 1 }
+    { field: "grossWages", headerName: "Gross Wages", flex: 1,type:"number", hide:false },
+    { field: "epfWages", headerName: "EPF Wages", flex: 1,type:"number", hide:false },
+    { field: "epsWages", headerName: "EPS Wages", flex: 1,type:"number", hide:false },
+    { field: "edliWages", headerName: "EDLI Wages", flex: 1,type:"number", hide:false },
+    { field: "epfContriRemitted", headerName: "EPF Contri remitted", flex: 1,type:"number", hide:false },
+    { field: "epscontriRemitted", headerName: "EPS Contri remitted", flex: 1,type:"number", hide:false },
+    { field: "epfEpsDiffRemitted", headerName: "EPF EPS Diff remitted", flex: 1,type:"number", hide:false },
+    { field: "NCP", headerName: "NCP Days", flex: 1,type:"number", hide:false },
+    { field: "Refund", headerName: "Refund Of Advances", flex: 1,type:"number", hide:false }
   ];
   const ptColumns = [
-    { field: "empcode", headerName: "Emp Code", flex: 1 },
-    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1 },
-    { field: "employee_name", headerName: "Name", flex: 2 },
-    { field: "date_of_joining", headerName: "DOJ", flex: 1 },
+    { field: "empcode", headerName: "Emp Code", flex: 1,hide:false },
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1,hide:true },
+    { field: "employee_name", headerName: "Name", flex: 2,hide:false },
+    { field: "date_of_joining", headerName: "DOJ", flex: 1 ,hide:true},
     {
       field: "schoolShortName",
       headerName: "Inst",
       flex: 1,
+      hide:true
     },
     {
       field: "departmentShortName",
       headerName: "Dept",
-      flex: 1
+      flex: 1,
+      hide:true
     },
     {
       field: "designationShortName",
       headerName: "Desig",
-      flex: 1
+      flex: 1,
+      hide:true
     },
-    { field: "total_earning", headerName: "Gross Amount", type: "number", flex: 1 },
-    { field: "pt", headerName: "Deduction Amount", type: "number", flex: 1 },
+    { field: "total_earning", headerName: "Gross Amount", type: "number", flex: 1,hide:false },
+    { field: "pt", headerName: "Deduction Amount", type: "number", flex: 1,hide:false },
   ];
 
   const advanceColumns = [
-    { field: "empcode", headerName: "Emp Code", flex: 1 },
-    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1 },
-    { field: "employee_name", headerName: "Name", flex: 2 },
-    { field: "date_of_joining", headerName: "DOJ", flex: 1 },
+    { field: "empcode", headerName: "Emp Code", flex: 1,hide:false },
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1,hide:true },
+    { field: "employee_name", headerName: "Name", flex: 2,hide:false },
+    { field: "date_of_joining", headerName: "DOJ", flex: 1 ,hide:true},
     {
       field: "schoolShortName",
       headerName: "Inst",
       flex: 1,
+      hide:true
     },
     {
       field: "departmentShortName",
       headerName: "Dept",
-      flex: 1
+      flex: 1,
+      hide:true
     },
     {
       field: "designationShortName",
       headerName: "Desig",
-      flex: 1
+      flex: 1,
+      hide:true
     },
-    { field: "advance", headerName: "Advance Amount", type: "number", flex: 1 }
+    { field: "advance", headerName: "Advance Amount", type: "number", flex: 1,hide:false }
   ];
 
   const tdsColumns = [
-    { field: "empcode", headerName: "Emp Code", flex: 1 },
-    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1 },
-    { field: "employee_name", headerName: "Name", flex: 2 },
-    { field: "date_of_joining", headerName: "DOJ", flex: 1 },
+    { field: "empcode", headerName: "Emp Code", flex: 1,hide:false },
+    { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1,hide:true },
+    { field: "employee_name", headerName: "Name", flex: 2,hide:false },
+    { field: "date_of_joining", headerName: "DOJ", flex: 1,hide:true },
     {
       field: "schoolShortName",
       headerName: "Inst",
       flex: 1,
+      hide:true
     },
     {
       field: "departmentShortName",
       headerName: "Dept",
-      flex: 1
+      flex: 1,
+      hide:true
     },
     {
       field: "designationShortName",
       headerName: "Desig",
-      flex: 1
+      flex: 1,
+      hide:true
     },
-    { field: "gross_pay", headerName: "Gross Earning", type: "number", flex: 1 },
-    { field: "tds", headerName: "TDS", type: "number", flex: 1 }
+    { field: "gross_pay", headerName: "Gross Earning", type: "number", flex: 1,hide:false },
+    { field: "tds", headerName: "TDS", type: "number", flex: 1,hide:false }
   ];
 
+  const schoolColumns = [
+     { field: "bankId", headerName: "Bank", flex: 1,hide:false },
+     {  field: "schoolNameShort", headerName: "Inst", flex: 1,hide:false },
+     { field: "totalNetPay", headerName: "Amount", flex: 1,hide:false }
+  ];
+
+  const attendanceColumns = [
+    { field: "name", headerName: "Attendance Summary", flex: 1, hide: false },
+    { field: "value", headerName: "Count", flex: 1, hide: false }
+  ];
+
+  const particularsColumns = [
+    { field: "name", headerName: "Particulars", flex: 1, hide: false },
+    { field: "value", headerName: "Amount", flex: 1, hide: false }
+  ];
+  
   
   const onClickPrint = async () => {
     const chunkArray = (array, chunkSize) =>
@@ -473,15 +580,28 @@ const SalaryMisIndex = () => {
         array.slice(i * chunkSize, i * chunkSize + chunkSize)
       );
 
-    const rowChunks = chunkArray(rows, 35);
+    const list = salaryReportType == "school" ? schoolRows :
+      salaryReportType == "epf" ? epfRows : rows; 
+
+    const pageSNo = salaryReportType == "lic" ? 35 : salaryReportType == "epf" ? 30 : 40;
+
+    const rowChunks = chunkArray(list, pageSNo);
     const pages = [];
     rowChunks.forEach((rowChunk) => {
       pages.push({ rows: rowChunk });
     });
-    const netPayTotalPay = rows.reduce((sum,acc)=>sum + acc.netpay,0)
-    const reportResponse = await GenerateSalaryMisReport(salaryReportType, pages, date,(salaryReportType == "bank"? bankReportColumns : 
+
+    const grandTotal = salaryReportType == "bank" ? bankTotalNetPay:
+    salaryReportType == "lic" ? licTotal : salaryReportType == "advance" ? advanceTotal : salaryReportType == "tds" ? tdsTotal :
+    salaryReportType == "pt" ? ptTotal : salaryReportType == "esi" ? esiTotal : salaryReportType =="school" ? schoolNetPayTotal : 0;
+
+    const earningTotal = salaryReportType == "tds" ? grossEarningTotal :
+    salaryReportType == "pt" ? totalEarning : salaryReportType == "esi" ? esiGrossEarningTotal : 0;
+
+    const reportResponse = await GenerateSalaryMisReport(schoolShortName,pageSNo,salaryReportType, pages, date,(salaryReportType == "bank"? bankPrintColumns : 
       salaryReportType == "lic"? licColumns : salaryReportType == "tds"? tdsColumns: salaryReportType == "advance"? advanceColumns:
-      salaryReportType == "pt"? ptColumns : salaryReportType == "esi"? esiColumns: []),(salaryReportType == "bank"? netPayTotalPay:0));
+      salaryReportType == "pt"? ptColumns : salaryReportType == "esi"? esiColumns: salaryReportType=="epf" ? epfColumns : salaryReportType == "school" ? schoolColumns : []),grandTotal,earningTotal,esimTotal,
+    attendanceColumns,attendanceRows,particularsColumns,earningRows,deductionRows);
     if (!!reportResponse) {
       setReportPath(URL.createObjectURL(reportResponse));
       setIsPrintModalOpen(!isPrintModalOpen);
@@ -540,22 +660,15 @@ const SalaryMisIndex = () => {
             variant="contained"
             disableElevation
             startIcon={<PrintIcon />}
-          disabled={loading || salaryReportType !=="bank"}
+          disabled={loading || (rows?.length == 0 && salaryReportType !== "summary" && salaryReportType !=="school")} 
           onClick={onClickPrint}
           >
-            {/* {loading ? (
-              <CircularProgress
-                size={20}
-                style={{ margin: "2px 13px" }}
-              />
-            ) : ( */}
             Print
-            {/* )} */}
           </Button>
         </Grid>
       </Grid>
       {!(salaryReportType == "summary" || salaryReportType == "school") ? <Box mt={1} sx={{ position: "absolute", width: "100%" }}>
-        <GridIndex rows={rows}
+        <GridIndex rows={salaryReportType == "epf" ? epfRows: rows}
           columns={salaryReportType == "bank" ? bankReportColumns : salaryReportType == "lic" ? licColumns : salaryReportType == "esi" ? esiColumns :
             salaryReportType == "epf" ? epfColumns : salaryReportType == "pt" ? ptColumns : salaryReportType == "advance" ? advanceColumns :
               salaryReportType == "tds" ? tdsColumns : []}
