@@ -197,7 +197,7 @@ function PoPaymentList() {
           style={{ color: "blue", cursor: "pointer" }}
           onClick={() =>
             navigate(
-              `/payment-voucher-pdf/${params.row.journalVoucherNumber}`,
+              `/payment-voucher-pdf/${params.row.paymentVoucherId}`,
               {
                 state: { advancePdfStatus: true },
               }
