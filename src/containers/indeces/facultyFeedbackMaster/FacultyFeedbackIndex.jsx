@@ -43,12 +43,15 @@ const FacultyFeedbackIndex = () => {
       )?.roleShortName;
 
     useEffect(() => {
+
         setCrumbs([
             { name: "Faculty Feedback" }
         ])
+
         getSchoolDetails();
         getAcademicYearDetails();
         getData();
+        
     }, []);
 
     useEffect(() => {

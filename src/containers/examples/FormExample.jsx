@@ -94,7 +94,7 @@ function FormExample() {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
 
-  // checks for every field
+ 
   const checks = {
     name: [values.name !== ""],
     email: [
@@ -223,6 +223,7 @@ function FormExample() {
       "Maximum size 2 MB",
     ],
   };
+
   const toppingOptions = [
     { value: 0, label: "Mushroom" },
     { value: 1, label: "Tomato" },
@@ -262,6 +263,7 @@ function FormExample() {
       [name]: options.map((obj) => obj.value),
     }));
   };
+  
   const handleSelectNone = (name) => {
     setValues((prev) => ({ ...prev, [name]: [] }));
   };
