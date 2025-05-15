@@ -201,7 +201,7 @@ function RefreshmentBillingLockedIndex() {
 
   const onClickPrint = async (rowData,type) => {
     try {
-      const res = await axios.get(`/api/fetchAllMealBillDetails?page=0&page_size=10000000&sort=created_date&bill_number=${rowData.bill_number}`);
+      const res = await axios.get(`/api/fetchAllMealBillDetails?page=0&page_size=10000000&sort=created_date&bill_number=${rowData.bill_number}&school_id=${rowData.school_id}&financial_year_id=${rowData.financial_year_id}`);
       if(res.status == 200 || res.status == 201){
         const list = res.data.data.Paginated_data.content.reverse();
         const chunkArray = (array, chunkSize) =>

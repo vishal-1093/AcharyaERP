@@ -182,6 +182,19 @@ const SalaryMisIndex = () => {
             (schoolId && !bank && date) ? `${apiUrl}?schoolId=${schoolId}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` :
               (!schoolId && bank && date) ? `${apiUrl}?bankId=${bank}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` : "");
         if (res.status == 200 || res.status == 201) {
+          const epfList  = res.data.data?.map((ep,index)=>({
+              id:index+1,
+              grossWages: ep.pf_earnings,
+              edliWages: ep.pf_earnings,
+              epfWages: ep.pf_earnings,
+              epsWages: ep.pf_earnings,
+              epscontriRemitted : ep.pension_fund,
+              epfContriRemitted : ep.pf,
+              epfEpsDiffRemitted : ep.epf_difference,
+              ncpDays:0,
+              refundOfAdvances:0,
+              ...ep
+            }))?.filter((li)=>li.pf_earnings !==0 || li.pension_fund !==0 || li.pf !==0 || li.epf_difference !==0);
           setState((prevState) => ({
             ...prevState,
             rows: type == "bank" ? res.data.data?.filter((ele) => ele.netpay !== 0) :
@@ -204,19 +217,7 @@ const SalaryMisIndex = () => {
             grossEarningTotal : res.data.data?.filter((ele) => ele.tds !== null && ele.tds !== 0)?.reduce((acc, curr) => acc + curr.gross_pay, 0),
             ptTotal: res.data.data?.filter((ele) => ele.pt !== 0)?.reduce((acc, curr) => acc + curr.pt, 0),
             totalEarning :  res.data.data?.filter((ele) => ele.pt !== 0)?.reduce((acc, curr) => acc + curr.total_earning, 0),
-
-            epfRows : res.data.data.map((ep,index)=>({
-              id:index+1,
-              grossWages: ep.pf_earnings,
-              edliWages: ep.pf_earnings,
-              epfWages: ep.pf_earnings,
-              epsWages: ep.pf_earnings,
-              epscontriRemitted : ep.pension_fund,
-              epfContriRemitted : ep.pf,
-              epfEpsDiffRemitted : ep.epf_difference,
-              ...ep
-            }))
-
+            epfRows : epfList
           }));
         }
       } else if (date && (type !== "school" && type == "summary")) {
@@ -474,8 +475,8 @@ const SalaryMisIndex = () => {
     { field: "epfContriRemitted", headerName: "EPF Contri remitted", flex: 1,type:"number", hide:false },
     { field: "epscontriRemitted", headerName: "EPS Contri remitted", flex: 1,type:"number", hide:false },
     { field: "epfEpsDiffRemitted", headerName: "EPF EPS Diff remitted", flex: 1,type:"number", hide:false },
-    { field: "NCP", headerName: "NCP Days", flex: 1,type:"number", hide:false },
-    { field: "Refund", headerName: "Refund Of Advances", flex: 1,type:"number", hide:false }
+    { field: "ncpDays", headerName: "NCP Days", flex: 1,type:"number", hide:false },
+    { field: "refundOfAdvances", headerName: "Refund Of Advances", flex: 1,type:"number", hide:false }
   ];
   const ptColumns = [
     { field: "empcode", headerName: "Emp Code", flex: 1,hide:false },

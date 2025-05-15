@@ -135,9 +135,11 @@ export const GenerateSalaryMisReport = (
                     bottom={1}
                     customWidth={c.field == "employee_name" ? 3 : c.field == "bank_account_no" ? 2 : c.field == "bank_ifsccode" ? 2 : ""}
                     align={c.field == "netpay" || c.field == "lic" || c.field == "advance" || c.field == "tds" || c.field == "gross_pay" ||
-                     c.field == "pt" || c.field == "total_earning" || c.field == "totalNetPay" || c.field == "esi" || c.field == "esi_contribution_employee" || c.field == "pay_days" ||
-                     c.field == "grossWages" || c.field == "edliWages" || c.field == "epfWages" || c.field == "epsWages" ||
-                     c.field == "epscontriRemitted" || c.field == "epfContriRemitted" || c.field == "epfEpsDiffRemitted"    ? "right" : c.field == "empcode" || c.field == "bank_account_no" || c.field == "lic_number" || c.field == "schoolNameShort" ? "center": "left"}
+                     c.field == "pt" || c.field == "total_earning" || c.field == "totalNetPay" || c.field == "esi" || c.field == "esi_contribution_employee" || 
+                     c.field == "pay_days" || c.field == "grossWages" || c.field == "edliWages" || c.field == "epfWages" || c.field == "epsWages" ||
+                     c.field == "epscontriRemitted" || c.field == "epfContriRemitted" || c.field == "epfEpsDiffRemitted" || 
+                     c.field == "ncpDays" || c.field == "refundOfAdvances" ? "right" : c.field == "empcode" || c.field == "bank_account_no" ||
+                      c.field == "lic_number" || c.field == "schoolNameShort" ? "center": "left"}
                     labelType="text"
                   />))}
             </DispayRow>
