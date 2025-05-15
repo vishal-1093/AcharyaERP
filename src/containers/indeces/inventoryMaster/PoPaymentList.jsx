@@ -163,8 +163,51 @@ function PoPaymentList() {
       valueGetter: (value, row) =>
         row.grnStatus ? Math.round(row.grnStatus) : "",
     },
-    { field: "jvStatus", headerName: "Journal", flex: 1, hide: true },
-    { field: "paymentStatus", headerName: "Payment", flex: 1, hide: true },
+    {
+      field: "jvStatus",
+      headerName: "Journal",
+      flex: 1,
+      headerAlign: "right",
+      align: "right",
+      renderCell: (params) => (
+
+        <Typography
+          style={{ color: "blue", cursor: "pointer" }}
+          onClick={() =>
+            handleGeneratePdf(
+              params.row.journalVoucherNumber,
+              params.row.school_id,
+              params.row.fcYearId
+            )
+          }
+        >
+          {params.row.jvStatus}
+        </Typography>
+      )
+    },
+    {
+      field: "paymentStatus",
+      headerName: "Payment",
+      flex: 1,
+      headerAlign: "right",
+      align: "right",
+      renderCell: (params) => (
+
+        <Typography
+          style={{ color: "blue", cursor: "pointer" }}
+          onClick={() =>
+            navigate(
+              `/payment-voucher-pdf/${params.row.paymentVoucherId}`,
+              {
+                state: { advancePdfStatus: true },
+              }
+            )
+          }
+        >
+          {params.row.paymentStatus}
+        </Typography>
+      )
+    },
     // {
     //   field: "Print",
     //   headerName: "Print PO",
@@ -329,44 +372,44 @@ function PoPaymentList() {
     //   ],
     // });
   };
-const getData = async () => {
-  const queryParams = {
-    ...(values.startDate && {
-      fromDate: moment(values.startDate).format("YYYY-MM-DD"),
-    }),
-    ...(values.endDate && {
-      toDate: moment(values.endDate).format("YYYY-MM-DD"),
-    }),
-    ...(values.school_Id && { schoolId: values.school_Id }),
-    ...(values.paymentType && { paymentType: values.paymentType }),
-    ...(values.filter && values.filter !== "custom" && {
-      poFilter: values.filter,
-    }),
+  const getData = async () => {
+    const queryParams = {
+      ...(values.startDate && {
+        fromDate: moment(values.startDate).format("YYYY-MM-DD"),
+      }),
+      ...(values.endDate && {
+        toDate: moment(values.endDate).format("YYYY-MM-DD"),
+      }),
+      ...(values.school_Id && { schoolId: values.school_Id }),
+      ...(values.paymentType && { paymentType: values.paymentType }),
+      ...(values.filter && values.filter !== "custom" && {
+        poFilter: values.filter,
+      }),
+    };
+
+    const queryString = new URLSearchParams(queryParams).toString();
+
+    const url = `/api/purchase/poReport?${queryString}`;
+
+    const requestBody = {
+      pageNo: 0,
+      pageSize: 100000,
+      createdDate: null,
+      institute: null,
+      vendor: null,
+    };
+
+    try {
+      const res = await axios.post(url, requestBody);
+      const rowId = res.data.data.map((obj, index) => ({
+        ...obj,
+        id: index + 1,
+      }));
+      setRows(rowId?.reverse());
+    } catch (err) {
+      console.error(err);
+    }
   };
-
-  const queryString = new URLSearchParams(queryParams).toString();
-
-  const url = `/api/purchase/poReport?${queryString}`;
-
-  const requestBody = {
-    pageNo: 0,
-    pageSize: 100000,
-    createdDate: null,
-    institute: null,
-    vendor: null,
-  };
-
-  try {
-    const res = await axios.post(url, requestBody);
-    const rowId = res.data.data.map((obj, index) => ({
-      ...obj,
-      id: index + 1,
-    }));
-    setRows(rowId?.reverse());
-  } catch (err) {
-    console.error(err);
-  }
-};
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -408,6 +451,15 @@ const getData = async () => {
         });
         setAlertOpen(true);
       });
+  };
+  const handleGeneratePdf = async (
+    journalVoucherNumber,
+    schoolId,
+    fcYearId
+  ) => {
+    navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
+      state: { grnIndexStatus: true, schoolId, fcYearId },
+    });
   };
   return (
     <>
