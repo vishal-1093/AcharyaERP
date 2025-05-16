@@ -21,12 +21,6 @@ const bookmanFont = {
   fontSize: "13px !important",
 };
 
-const bookmanFontLabel = {
-  fontFamily: "Roboto",
-  fontSize: "13px !important",
-  fontWeight: "bold",
-};
-
 const bookmanFontPrint = {
   fontFamily: "Roboto",
   color: "black",
@@ -36,29 +30,6 @@ const bookmanFontPrint = {
 function StudentDetailsByAuid({ isPrintClick, studentData }) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-  console.log(studentData);
-
-  const DisplayContent = ({ label, value }) => {
-    return (
-      <>
-        <Grid item xs={12} md={2} lg={1.5}>
-          <Typography variant="subtitle2" sx={bookmanFontLabel}>
-            {label}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={4} lg={4.5}>
-          <Typography
-            variant="subtitle2"
-            color="textSecondary"
-            sx={bookmanFont}
-          >
-            {value}
-          </Typography>
-        </Grid>
-      </>
-    );
-  };
 
   if (error) {
     return (
@@ -83,10 +54,6 @@ function StudentDetailsByAuid({ isPrintClick, studentData }) {
       </Typography>
     );
   }
-
-  const handleAuid = (auid) => {
-    navigate(`/student-ledger/${auid}`);
-  };
 
   return (
     <>
@@ -327,8 +294,7 @@ function StudentDetailsByAuid({ isPrintClick, studentData }) {
                         ...(isPrintClick ? bookmanFontPrint : bookmanFont),
                       }}
                     >
-                      {studentData.fee_admission_category_short_name} -{" "}
-                      {studentData.fee_admission_sub_category_short_name}
+                      {studentData.fee_admission_category_short_name}
                     </span>
                   </TableCell>
                 </TableRow>

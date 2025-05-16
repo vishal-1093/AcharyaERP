@@ -43,6 +43,9 @@ function PoAssignedData() {
 
   const bill_approver_status = "Status Pending";
 
+  const printPo = async (rowValue, status) => {
+    navigate(`/PoPdf/${rowValue.poId}`, { state: { letterHeadStatus: status, pathName: "/Approvepo" } })
+  };
   const columns = [
     {
       field: "createdDate",
@@ -178,7 +181,7 @@ function PoAssignedData() {
       flex: 1,
       renderCell: (params) => {
         return (
-          <IconButton onClick={() => handlePreview(params)}>
+          <IconButton onClick={() => printPo(params.row, false)}>
             <Visibility fontSize="small" color="primary" />
           </IconButton>
         );

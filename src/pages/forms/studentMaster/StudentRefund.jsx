@@ -8,15 +8,13 @@ import {
   CardHeader,
   CircularProgress,
   Grid,
-  Typography,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
-import { useParams } from "react-router-dom";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import StudentDetailsByAuid from "../../../components/StudentDetailsByAuid";
-const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
+
+const StudentDetailsByAuid = lazy(() =>
+  import("../../../components/StudentDetailsByAuid")
+);
 const StudentRefundDetails = lazy(() =>
   import("../../../components/StudentRefundDetails")
 );
@@ -27,14 +25,11 @@ const initialValues = {
 
 function StudentRefund() {
   const [values, setValues] = useState(initialValues);
-  const [id, setId] = useState();
   const [loading, setLoading] = useState(false);
   const [allExpand, setAllExpand] = useState({});
-  const [isPrintClick, setIsPrintClick] = useState(false);
   const [studentData, setStudentData] = useState([]);
   const [open, setOpen] = useState(false);
 
-  const { auid } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
@@ -52,10 +47,6 @@ function StudentRefund() {
       "Invalid AUID",
     ],
   };
-
-  //   useEffect(() => {
-  //     handleSubmit();
-  //   }, [values.auid]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -158,25 +149,6 @@ function StudentRefund() {
                     </Box>
                   </Grid>
                 )}
-
-                {/* {id && (
-                  <Grid item xs={12} id="ledger">
-                    <Box sx={{ display: "flex", flexDirection: "column" }}>
-                      <StudentDetailsByAuid
-                        id={values.auid}
-                        // header={
-                        //   isPrintClick ? "Student Ledger" : "Student Details"
-                        // }
-                        isPrintClick={isPrintClick}
-                      />
-                      <StudentRefundDetails
-                        id={id}
-                        isPrintClick={isPrintClick}
-                        studentDataResponse={studentData}
-                      />
-                    </Box>
-                  </Grid>
-                )} */}
               </Grid>
             </CardContent>
           </Card>

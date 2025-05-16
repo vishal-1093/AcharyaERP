@@ -39,6 +39,8 @@ const StyledTableCells = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 function StudentRefundIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -144,8 +146,6 @@ function StudentRefundIndex() {
         `/api/finance/fetchAllRefundRequest?page=${0}&page_size=${1000000000}&sort=created_date`
       )
       .then((Response) => {
-        console.log(Response);
-
         setRows(Response.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
@@ -159,7 +159,6 @@ function StudentRefundIndex() {
         `/api/finance/getRefundRequestDataDetails/${data.refund_reference_no}`
       )
       .then((response) => {
-        console.log(response);
         setReceiptData(response.data.data);
       })
       .catch((error) => console.error(error));
@@ -204,6 +203,67 @@ function StudentRefundIndex() {
       ids.push(obj.id);
     });
 
+    const journalPayload = [];
+
+    const creditPayload = {
+      active: true,
+      date: moment(new Date()).format("DD-MM-YYYY"),
+      credit: receiptData?.reduce(
+        (total, sum) => Number(total) + Number(sum.inr_value),
+        0
+      ),
+      credit_total: receiptData?.reduce(
+        (total, sum) => Number(total) + Number(sum.inr_value),
+        0
+      ),
+      debit: 0,
+      debit_total: receiptData?.reduce(
+        (total, sum) => Number(total) + Number(sum.inr_value),
+        0
+      ),
+
+      pay_to: receiptData?.[0]?.student_name,
+      payment_mode: 4,
+      remarks: `BEING REFUND GENERATED FOR ${receiptData?.[0]?.auid}, ${receiptData?.[0]?.student_name}, ${receiptData?.[0]?.receipt_no}. DFDS& DATE , ${receiptData?.[0]?.refund_remarks}, DUE ADMISSION CANCELLATION`,
+      school_id: receiptData?.[0]?.school_id,
+      voucher_head_id: 503,
+      type: "REFUND-JV",
+      draftCreatedName: receiptData?.[0]?.created_username,
+      verifier_id: userID,
+      verified_status: 1,
+      verified_date: new Date(),
+    };
+
+    receiptData?.forEach((obj) => {
+      journalPayload.push({
+        active: true,
+        date: moment(new Date()).format("DD-MM-YYYY"),
+        credit: 0,
+        credit_total: receiptData?.reduce(
+          (total, sum) => Number(total) + Number(sum.inr_value),
+          0
+        ),
+        debit: obj.inr_value,
+        debit_total: receiptData?.reduce(
+          (total, sum) => Number(total) + Number(sum.inr_value),
+          0
+        ),
+        draftCreatedName: obj.created_username,
+        pay_to: receiptData?.[0]?.student_name,
+        payment_mode: 1,
+        reference_number: null,
+        remarks: `BEING REFUND GENERATED FOR ${receiptData?.[0]?.auid}, ${receiptData?.[0]?.student_name}, ${receiptData?.[0]?.receipt_no}. DFDS & DATE , ${receiptData?.[0]?.refund_remarks}, DUE ADMISSION CANCELLATION`,
+        school_id: receiptData?.[0]?.school_id,
+        voucher_head_id: obj.voucher_head_new_id,
+        type: "REFUND-JV",
+        verifier_id: userID,
+        verified_status: 1,
+        verified_date: new Date(),
+      });
+    });
+
+    journalPayload.push(creditPayload);
+
     try {
       const response = await axios.put(
         `/api/finance/updateRefundRequest/${ids?.toString()}`,
@@ -211,13 +271,20 @@ function StudentRefundIndex() {
       );
 
       if (response.status === 200 || response.status === 201) {
-        setAlertMessage({
-          severity: "success",
-          message: "Approved Successfully",
-        });
-        setAlertOpen(true);
-        setApproveOpen(false);
-        getData();
+        const journalResponse = await axios.post(
+          "api/finance/journalVoucher",
+          journalPayload
+        );
+
+        if (journalResponse.status === 200 || journalResponse.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Approved Successfully",
+          });
+          setAlertOpen(true);
+          setApproveOpen(false);
+          getData();
+        }
       }
     } catch (error) {
       setAlertMessage({
