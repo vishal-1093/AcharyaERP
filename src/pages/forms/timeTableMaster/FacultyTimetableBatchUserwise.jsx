@@ -754,7 +754,8 @@ function FacultyTimetableBatchUserwise() {
                 roleName === "Super Admin" ||
                 roleName === "Admin" ||
                 roleName === "Principal" ||
-                roleName === "HOD"
+                roleName === "HOD" ||
+                roleName === "Accounts Role"
                   ? new Date(commencementDate?.from_date)
                   : new Date(new Date().setDate(new Date().getDate() + 3))
               }
