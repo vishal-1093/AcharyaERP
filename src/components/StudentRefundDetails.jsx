@@ -12,7 +12,6 @@ import {
   TableCell,
   styled,
   tableCellClasses,
-  IconButton,
   Typography,
   Button,
 } from "@mui/material";
@@ -31,7 +30,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     textAlign: "left",
     fontFamily: "Roboto",
     fontSize: "13px !important",
-    // width: "25%",
   },
 }));
 
@@ -43,7 +41,6 @@ const StyledTableCellRight = styled(TableCell)(({ theme }) => ({
     textAlign: "right",
     fontFamily: "Roboto",
     fontSize: "13px !important",
-    // width: "25%",
   },
 }));
 
@@ -327,8 +324,6 @@ function StudentRefundDetails({ id, studentDataResponse }) {
         });
       }
     } catch (error) {
-      console.log(error);
-
       setTestData([]);
       setAlertMessage({
         severity: "error",
@@ -483,27 +478,6 @@ function StudentRefundDetails({ id, studentDataResponse }) {
     );
   };
 
-  const handleChangeOne = (e, year, voucherId) => {
-    const splitName = e.target.name.split("-");
-
-    setTestData((prev) => {
-      const updatedData = { ...prev };
-
-      const index = updatedData[year].findIndex(
-        (item) => item.voucherId === voucherId
-      );
-
-      const positiveAmount = Math.abs(updatedData[year][index].amount);
-
-      updatedData[year][index].payingNow =
-        Number(e.target.value) > positiveAmount ? 0 : Number(e.target.value);
-
-      return updatedData;
-    });
-
-    // disabledFunction(testData, firstData);
-  };
-
   const handleChangeCheckbox = (feeReceipt, year, obj) => {
     const data = studentPaidData
       .filter(
@@ -563,7 +537,7 @@ function StudentRefundDetails({ id, studentDataResponse }) {
             paid_year: obj.paid_year,
             requested_remarks: values.remarks,
             balance_amount: receiptTotal - total,
-            prev_financial_year_id: 4,
+            prev_financial_year_id: obj.financial_year_id,
             inr_value: obj.payNow,
             refund_status: "Processed",
             created_by: 1,
@@ -644,51 +618,6 @@ function StudentRefundDetails({ id, studentDataResponse }) {
                       </StyledTableCellBodyRight>
                     );
                   })}
-
-                {/* {receiptData?.map((receiptId) => (
-                  <StyledTableCellBodyRight>
-                    {`${
-                      receiptFormatData?.[
-                        `${vouchers.voucherId}-${obj1}-${receiptId.fee_receipt}`
-                      ]?.[0]?.amount_paid
-                    }`}
-                  </StyledTableCellBodyRight>
-                ))} */}
-
-                {/* {receiptData?.map((receiptId) => {
-                  const splitName = Object.keys(receiptFormatData).split("-");
-                  if (
-                    Number(splitName[0]) === Number(vouchers.voucherId) &&
-                    Number(splitName[1]) === Number(obj1) &&
-                    Number(splitName[2]) === Number(receiptId.fee_receipt)
-                  ) {
-                    <StyledTableCellBodyRight>
-                      {`${
-                        receiptFormatData?.[
-                          `${vouchers.voucherId}-${obj1}-${receiptId.fee_receipt}`
-                        ]?.[0]?.amount_paid
-                      }`}
-                    </StyledTableCellBodyRight>;
-                  }
-                })} */}
-
-                {/* <StyledTableCellBodyRight>
-                  <CustomTextField
-                    name={`payingNow-${obj1}-${vouchers.voucherId}`}
-                    label=""
-                    value={vouchers.payingNow}
-                    handleChange={(e) =>
-                      handleChangeOne(e, obj1, vouchers.voucherId)
-                    }
-                    InputProps={{
-                      sx: { textAlign: "right" },
-                      inputProps: {
-                        style: { textAlign: "right" }, // fallback for consistent behavior
-                      },
-                    }}
-                    disabled={vouchers.amount === 0 || vouchers.amount > 0}
-                  />
-                </StyledTableCellBodyRight> */}
               </TableRow>
             );
         })}
@@ -711,7 +640,7 @@ function StudentRefundDetails({ id, studentDataResponse }) {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <StyledTableCell>{"Sem" + year}</StyledTableCell>
+                      <StyledTableCell>{`Sem-${year}`}</StyledTableCell>
                       <StyledTableCellRight>Fixed</StyledTableCellRight>
                       <StyledTableCellRight>Due</StyledTableCellRight>
 
@@ -719,12 +648,6 @@ function StudentRefundDetails({ id, studentDataResponse }) {
                         if (Number(obj.paidYear) === Number(year)) {
                           return (
                             <StyledTableCellRight key={obj.fee_receipt}>
-                              {/* <div
-                            style={{
-                              display: "flex",
-                              gap: 2,
-                            }}
-                          > */}
                               {`${obj.fee_receipt}/${obj.created_date}`}
                               <Checkbox
                                 checked={obj.checked}
@@ -745,8 +668,6 @@ function StudentRefundDetails({ id, studentDataResponse }) {
                                   marginBottom: 0.5,
                                 }}
                               />
-
-                              {/* </div> */}
                             </StyledTableCellRight>
                           );
                         }
@@ -755,7 +676,7 @@ function StudentRefundDetails({ id, studentDataResponse }) {
                       {refundReceiptHeader?.map((obj) => {
                         if (Number(obj.paid_year) === Number(year)) {
                           return (
-                            <StyledTableCellRight>{`R-${obj.refund_reference_no}/${obj.created_date}`}</StyledTableCellRight>
+                            <StyledTableCellRight>{`RVN-${obj.refund_reference_no}/${obj.created_date}`}</StyledTableCellRight>
                           );
                         }
                       })}

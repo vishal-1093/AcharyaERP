@@ -20,15 +20,15 @@ import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import moment from "moment";
 
 const bookmanFont = {
-  fontFamily: 'Roboto',
-  fontSize: '13px !important',
+  fontFamily: "Roboto",
+  fontSize: "13px !important",
 };
 
 const bookmanFontPrint = {
   // fontFamily: 'Bookman Old Style, serif',
   fontFamily: "Roboto",
   color: "black",
-  fontSize: '20px !important',
+  fontSize: "20px !important",
 };
 
 const ModalWrapper = lazy(() => import("./ModalWrapper"));
@@ -39,16 +39,16 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     color: theme.palette.tableBg.textColor,
     border: "1px solid rgba(224, 224, 224, 1)",
     textAlign: "center",
-    fontFamily: 'Roboto',
-    fontSize: '13px !important'
+    fontFamily: "Roboto",
+    fontSize: "13px !important",
   },
 }));
 
 const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.body}`]: {
     border: "1px solid rgba(224, 224, 224, 1)",
-    fontFamily: 'Roboto',
-    fontSize: '13px !important'
+    fontFamily: "Roboto",
+    fontSize: "13px !important",
   },
 }));
 
@@ -61,7 +61,7 @@ const headerCategories = [
   { label: "Due", value: "due" },
 ];
 
-function StudentFeeDetails({ id, isPrintClick=false }) {
+function StudentFeeDetails({ id, isPrintClick = false }) {
   const [data, setData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
   const [total, setTotal] = useState();
@@ -78,6 +78,9 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
   const [uniformData, setUniformData] = useState({});
   const [readmissionData, setReadmissionData] = useState({});
   const [hostelData, setHostelData] = useState([]);
+  const [refundReceiptData, setRefundReceiptData] = useState([]);
+  const [refundReceiptHeaders, setRefundReceiptHeaders] = useState([]);
+  const [refundTotalReceiptWise, setRefundTotalReceiptWise] = useState([]);
 
   useEffect(() => {
     getFeeData();
@@ -98,6 +101,7 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
         fee_receipt_student_pay_his_format: paid,
         dueAmount: due,
         fee_receipt_student_pay_his: paidHistory,
+        refundDetails: refundHistory,
         paidAtBoardData: board,
         uniformAndStationaryData: uniform,
         readmissionData: readmission,
@@ -155,6 +159,8 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
       const receiptHeads = {};
       const paidTempTotal = {};
       const voucherReceiptAmt = {};
+      const refundReceiptAmt = {};
+      const refundTotal = {};
 
       yearSemesters.forEach((obj) => {
         const { key } = obj;
@@ -258,6 +264,54 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
         });
       });
 
+      const Ids = [];
+      subAmountDetails?.forEach((obj) => {
+        Ids.push({
+          id: obj.voucher_head_new_id,
+          label: obj.voucher_head,
+        });
+      });
+
+      const filterRefundReceiptHeaders = Array?.from(
+        new Map(
+          refundHistory.map((item) => [item.refund_reference_no, item])
+        ).values()
+      );
+
+      Ids?.forEach((voucherId) => {
+        yearSemesters?.forEach((year) => {
+          filterRefundReceiptHeaders?.forEach((receiptId) => {
+            const key = `${voucherId.id}-${year.key}-${receiptId.refund_reference_no}`;
+
+            const existingPayment = refundHistory.find(
+              (payment) =>
+                payment.voucher_head_new_id === voucherId.id &&
+                payment.paid_year === year.key &&
+                payment.refund_reference_no === receiptId.refund_reference_no
+            );
+
+            refundReceiptAmt[key] = existingPayment
+              ? [
+                  {
+                    amount_paid: existingPayment.approver_amount,
+                    voucher_head_id: voucherId.id,
+                  },
+                ]
+              : [{ amount_paid: 0, voucher_head_id: voucherId.id }];
+          });
+        });
+      });
+
+      refundHistory?.forEach((item) => {
+        const key = `${item.paid_year}-${item.refund_reference_no}`;
+        if (!refundTotal[key]) {
+          refundTotal[key] = 0;
+        }
+        refundTotal[key] += Number(item.inr_value);
+      });
+
+      setRefundTotalReceiptWise(refundTotal);
+
       const hostelResponse = await axios.get(
         `/api/hostel/getHostelDetailsForLedger/${id}`
       );
@@ -273,6 +327,8 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
       setUniformData(uniform);
       setReadmissionData(readmission);
       setHostelData(hostelResponse.data.data);
+      setRefundReceiptHeaders(filterRefundReceiptHeaders);
+      setRefundReceiptData(refundReceiptAmt);
     } catch (err) {
       console.error(err);
 
@@ -322,16 +378,31 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
   };
 
   const handleModal = (year) => {
-    setSelectedYear({ label: `Sem - ${year}`, value: `year${year}` });
+    setSelectedYear({
+      label: `Sem - ${year}`,
+      value: `year${year}`,
+      key: year,
+    });
     setModalOpen(true);
   };
 
   const DisplayHeaderText = ({ label }) => (
-    <Typography variant="subtitle2" sx={{fontWeight:600, ...(isPrintClick ? bookmanFontPrint : bookmanFont),}}>{label}</Typography>
+    <Typography
+      variant="subtitle2"
+      sx={{
+        fontWeight: 600,
+        ...(isPrintClick ? bookmanFontPrint : bookmanFont),
+      }}
+    >
+      {label}
+    </Typography>
   );
 
   const DisplayBodyText = ({ label }) => (
-      <Typography variant="subtitle2" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+    <Typography
+      variant="subtitle2"
+      sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+    >
       {label}
     </Typography>
   );
@@ -424,6 +495,18 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
                     <DisplayHeaderText label={pay.label} />
                   </StyledTableCell>
                 ))}
+                {refundReceiptHeaders?.map((ele, k) => {
+                  if (ele.paid_year === selectedYear.key)
+                    return (
+                      <StyledTableCell key={k} sx={{ textAlign: "right" }}>
+                        <DisplayHeaderText
+                          label={`RVN-${ele.refund_reference_no}/${moment(
+                            ele.created_date
+                          ).format("DD-MM-YYYY")}`}
+                        />
+                      </StyledTableCell>
+                    );
+                })}
               </TableRow>
             </TableHead>
 
@@ -456,6 +539,26 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
                       </StyledTableCellBody>
                     );
                   })}
+
+                  {refundReceiptHeaders
+                    ?.filter(
+                      (receipt) =>
+                        Number(receipt.paid_year) === Number(selectedYear?.key)
+                    )
+                    ?.map((receipt, k) => {
+                      const key = `${obj.voucher_head_new_id}-${selectedYear?.key}-${receipt.refund_reference_no}`;
+                      const amountPaid =
+                        refundReceiptData?.[key]?.[0]?.amount_paid ?? "0";
+
+                      return (
+                        <StyledTableCellBody
+                          key={k}
+                          sx={{ textAlign: "right" }}
+                        >
+                          <DisplayBodyText label={amountPaid} />
+                        </StyledTableCellBody>
+                      );
+                    })}
                 </TableRow>
               ))}
               <TableRow>
@@ -474,6 +577,18 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
                     />
                   </StyledTableCellBody>
                 ))}
+
+                {refundReceiptHeaders?.map((ele, l) => {
+                  const key = `${selectedYear?.key}-${ele.refund_reference_no}`;
+                  if (ele?.paid_year === selectedYear?.key)
+                    return (
+                      <StyledTableCellBody key={l} sx={{ textAlign: "right" }}>
+                        <DisplayHeaderText
+                          label={refundTotalReceiptWise[key]}
+                        />
+                      </StyledTableCellBody>
+                    );
+                })}
               </TableRow>
             </TableBody>
           </Table>
@@ -485,7 +600,7 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
           const { key, value } = obj;
           const field = `year${obj.key}`;
 
-           return (
+          return (
             <TableContainer key={i} component={Paper} sx={{ marginBottom: 2 }}>
               <Table size="small">
                 <TableHead>
@@ -510,7 +625,10 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
                               justifyContent: "right",
                             }}
                           >
-                            <Typography variant="subtitle2" sx={{fontWeight: 600, ...bookmanFont}}>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ fontWeight: 600, ...bookmanFont }}
+                            >
                               {category.label}
                             </Typography>
                             <IconButton
@@ -553,9 +671,13 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
                             <Typography
                               variant="subtitle2"
                               color="primary"
-                              sx={{ cursor: "pointer", ...(isPrintClick ? bookmanFontPrint : bookmanFont) }}
+                              sx={{
+                                cursor: "pointer",
+                                ...(isPrintClick
+                                  ? bookmanFontPrint
+                                  : bookmanFont),
+                              }}
                               onClick={() => handleModal(key)}
-                              
                             >
                               {totalValue}
                             </Typography>
@@ -644,7 +766,7 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
                 </TableBody>
               </Table>
             </TableContainer>
-            )
+          );
         })}
 
         {hostelData.length > 0 && (
@@ -661,16 +783,56 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Block</StyledTableCell>
-                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Academic Year</StyledTableCell>
-                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>DOR</StyledTableCell>
-                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Bed No.</StyledTableCell>
-                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Template</StyledTableCell>
-                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Fixed Amount</StyledTableCell>
-                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Waiver</StyledTableCell>
-                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Paid</StyledTableCell>
-                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Balance</StyledTableCell>
-                    <StyledTableCell sx={isPrintClick ? bookmanFontPrint : bookmanFont}>Food Status</StyledTableCell>
+                    <StyledTableCell
+                      sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                    >
+                      Block
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                    >
+                      Academic Year
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                    >
+                      DOR
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                    >
+                      Bed No.
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                    >
+                      Template
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                    >
+                      Fixed Amount
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                    >
+                      Waiver
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                    >
+                      Paid
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                    >
+                      Balance
+                    </StyledTableCell>
+                    <StyledTableCell
+                      sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                    >
+                      Food Status
+                    </StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -680,22 +842,38 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
                         <DisplayBodyText label={obj.blockName} />
                       </StyledTableCellBody>
                       <StyledTableCellBody sx={{ textAlign: "center" }}>
-                        <Typography variant="subtitle2" color="textSecondary" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                        <Typography
+                          variant="subtitle2"
+                          color="textSecondary"
+                          sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                        >
                           {obj.acYear}
                         </Typography>
                       </StyledTableCellBody>
                       <StyledTableCellBody sx={{ textAlign: "center" }}>
-                        <Typography variant="subtitle2" color="textSecondary" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                        <Typography
+                          variant="subtitle2"
+                          color="textSecondary"
+                          sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                        >
                           {obj.fromDate?.split("-").reverse().join("-")}
                         </Typography>
                       </StyledTableCellBody>
                       <StyledTableCellBody sx={{ textAlign: "center" }}>
-                        <Typography variant="subtitle2" color="textSecondary" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                        <Typography
+                          variant="subtitle2"
+                          color="textSecondary"
+                          sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                        >
                           {obj.bedName}
                         </Typography>
                       </StyledTableCellBody>
                       <StyledTableCellBody sx={{ textAlign: "center" }}>
-                        <Typography variant="subtitle2" color="textSecondary" sx={isPrintClick ? bookmanFontPrint : bookmanFont}>
+                        <Typography
+                          variant="subtitle2"
+                          color="textSecondary"
+                          sx={isPrintClick ? bookmanFontPrint : bookmanFont}
+                        >
                           {obj.hostelTemplateName}
                         </Typography>
                       </StyledTableCellBody>
@@ -711,7 +889,7 @@ function StudentFeeDetails({ id, isPrintClick=false }) {
                               obj.foodStatus === "VEG"
                                 ? "success.main"
                                 : "error.main",
-                            ...(isPrintClick ? bookmanFontPrint : bookmanFont)
+                            ...(isPrintClick ? bookmanFontPrint : bookmanFont),
                           }}
                         >
                           {obj.foodStatus}
