@@ -13,47 +13,34 @@ import useAlert from "../../../hooks/useAlert.js";
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField.jsx")
 );
-const CustomAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomAutocomplete.jsx")
-);
 const CustomFileInput = lazy(() =>
   import("../../../components/Inputs/CustomFileInput.jsx")
 );
 
-const yearSemLists = [
-  { label: "1/1", value: "1/1" },
-  { label: "1/2", value: "1/2" },
-  { label: "2/3", value: "2/3" },
-  { label: "2/4", value: "2/4" },
-  { label: "3/5", value: "3/5" },
-  { label: "3/6", value: "3/6" },
-  { label: "4/7", value: "4/7" },
-  { label: "4/8", value: "4/8" },
-  { label: "5/9", value: "5/9" },
-  { label: "5/10", value: "5/10" },
-  { label: "6/11", value: "6/11" },
-   { label: "6/12", value: "6/12" },
-];
-
 const initialState = {
-  auid:"",
-  StudentName: "",
+  rowDetails: null,
+  studentDetail: null,
+  totalDue: 0,
+  auid: "",
+  studentName: "",
   yearSem: "",
-  yearSemList: yearSemLists,
   grnrefno: "",
   pono: "",
   sno: "",
-  attachment:null,
+  attachment: null,
   loading: false
 };
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const LaptopIssueForm = () => {
   const [
     {
+      rowDetails,
+      studentDetail,
+      totalDue,
       auid,
-      StudentName,
+      studentName,
       yearSem,
-      yearSemList,
       grnrefno,
       sno,
       attachment,
@@ -67,23 +54,82 @@ const LaptopIssueForm = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
+    setState((prevState) => ({
+      ...prevState,
+      rowDetails: location.state,
+      grnrefno: location.state?.grn_ref_no,
+      sno: location.state?.serialNo
+    }));
     setCrumbs([
       { name: "Laptop Issue", link: "/laptop-issue" }
     ]);
   }, []);
 
-  const handleChangeAdvance = (name, newValue) => {
-      setState((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      (auid) && getStudentDetail()
+    }, 1000);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [auid]);
+
+  const getStudentDetail = async () => {
+    try {
+      const res = await axios.get(`/api/student/studentDetailsByAuid/${auid}`);
+      if (res.status == 200 || res.status == 201) {
+        if (res.data.data[0]) {
+          setState((prevState) => ({
+            ...prevState,
+            studentDetail: res.data.data[0],
+            studentName: res.data.data[0]?.student_name || "",
+            yearSem: `${res.data.data[0]?.current_year}/${res.data.data[0]?.current_sem}` || ""
+          }));
+          (res.data.data[0]?.student_id) && getStudentDue(res.data.data[0].student_id);
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "No student detail found !!",
+          });
+          setAlertOpen(true);
+        }
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getStudentDue = async (studentId) => {
+    try {
+      const res = await axios.get(`/api/student/getDueAmountForLaptop/${studentId}`);
+      if (res.status == 200 || res.status == 201) {
+        setState((prevState) => ({
+          ...prevState,
+          totalDue: res.data.data.totalDue
+        }))
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const handleChange = (e) => {
     let { name, value } = e.target;
     setState((prevState) => ({
       ...prevState,
-      [name]: name == "auid" ? value.trim() : value,
+      [name]: value.trim(),
     }));
   };
 
@@ -112,7 +158,10 @@ const LaptopIssueForm = () => {
   const checkAttachment = {
     attachment: [
       attachment !== "",
-      attachment?.name?.endsWith(".pdf"),
+      attachment?.name?.endsWith(".pdf") ||
+      attachment?.name?.endsWith(".jpeg") ||
+      attachment?.name?.endsWith(".jpg") ||
+      attachment?.name?.endsWith(".png"),
       attachment?.size < 2000000,
     ],
   };
@@ -124,7 +173,80 @@ const LaptopIssueForm = () => {
     }));
   };
 
+  const getAttachmentUploadResponse = async () => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append("laptop_issue_id", rowDetails?.id)
+      attachment?.name?.endsWith(".pdf") && formData.append("file", attachment);
+      (attachment?.name?.endsWith(".jpeg") ||
+        attachment?.name?.endsWith(".jpg") ||
+        attachment?.name?.endsWith(".png") && formData.append("image_file", attachment))
+      const res = await axios.post(`api/student/laptopIssueUploadFile`, formData);
+      if (res.status == 200 || res.status == 201) {
+        return res;
+      }
+    } catch (error) {
+      setLoading(false)
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  console.log("rowData=======",rowDetails)
+
   const handleSubmit = async () => {
+    try {
+      const attachmentRes = await getAttachmentUploadResponse();
+      const payload = {
+        "laptop_issue_id": rowDetails?.id,
+        "student_id": studentDetail?.school_id,
+        "issued_date": new Date(),
+        "issued_by": userId,
+        "status": true,
+        "serialNo": rowDetails?.serialNo,
+        "ack_date": rowDetails?.ack_date,
+        "grn_ref_no": rowDetails?.grn_ref_no,
+        "description": rowDetails?.description,
+        "type": rowDetails?.type,
+        "year_sem": studentDetail?.current_sem ? studentDetail?.current_sem : studentDetail?.current_year,
+        "attachment_path": attachment?.name,
+        "attachment_type": null,
+        "acknowledgment_path": null,
+        "acknowledgment_type": null,
+        "active": true,
+        // "created_date": "2025-05-14T10:54:31.468+00:00",
+        // "modified_date": "2025-05-14T10:54:31.468+00:00",
+        // "created_by": 1,
+        // "modified_by": null,
+        // "created_username": "Amadmin",
+        // "modified_username": null
+      };
+      const res = await axios.put(`api/student/updateLaptopIssue/${rowDetails?.id}`, payload);
+      if (attachmentRes && (res.status == 200 || res.status == 201)) {
+        navigate("/laptop-issue");
+        setAlertMessage({
+          severity: "success",
+          message: "Laptop is successfully issued !!",
+        });
+        setAlertOpen(true);
+        setLoading(false)
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+      setLoading(false)
+    }
   };
 
   return (
@@ -141,32 +263,20 @@ const LaptopIssueForm = () => {
             />
           </Grid>
 
-         <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="studentName"
               label="Student Name"
-              value={StudentName || ""}
-              handleChange={handleChange}
-              required
+              value={studentName || ""}
+              disabled
             />
           </Grid>
-        <Grid item xs={12} md={4}>
-          <CustomAutocomplete
-            name="yearSem"
-            label="Year Sem"
-            value={yearSem || ""}
-            options={yearSemList || []}
-            handleChangeAdvance={handleChangeAdvance}
-            required
-          />
-        </Grid>
-        <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
-              name="grnrefno"
-              label="GRN Ref No."
-              value={grnrefno || ""}
-              handleChange={handleChange}
-              required
+              name="yearSem"
+              label="Year Sem"
+              value={yearSem || ""}
+              disabled
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -174,16 +284,31 @@ const LaptopIssueForm = () => {
               name="sno"
               label="Serial No."
               value={sno || ""}
-              handleChange={handleChange}
-              required
+              disabled
             />
           </Grid>
-
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="grnrefno"
+              label="GRN Ref No."
+              value={grnrefno || ""}
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="totalDue"
+              label="Total Due"
+              value={totalDue || 0}
+              type="number"
+              disabled
+            />
+          </Grid>
           <Grid item xs={12} md={4}>
             <CustomFileInput
               name="attachment"
-              label="Pdf File Attachment"
-              helperText="PDF - smaller than 2 MB"
+              label="PDF or JPEG or JPG or PNG  File Attachment"
+              helperText="File Attachment - smaller than 2 MB"
               file={attachment}
               handleFileDrop={handleFileDrop}
               handleFileRemove={handleFileRemove}
@@ -196,7 +321,7 @@ const LaptopIssueForm = () => {
             item
             align="right"
             xs={12}
-            md={12}
+            md={8}
             sx={{ display: "flex", justifyContent: "end", alignItems: "end" }}
           >
             <Button
@@ -204,6 +329,7 @@ const LaptopIssueForm = () => {
               variant="contained"
               color="primary"
               onClick={handleSubmit}
+              disabled={totalDue != 0 || !studentDetail || !attachment || loading}
             >
               {loading ? (
                 <CircularProgress
@@ -212,12 +338,12 @@ const LaptopIssueForm = () => {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                <strong>{!!location.state ? "Update" : "Submit"}</strong>
+                "Submit"
               )}
             </Button>
           </Grid>
         </Grid>
-        </FormWrapper>
+      </FormWrapper>
     </Box>
   );
 };

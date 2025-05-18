@@ -9,7 +9,7 @@ import {
 import useAlert from "../../../hooks/useAlert.js";
 import axios from "../../../services/Api.js";
 import AddBoxIcon from '@mui/icons-material/AddBox';
-import moment from "moment";
+import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import { useNavigate } from "react-router-dom";
 const ModalWrapper = lazy(() => import("../../../components/ModalWrapper.jsx"));
 const CustomFileInput = lazy(() =>
@@ -18,18 +18,20 @@ const CustomFileInput = lazy(() =>
 
 const initialValues = {
   attachment: null,
-  rows:[]
+  rows: [],
+  loading:false,
+  isUploadModalOpen: false
 };
 const requiredAttachment = ["attachment"];
 
 function LaptopIssueIndex() {
-  const [{attachment,rows}, setValues] = useState(initialValues);
+  const [{ attachment, rows, isUploadModalOpen,loading }, setValues] = useState(initialValues);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  useEffect(()=>{
+  useEffect(() => {
     getData()
-  },[])
+  }, [])
 
   const columns = [
     {
@@ -54,9 +56,9 @@ function LaptopIssueIndex() {
       field: "issue",
       headerName: "Issue",
       flex: 1,
-      type:"actions",
+      type: "actions",
       getActions: (params) => [
-        <IconButton onClick={()=>navigate("/laptop-issue-form")}>
+        <IconButton onClick={() => navigate("/laptop-issue-form",{state:params.row})}>
           <AddBoxIcon fontSize="small" color="primary" />
         </IconButton>
       ]
@@ -64,23 +66,23 @@ function LaptopIssueIndex() {
   ];
 
   const setLoading = (val) => {
-    setValues((prevState)=>({
+    setValues((prevState) => ({
       ...prevState,
-      loading:val
+      loading: val
     }))
   };
 
-    const handleFileDrop = (name, newFile) => {
+  const handleFileDrop = (name, newFile) => {
     setValues((prev) => ({
       ...prev,
       [name]: newFile,
     }));
   };
 
-    const errorAttachmentMessages = {
+  const errorAttachmentMessages = {
     attachment: [
       "This field is required",
-      "Please upload a csv",
+      "Please upload csv file",
       "Maximum size 2 MB",
     ],
   };
@@ -96,11 +98,18 @@ function LaptopIssueIndex() {
   const handleFileRemove = (name) => {
     setValues((prev) => ({
       ...prev,
-     attachment : null,
+      attachment: null,
     }));
   };
 
-    const isAttachmentValid = () => {
+  const handleUpload = () => {
+    setValues((prevState) => ({
+      ...prevState,
+      isUploadModalOpen: !isUploadModalOpen
+    }))
+  };
+
+  const isAttachmentValid = () => {
     for (let i = 0; i < requiredAttachment.length; i++) {
       const field = requiredAttachment[i];
       if (Object.keys(checkAttachment).includes(field)) {
@@ -119,9 +128,10 @@ function LaptopIssueIndex() {
       if (res.status == 200 || res.status == 201) {
         setAlertMessage({
           severity: "success",
-          message: `Laptop issue attachment uploaded successfully !!`,
+          message: `Attachment uploaded successfully !!`,
         });
         setAlertOpen(true);
+        handleUpload();
         getData()
       }
     } catch (error) {
@@ -137,13 +147,15 @@ function LaptopIssueIndex() {
 
   const getData = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(`/api/student/fetchAllLaptopIssue?page=0&page_size=100000000&sort=created_date`);
       if (res.status == 200 || res.status == 200) {
         setValues((prevState) => ({
           ...prevState,
           rows: res.data.data.Paginated_data.content,
           attachment: null
-        }))
+        }));
+        setLoading(false)
       }
     } catch (error) {
       setAlertMessage({
@@ -153,41 +165,59 @@ function LaptopIssueIndex() {
           : "An error occured !!",
       });
       setAlertOpen(true);
+      setLoading(false)
     }
   };
 
   return (
-    <Box>
-      <Grid container sx={{ display: "flex",alignItems:"flex-end", justifyContent: "flex-end", gap: "10px", marginTop: { xs: 2, md: -5 } }}>
-        <Grid item xs={12} md={2}>
-          <CustomFileInput
-            name="attachment"
-            label="CSV File Attachment"
-            helperText="CSV - smaller than 2 MB"
-            file={attachment}
-            handleFileDrop={handleFileDrop}
-            handleFileRemove={handleFileRemove}
-            checks={checkAttachment.attachment}
-            errors={errorAttachmentMessages.attachment}
-            required
-          />
-        </Grid>
-        <Grid xs={12} md={1} align="end">
-          <Button
-            onClick={()=>onSubmit(attachment)}
-            variant="contained"
-            disableElevation
-            disabled={!isAttachmentValid()}
-          >
-            Submit
-          </Button>
-        </Grid>
-      </Grid>
-      <Box sx={{ position: "relative", marginTop: { xs: 8, md: 1 }}}>
+    <Box sx={{ position: "relative" }}>
+      <Button
+        sx={{ position: "absolute", right: 0, marginTop: -6 }}
+        startIcon={<DriveFolderUploadIcon />}
+        onClick={handleUpload}
+        variant="contained"
+        disableElevation
+      >
+        Upload
+      </Button>
+      <Box sx={{ position: "relative", marginTop: { xs: 8, md: 1 } }}>
         <Box sx={{ position: "absolute", width: "100%" }}>
-          <GridIndex rows={rows} columns={columns}/>
+          <GridIndex rows={rows} columns={columns} loading={loading}/>
         </Box>
       </Box>
+
+      <ModalWrapper
+        title="Laptop Issue File"
+        maxWidth={500}
+        open={isUploadModalOpen}
+        setOpen={() => handleUpload()}
+      >
+        <Grid container>
+          <Grid item xs={12}>
+            <CustomFileInput
+              name="attachment"
+              label="CSV File"
+              helperText="CSV File"
+              file={attachment}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              checks={checkAttachment.attachment}
+              errors={errorAttachmentMessages.attachment}
+              required
+            />
+          </Grid>
+          <Grid item mt={1} xs={12} textAlign="right">
+            <Button
+              onClick={() => onSubmit(attachment)}
+              variant="contained"
+              disableElevation
+              disabled={!isAttachmentValid()}
+            >
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
     </Box>
   );
 }
