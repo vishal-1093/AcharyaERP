@@ -586,6 +586,7 @@ function StudentFeereceiptIndex() {
             value={values.filter}
             options={values.filterList || []}
             handleChangeAdvance={handleChangeAdvance}
+            required
           />
         </Grid>
         {values.filter == "custom" && (

@@ -16,6 +16,8 @@ const initialValues = { document: "" };
 
 const requiredFields = ["document"];
 
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
+
 function UploadPhoto({ empId, documentViewAccess, setBackDropLoading }) {
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
@@ -187,7 +189,7 @@ function UploadPhoto({ empId, documentViewAccess, setBackDropLoading }) {
               />
             )}
           </Grid>
-          <Grid item xs={12} md={12}>
+          {(roleId == 1 || roleId == 5 || roleId === 6) && <Grid item xs={12} md={12}>
             <CustomFileInput
               name="document"
               label="File"
@@ -198,8 +200,8 @@ function UploadPhoto({ empId, documentViewAccess, setBackDropLoading }) {
               checks={checks.document}
               errors={errorMessages.document}
             />
-          </Grid>
-          <Grid item xs={12} md={3} align="right">
+          </Grid>}
+          {(roleId == 1 || roleId == 5 || roleId === 6) && <Grid item xs={12} md={3} align="right">
             <Button
               variant="contained"
               onClick={uploadPhoto}
@@ -215,7 +217,7 @@ function UploadPhoto({ empId, documentViewAccess, setBackDropLoading }) {
                 "Upload"
               )}
             </Button>
-          </Grid>
+          </Grid>}
         </Grid>
       </CardContent>
     </Card>

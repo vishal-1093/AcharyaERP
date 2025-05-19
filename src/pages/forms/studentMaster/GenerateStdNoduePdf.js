@@ -29,6 +29,8 @@ const styles = StyleSheet.create({
   margin: { marginTop: "20px" },
 });
 
+const letterHead = require.context("../../../assets", true);
+
 export const GenerateStdNoduePdf = (studentData, programType, dueYear) => {
   const DispayRow = ({ children }) => (
     <View style={styles.tableRow}>{children}</View>
@@ -92,7 +94,8 @@ export const GenerateStdNoduePdf = (studentData, programType, dueYear) => {
 
   const PageData = () => (
     <View style={styles.pageLayout}>
-      <Image style={styles.image} src={ait} />
+      <Image style={styles.image} 
+      src={letterHead(`./${studentData?.org_type.toLowerCase()}${studentData?.school_name_short.toLowerCase()}.jpg`)} />
       <View style={styles.layout}>
         <View>
           <Text style={styles.heading}>

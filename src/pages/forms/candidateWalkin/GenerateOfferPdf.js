@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   margin: { marginTop: "14px" },
   subMargin: { marginTop: "9px" },
   subLeftMargin: { marginLeft: "16px" },
-  paragraphMargin: { marginTop: "5px" },
+  paragraphMargin: { marginTop: "2px" },
   paragraph: { textAlign: "justify", lineHeight: 1.4 },
   policyParagraph: {
     textAlign: "justify",
@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
   },
   heading: { fontSize: 14, fontFamily: "Times-Bold", textAlign: "center" },
   subHeading: { fontSize: 12, fontFamily: "Times-Bold" },
+  boldParagraph: { fontSize: 11, fontFamily: "Times-Bold" },
   table: {
     display: "table",
     width: "auto",
@@ -280,20 +281,19 @@ export const GenerateOfferPdf = (data, feeTemplateData, noOfYears, remarks) => {
           • &nbsp; &nbsp; Registration Fee: To be paid immediately upon
           acceptance of the Offer Letter.
         </Text>
-        <Text style={{ ...styles.paragraph, ...styles.subLeftMargin }}>
+        {/* <Text style={{ ...styles.paragraph, ...styles.subLeftMargin }}>
           • &nbsp; &nbsp; 50% of Total Fees: Must be settled within 3 working
           days from acceptance.
-        </Text>
+        </Text> */}
         <Text style={{ ...styles.paragraph, ...styles.subLeftMargin }}>
-          • &nbsp; &nbsp; Remaining Balance: To be paid within 15 days from
-          acceptance.
+          • &nbsp; &nbsp; Remaining Balance: Must be settled within <Text style={styles.boldParagraph}> 3 working days from payment of the Registration Fee</Text>.
         </Text>
       </View>
     </View>
   );
 
   const FeeBreakDown = () => (
-    <View>
+    <View style={{marginTop:"10px"}}>
       <View>
         <Text style={styles.bold}>Fee Breakdown:</Text>
       </View>

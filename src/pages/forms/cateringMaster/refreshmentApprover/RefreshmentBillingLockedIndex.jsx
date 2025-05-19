@@ -201,9 +201,12 @@ function RefreshmentBillingLockedIndex() {
 
   const onClickPrint = async (rowData,type) => {
     try {
-      const res = await axios.get(`/api/fetchAllMealBillDetails?page=0&page_size=10000000&sort=created_date&bill_number=${rowData.bill_number}&school_id=${rowData.school_id}&financial_year_id=${rowData.financial_year_id}`);
+      const res = await axios.get( `/api/getMealRefreshmentRequests?voucher_head_new_id=${rowData.voucher_head_new_id
+          }&month=${moment(rowData.month_year.slice(0,2)).format("M")}&year=${moment(
+            rowData.month_year.slice(3)
+          ).format("YYYY")}&school_id=${rowData.school_id}`);
       if(res.status == 200 || res.status == 201){
-        const list = res.data.data.Paginated_data.content.reverse();
+        const list = res.data.data;
         const chunkArray = (array, chunkSize) =>
           Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
             array.slice(i * chunkSize, i * chunkSize + chunkSize)
