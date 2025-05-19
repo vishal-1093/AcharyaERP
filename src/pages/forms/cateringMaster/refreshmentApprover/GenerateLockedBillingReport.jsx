@@ -230,7 +230,7 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.dept_name_short}
+                label={obj.department}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -239,7 +239,7 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.mrrCreated_username}
+                label={obj.endUser}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -266,7 +266,7 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.meal_type}
+                label={obj.menuType}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -275,7 +275,7 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.approved_count}
+                label={obj.qty}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -284,7 +284,7 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.rate_per_count}
+                label={obj.rate}
                 style="Times-Roman"
                 right={1}
                 bottom={1}
@@ -293,7 +293,7 @@ export const GenerateLockedBillingReport = (
               />
               <DisplayCells
                 key={i}
-                label={obj.total_amount}
+                label={obj.total}
                 style="Times-Roman"
                 right={1}
                 bottom={1}

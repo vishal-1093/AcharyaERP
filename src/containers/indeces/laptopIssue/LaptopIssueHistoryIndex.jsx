@@ -45,7 +45,6 @@ function LaptopIssueHistoryIndex() {
       field: "grn_ref_no",
       headerName: "GRN Ref No.",
       flex: 1,
-      type: "number",
       hideable: false,
     },
     {
@@ -66,10 +65,18 @@ function LaptopIssueHistoryIndex() {
       flex: 1,
       type:"actions",
       getActions: (params) => [
-        <IconButton>
-          <VisibilityIcon  color="primary" />
-        </IconButton>
-      ]
+          <IconButton
+            onClick={() => handleDownload(params.row.attachment_path)}
+            sx={{ padding: 0 }}
+            disabled={!params.row.attachment_path}
+          >
+            <VisibilityIcon
+              fontSize="small"
+              color={params.row.attachment_path ? "primary" : "secondary"}
+              sx={{ cursor: "pointer" }}
+            />
+          </IconButton>
+      ],
     },
     {
       field: "acknowledge",
@@ -95,6 +102,18 @@ function LaptopIssueHistoryIndex() {
     },
   ];
 
+  const handleDownload = async (fileName) => {
+    await axios
+      .get(`api/student/laptopIssueFileDownload?fileName=${fileName}`, {
+        responseType: "blob",
+      })
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const setLoading = (val) => {
     setValues((prevState) => ({
       ...prevState,
@@ -104,12 +123,14 @@ function LaptopIssueHistoryIndex() {
 
   const getData = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(`/api/student/fetchAllLaptopIssueHistory?page=0&page_size=1000000&sort=created_date`);
       if (res.status == 200 || res.status == 201) {
         setValues((prevState) => ({
           ...prevState,
           rows: res.data.data.Paginated_data.content
-        }))
+        }));
+        setLoading(false)
       }
     } catch (error) {
       setAlertMessage({
@@ -119,6 +140,7 @@ function LaptopIssueHistoryIndex() {
           : "An error occured !!",
       });
       setAlertOpen(true);
+      setLoading(false)
     }
   };
 
