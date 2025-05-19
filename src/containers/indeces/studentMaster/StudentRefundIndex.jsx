@@ -77,15 +77,15 @@ function StudentRefundIndex() {
           <IconButton color="primary">
             <CheckCircleIcon
               fontSize="small"
-              onClick={() =>
-                navigate(`/StudentRefundPdf`, {
-                  state: {
-                    id: params.row.refund_reference_no,
-                    schoolId: params.row.school_id,
-                    fcYearId: params.row.financial_year_id,
-                  },
-                })
-              }
+              // onClick={() =>
+              //   navigate(`/StudentRefundPdf`, {
+              //     state: {
+              //       id: params.row.refund_reference_no,
+              //       schoolId: params.row.school_id,
+              //       fcYearId: params.row.financial_year_id,
+              //     },
+              //   })
+              // }
             />
           </IconButton>
         ) : params.row.created_by === userId ? (

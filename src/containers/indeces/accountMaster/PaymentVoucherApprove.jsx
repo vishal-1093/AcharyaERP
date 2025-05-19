@@ -203,6 +203,7 @@ function PaymentVoucherApprove() {
       credit_total: obj.debit_total,
       credit: obj.debit,
       created_name: obj.created_username,
+      date: moment(new Date()).format("DD-MM-YYYY"),
     }));
 
     try {

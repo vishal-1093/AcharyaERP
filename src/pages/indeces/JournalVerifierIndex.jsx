@@ -1,6 +1,6 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../services/Api";
-import { Grid, IconButton, Typography } from "@mui/material";
+import { Button, Grid, IconButton, Typography } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
@@ -242,18 +242,26 @@ function JournalVerifierIndex() {
       {!!attachmentModal && (
         <ModalWrapper
           title=""
-          maxWidth={1000}
+          maxWidth={700}
           open={attachmentModal}
           setOpen={() => handleViewAttachmentModal()}
         >
           <Grid container>
             <Grid item xs={12} md={12}>
               {!!fileUrl ? (
-                <iframe
-                  width="100%"
-                  style={{ height: "100vh" }}
-                  src={fileUrl}
-                ></iframe>
+                <>
+                  <iframe
+                    src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                    title="PDF Viewer"
+                    width="100%"
+                    height="100%"
+                    style={{
+                      border: "none",
+                      minHeight: "100vh",
+                      marginTop: "1rem",
+                    }}
+                  ></iframe>
+                </>
               ) : (
                 <></>
               )}

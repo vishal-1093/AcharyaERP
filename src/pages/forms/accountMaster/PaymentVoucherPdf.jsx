@@ -596,7 +596,7 @@ const PaymentVoucherPdf = () => {
                 <Box component="span" sx={{ fontWeight: "600" }}>
                   Date:{" "}
                 </Box>{" "}
-                {voucherData?.[0]?.date}
+                {moment(voucherData?.[0]?.created_date).format("DD-MM-YYYY")}
               </Typography>
             </Grid>
           </Grid>
@@ -864,23 +864,24 @@ const PaymentVoucherPdf = () => {
         >
           <Grid item xs={4}>
             <Typography variant="body1">
-              {voucherData?.[0]?.created_name} -{" "}
-              {moment(voucherData?.[0]?.created_date).format("DD-MM-YYYY")}{" "}
+              {voucherData?.[0]?.created_name}
               <br />
               Created By
             </Typography>
           </Grid>
           <Grid item xs={4} textAlign="center">
             <Typography variant="body1">
-              {voucherData?.[0]?.verifyName} -{" "}
-              {moment(voucherData?.[0]?.verified_date).format("DD-MM-YYYY")}{" "}
+              {voucherData?.[0]?.verifyName}
+              {/* -{" "}
+              {moment(voucherData?.[0]?.verified_date).format("DD-MM-YYYY")}{" "} */}
               <br /> Verified By
             </Typography>
           </Grid>
           <Grid item xs={4} textAlign="right">
             <Typography variant="body1">
-              {voucherData?.[0]?.approverName} -{" "}
-              {moment(voucherData?.[0]?.approved_date).format("DD-MM-YYYY")}{" "}
+              {voucherData?.[0]?.approverName}
+              {/* -{" "}
+              {moment(voucherData?.[0]?.approved_date).format("DD-MM-YYYY")}{" "} */}
               <br /> Approved By
             </Typography>
           </Grid>
