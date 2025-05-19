@@ -30,7 +30,8 @@ const initialState = {
   attachment: null,
   loading: false
 };
-const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const loggedInUser = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
+const requiredAttachment = ["attachment"];
 
 const LaptopIssueForm = () => {
   const [
@@ -166,6 +167,17 @@ const LaptopIssueForm = () => {
     ],
   };
 
+   const isAttachmentValid = () => {
+    for (let i = 0; i < requiredAttachment.length; i++) {
+      const field = requiredAttachment[i];
+      if (Object.keys(checkAttachment).includes(field)) {
+        const ch = checkAttachment[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![field]) return false;
+    }
+    return true;
+  };
+
   const setLoading = (val) => {
     setState((prevState) => ({
       ...prevState,
@@ -198,8 +210,6 @@ const LaptopIssueForm = () => {
     }
   };
 
-  console.log("rowData=======",rowDetails)
-
   const handleSubmit = async () => {
     try {
       const attachmentRes = await getAttachmentUploadResponse();
@@ -207,7 +217,8 @@ const LaptopIssueForm = () => {
         "laptop_issue_id": rowDetails?.id,
         "student_id": studentDetail?.school_id,
         "issued_date": new Date(),
-        "issued_by": userId,
+        "issued_by": loggedInUser?.userId,
+        "issued_by_name": loggedInUser?.userName,
         "status": true,
         "serialNo": rowDetails?.serialNo,
         "ack_date": rowDetails?.ack_date,
@@ -220,12 +231,6 @@ const LaptopIssueForm = () => {
         "acknowledgment_path": null,
         "acknowledgment_type": null,
         "active": true,
-        // "created_date": "2025-05-14T10:54:31.468+00:00",
-        // "modified_date": "2025-05-14T10:54:31.468+00:00",
-        // "created_by": 1,
-        // "modified_by": null,
-        // "created_username": "Amadmin",
-        // "modified_username": null
       };
       const res = await axios.put(`api/student/updateLaptopIssue/${rowDetails?.id}`, payload);
       if (attachmentRes && (res.status == 200 || res.status == 201)) {
@@ -329,7 +334,7 @@ const LaptopIssueForm = () => {
               variant="contained"
               color="primary"
               onClick={handleSubmit}
-              disabled={totalDue != 0 || !studentDetail || !attachment || loading}
+              disabled={totalDue != 0 || !studentDetail || !attachment || !isAttachmentValid() || loading}
             >
               {loading ? (
                 <CircularProgress

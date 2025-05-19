@@ -165,16 +165,13 @@ function RefreshmentRequestReport() {
           `/api/getMealRefreshmentRequests?voucher_head_new_id=${values.vendorId
           }&month=${moment(values.date).format("M")}&year=${moment(
             values.date
-          ).format("YYYY")}`
+          ).format("YYYY")}&school_id=${values.schoolId}`
         );
       if (res.status == 200 || res.status == 201) {
         checkLockedOrNot();
         const list = res.data.data;
         if (list?.length > 0) {
-          const schoolRows = list.filter(
-            (obj) => obj.institute === schoolData.label
-          );
-          setRows(schoolRows);
+          setRows(list);
         } else {
           setAlertMessage({
             severity: "error",
