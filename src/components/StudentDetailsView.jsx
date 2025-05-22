@@ -515,7 +515,6 @@ function StudentDetailsView() {
       .get(`/api/student/getAllStudentDetailsData/${Id}`)
       .then((res) => {
         const data = res?.data?.data?.Student_details;
-
         setEditStudentDetails((prev) => ({
           ...prev,
           studentName: data?.student_name,
@@ -857,7 +856,7 @@ function StudentDetailsView() {
       payload.active = true;
       payload.student_name = editStudentDetails.studentName;
       payload.alternate_number = editStudentDetails.alternateMobile;
-      // payload.dateofbirth = editStudentDetails.dob;
+      payload.dateofbirth = moment(editStudentDetails.dob).format("YYYY-MM-DD");
       payload.account_number = editStudentDetails.accountNumber;
       payload.candidate_sex = editStudentDetails.gender;
       payload.mobile = editStudentDetails.mobile;
@@ -1234,7 +1233,6 @@ function StudentDetailsView() {
                                     handleChange={handleChangeEditStudent}
                                     checks={checks.studentName}
                                     errors={errorMessages.studentName}
-                                    disabled
                                     required
                                   />
                                 </Grid>
