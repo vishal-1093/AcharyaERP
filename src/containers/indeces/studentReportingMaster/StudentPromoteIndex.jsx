@@ -104,8 +104,6 @@ function StudentPromoteIndex() {
     setCurrentSem(selectedRow[0]?.current_sem);
   };
 
-  console.log(rowData);
-
   const handleStatus = (params) => {
     setEligibleOpen(true);
   };

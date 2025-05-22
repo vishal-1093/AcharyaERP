@@ -110,17 +110,31 @@ function ExamFeeReceipt() {
   const [payTillYears, setPayTillYears] = useState([]);
   const [totalPaying, setTotalPaying] = useState();
   const [loading, setLoading] = useState(false);
+  const [inrValue, setInrValue] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
   useEffect(() => {
     getSchoolData();
+    getInrValue();
   }, []);
 
   useEffect(() => {
     getBankData();
   }, [values.schoolId]);
+
+  const getInrValue = async () => {
+    await axios
+      .get(`/api/finance/allActiveDollarToInrConversion`)
+      .then((res) => {
+        const inr = res.data.data.reduce((max, obj) => {
+          return obj.dollar_to_inr_id > max.dollar_to_inr_id ? obj : max;
+        }, res.data.data[0]);
+        setInrValue(inr);
+      })
+      .catch((err) => console.error(err));
+  };
 
   useEffect(() => {
     let count = 0;
@@ -455,6 +469,11 @@ function ExamFeeReceipt() {
         hostel_status: 0,
         paid_year: newArr?.toString(),
         school_id: studentData.school_id,
+        inr_value:
+          studentData.currency_type_name === "USD" ||
+          values.receivedIn === "USD"
+            ? Math.round(Number(values.receivedAmount * inrValue.inr))
+            : Math.round(Number(values.receivedAmount)),
       };
 
       const response = payTillYears?.map((obj) => {
@@ -986,6 +1005,20 @@ function ExamFeeReceipt() {
                     </>
                   )}
                   {/*Saved Data Open Ends */}
+
+                  {studentData.currency_type_name === "USD" &&
+                    values.receivedIn === "INR" && (
+                      <Grid item xs={12} align="center">
+                        <Typography variant="subtitle2" color="error">
+                          Amount of{" "}
+                          {Math.round(
+                            Number(values.receivedAmount || values.ddAmount) *
+                              inrValue.inr
+                          )}{" "}
+                          is being collected in INR
+                        </Typography>
+                      </Grid>
+                    )}
 
                   {/* Accordian Start */}
                   <Grid item xs={12} align="center">
