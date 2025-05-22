@@ -65,6 +65,8 @@ function JournalGrnIndex() {
   const [paymentData, setPaymentData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
+  const [fileUrl, setFileUrl] = useState(null);
+  const [attachmentModal, setAttachmentModal] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -228,7 +230,9 @@ function JournalGrnIndex() {
         }
       );
       const url = URL.createObjectURL(response.data);
-      window.open(url);
+
+      setFileUrl(url);
+      setAttachmentModal(true);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -389,6 +393,37 @@ function JournalGrnIndex() {
           setModalWrapperOpen={setModalWrapperOpen}
         />
       </ModalWrapper>
+
+      {!!attachmentModal && (
+        <ModalWrapper
+          title=""
+          maxWidth={700}
+          open={attachmentModal}
+          setOpen={setAttachmentModal}
+        >
+          <Grid container>
+            <Grid item xs={12} md={12}>
+              {!!fileUrl ? (
+                <>
+                  <iframe
+                    src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                    title="PDF Viewer"
+                    width="100%"
+                    height="100%"
+                    style={{
+                      border: "none",
+                      minHeight: "100vh",
+                      marginTop: "1rem",
+                    }}
+                  ></iframe>
+                </>
+              ) : (
+                <></>
+              )}
+            </Grid>
+          </Grid>
+        </ModalWrapper>
+      )}
 
       <ModalWrapper
         open={poWrapperOpen}
