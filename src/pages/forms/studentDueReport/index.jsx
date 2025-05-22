@@ -5,6 +5,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import axios from "../../../services/Api";
 import moment from "moment";
 import { useLocation } from "react-router-dom";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const FALLBACKCRUMB = [
     {
@@ -22,12 +23,14 @@ const StudentDueReport = () => {
     const [showButton, setShowButton] = useState(true)
     const [isBranchWiseDueReport, setIsBranchWiseDueReport] = useState(true)
     const { pathname } = useLocation();
+    const setCrumbs = useBreadcrumbs();
 
     const roleShortName = JSON.parse(
         sessionStorage.getItem("AcharyaErpUser")
     )?.roleShortName;
 
     useEffect(() => {
+          setCrumbs([])
         getInstituteData()
     }, [])
 

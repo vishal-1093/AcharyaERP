@@ -46,6 +46,8 @@ import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
 import RazorPayPendingSettlementDetail from "./containers/indeces/razorpaySettlementMaster/razorpayPendingSettlement.jsx";
+import FacultyFeedbackReportCourseForm from "./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportCourseForm.jsx";
+//import FacultyFeedbackReportByCourse from "./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportByCourse.jsx";
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
 );
@@ -91,6 +93,10 @@ const StudentFeedbackReportMaster = lazy(() =>
 const FacultyFeedbackMaster = lazy(() =>
   import("./pages/masters/FacultyFeedbackMaster")
 );
+
+const FacultyFeedbackReportByCourse = lazy(()=>
+  import("./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportByCourse.jsx")
+)
 
 const StudentRazorPayWindowUniform = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
@@ -1590,7 +1596,6 @@ const StudentCoursewiseAttendance = lazy(() =>
 const DetailedAttendancefilter = lazy(() =>
   import("./pages/forms/studentMaster/DetailedAttendancefilter")
 );
-// Faculty Details
 
 const FacultyDetails = lazy(() => import("./pages/masters/FacultyDetails.jsx"));
 
@@ -9429,6 +9434,27 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-course"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  {/* <FacultyFeedbackReportByCourse /> */}
+                  <FacultyFeedbackReportCourseForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/facultyFeedbackMasterCourseIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportByCourse />
+                </Suspense>
+              }
+            />
+            
+            
           </>
           <>
             <Route

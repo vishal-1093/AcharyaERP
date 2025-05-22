@@ -9,6 +9,8 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FacultyCourseDetailModal from "../../../components/FacultyCourseDetailModal";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
+import CustomFilter from "../../../components/Inputs/CustomCommonFilter";
+import CustomToggle from "../../../components/Inputs/CustomToggle";
 const CourseModalContent = {
     title: "Select Course",
     message: ""
@@ -32,15 +34,17 @@ const FacultyFeedbackIndex = () => {
     const [schoolOptions, setSchoolOptions] = useState([]);
     const [departmentOptions, setDepartmentOptions] = useState([]);
     const [acYearOptions, setAcYearOptions] = useState([]);
+    // const [showFilter, setShowFilter] = useState(false);
+    //  const [selectedFilters, setSelectedFilters] = useState([]);
     const setCrumbs = useBreadcrumbs();
     const navigate = useNavigate();
     const { pathname } = useLocation();
-      const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-      const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
-      const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
-      const roleShortName = JSON.parse(
+    const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+    const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
+    const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
+    const roleShortName = JSON.parse(
         sessionStorage.getItem("AcharyaErpUser")
-      )?.roleShortName;
+    )?.roleShortName;
 
     useEffect(() => {
 
@@ -51,21 +55,21 @@ const FacultyFeedbackIndex = () => {
         getSchoolDetails();
         getAcademicYearDetails();
         getData();
-        
+
     }, []);
 
     useEffect(() => {
         getData();
-      }, [values?.schoolId, values?.deptId, values?.acYearId]);
-    
-      useEffect(() => {
-            getDepartmentOptions();
-      }, [schoolID, values?.schoolId]);
+    }, [values?.schoolId, values?.deptId, values?.acYearId]);
+
+    useEffect(() => {
+        getDepartmentOptions();
+    }, [schoolID, values?.schoolId]);
 
     const getData = async () => {
         setLoading(true);
         const { schoolId, deptId, acYearId } = values;
-        let  baseURL = `/api/student/classFeedbackAnswersEmployeeDetails`;
+        let baseURL = `/api/student/classFeedbackAnswersEmployeeDetails`;
         let params ={
             sort: "created_date",
             page: 0,
@@ -76,29 +80,29 @@ const FacultyFeedbackIndex = () => {
         }
         switch (pathname) {
             case "/FacultyFeedbackMaster-inst":
-              params = {
-                ...params,
-                ...(schoolID && { school_id: schoolID }),
-              };
-              break;
-    
+                params = {
+                    ...params,
+                    ...(schoolID && { school_id: schoolID }),
+                };
+                break;
+
             case "/FacultyFeedbackMaster-dept":
-              params = {
-                ...params,
-                ...(schoolID && { school_id: schoolId ? schoolId : schoolID }),
-                ...(deptID && { dept_id: deptID })
-              };
-              break;
-     
+                params = {
+                    ...params,
+                    ...(schoolID && { school_id: schoolId ? schoolId : schoolID }),
+                    ...(deptID && { dept_id: deptID })
+                };
+                break;
+
             default:
-                baseURL = roleShortName !== "SAA" ?  `/api/student/classFeedbackAnswersEmployeeDetails?emp_id=${userID}` :  `/api/student/classFeedbackAnswersEmployeeDetails`;
-          }
-    
+                baseURL = roleShortName !== "SAA" ? `/api/student/classFeedbackAnswersEmployeeDetails?emp_id=${userID}` : `/api/student/classFeedbackAnswersEmployeeDetails`;
+        }
+
         await axios.get(baseURL, { params })
             .then((res) => {
                 const { content } = res?.data?.data?.Paginated_data
-                 setRows([...content] || []);
-                 setLoading(false);
+                setRows([...content] || []);
+                setLoading(false);
             })
             .catch((err) => {
                 setLoading(false);
@@ -198,6 +202,11 @@ const FacultyFeedbackIndex = () => {
         }
     };
 
+    // const handleFilterChange = (event) =>{
+    //     console.log("event.target.value", event.target.value)
+    //    setSelectedFilters(event.target.value)
+    // }
+
     const columns = [
         { field: "empcode", headerName: "Employee Code", flex: 1 },
         { field: "employee_name", headerName: "Name", flex: 1 },
@@ -207,13 +216,13 @@ const FacultyFeedbackIndex = () => {
         { field: "designation_name", headerName: "Designation", flex: 1 },
         { field: "dept_name_short", headerName: "Department", flex: 1, hide: true },
         {
-              field: "feedback_window",
-              headerName: "Window",
-              flex: 1,
-              renderCell: (params) =>{
-               return `${moment(params.row.fromDate).format("DD-MM-YYYY")} - ${moment(params.row.toDate).format("DD-MM-YYYY")}`
-              }
-            },
+            field: "feedback_window",
+            headerName: "Window",
+            flex: 1,
+            renderCell: (params) =>{
+                return `${moment(params.row.fromDate).format("DD-MM-YYYY")} - ${moment(params.row.toDate).format("DD-MM-YYYY")}`
+            }
+        },
         {
             field: "report1",
             headerName: "Report1",
@@ -240,44 +249,52 @@ const FacultyFeedbackIndex = () => {
 
     return (
         <Box sx={{ width: "100%" }}>
-                <Box>
+            <Box>
                 <Grid container alignItems="center" gap={3} mt={2} mb={2}>
-                    {(pathname === "/FacultyFeedbackMaster-dept" || (roleShortName === "SAA" && pathname === "/FacultyFeedbackMaster") ) && (
-                    <Grid item xs={12} md={3}>
-                        <CustomAutocomplete
-                            name="schoolId"
-                            label="School"
-                            value={pathname === "/FacultyFeedbackMaster-dept" ? schoolID :values.schoolId}
-                            options={schoolOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                            disabled={pathname === "/FacultyFeedbackMaster-dept" ? true : false}
-                        />
-                    </Grid>
-                   )}
+                    {(pathname === "/FacultyFeedbackMaster-dept" || (roleShortName === "SAA" && pathname === "/FacultyFeedbackMaster")) && (
+                        <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                                name="schoolId"
+                                label="School"
+                                value={pathname === "/FacultyFeedbackMaster-dept" ? schoolID : values.schoolId}
+                                options={schoolOptions}
+                                handleChangeAdvance={handleChangeAdvance}
+                                disabled={pathname === "/FacultyFeedbackMaster-dept" ? true : false}
+                            />
+                        </Grid>
+                    )}
                     {(pathname === "/FacultyFeedbackMaster-inst" || (roleShortName === "SAA" && pathname === "/FacultyFeedbackMaster")) && (
-                    <Grid item xs={12} md={3}>
-                        <CustomAutocomplete
-                            name="deptId"
-                            label="Department"
-                            value={values.deptId}
-                            options={departmentOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                        />
-                    </Grid>
-                     )}
-                     {(pathname === "/FacultyFeedbackMaster-inst" || pathname === "/FacultyFeedbackMaster-dept" || roleShortName === "SAA" ) && (
-                    <Grid item xs={6} md={3}>
-                        <CustomAutocomplete
-                            name="acYearId"
-                            label="Academic Year"
-                            value={values.acYearId}
-                            options={acYearOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                        />
-                    </Grid>
-                     )}
+                        <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                                name="deptId"
+                                label="Department"
+                                value={values.deptId}
+                                options={departmentOptions}
+                                handleChangeAdvance={handleChangeAdvance}
+                            />
+                        </Grid>
+                    )}
+                    {(pathname === "/FacultyFeedbackMaster-inst" || pathname === "/FacultyFeedbackMaster-dept" || roleShortName === "SAA") && (
+                        <Grid item xs={6} md={3}>
+                            <CustomAutocomplete
+                                name="acYearId"
+                                label="Academic Year"
+                                value={values.acYearId}
+                                options={acYearOptions}
+                                handleChangeAdvance={handleChangeAdvance}
+                            />
+                        </Grid>
+                    )}
                 </Grid>
             </Box>
+            {/* <CustomToggle
+                isVisible={showFilter}
+                onToggle={() => setShowFilter(prev => !prev)}
+                label="Filters"
+            />
+            {showFilter ? (
+              <CustomFilter filterableColumns={columns} handleChange={handleFilterChange} selectedFilters={selectedFilters}/>
+            ): <></>} */}
             <GridIndex rows={rows} columns={columns} getRowId={row => row.class_feedback_answers_id} />
             <FacultyCourseDetailModal
                 open={showCourseModel}
