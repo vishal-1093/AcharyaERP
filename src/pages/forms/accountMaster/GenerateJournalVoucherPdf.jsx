@@ -372,16 +372,16 @@ const JournalVoucherPdf = () => {
                         sx={bookmanFont}
                       >
                         Narration:{" "}
-                        {voucherData?.[0]?.type !== "Salary-JV"
+                        {/* {voucherData?.[0]?.type !== "Salary-JV"
                           ? voucherData?.[0]?.voucher_head
-                          : ""}{" "}
+                          : ""}{" "} */}
                         {voucherData?.[0]?.remarks
                           ? ` ${voucherData?.[0]?.remarks}`
                           : ""}{" "}
-                        {voucherData?.[0]?.created_username &&
+                        {/* {voucherData?.[0]?.created_username &&
                         voucherData?.[0]?.type !== "Salary-JV"
                           ? ` created by ${voucherData?.[0]?.draftCreatedName}`
-                          : ""}
+                          : ""} */}
                       </Typography>
                     </>
                   </TableCell>

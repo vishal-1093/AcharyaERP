@@ -774,6 +774,11 @@ const PaymentVoucherIndex = lazy(() =>
 const SalaryVoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/SalaryVoucherForm.jsx")
 );
+
+const ConsultantVoucherForm = lazy(() =>
+  import("./pages/forms/accountMaster/ConsultantVoucherForm.jsx")
+);
+
 const DraftJournalVoucherIndex = lazy(() =>
   import("./pages/indeces/DraftJournalVoucherIndex.jsx")
 );
@@ -4091,6 +4096,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/consultant-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ConsultantVoucherForm />
               </Suspense>
             }
           />

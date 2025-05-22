@@ -31,7 +31,8 @@ const voucherList = [
     value: "Contra Voucher",
     link: "/contra-voucher",
   },
-  { label: "Salary Voucher", value: "Salary Voucher", link: "/salary-voucher" },
+  { label: "Salary JV", value: "Salary Voucher", link: "/salary-voucher" },
+  { label: "Consultant JV", value: "Consultant JV", link: "/consultant-voucher" },
 ];
 
 const initialValues = { schoolId: null, voucher: "" };
