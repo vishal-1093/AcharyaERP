@@ -452,7 +452,11 @@ function PoPdf() {
 
   useEffect(() => {
     getData();
+    if(location?.state?.path){
+      setCrumbs([{ name: "PO Payment History", link: location?.state?.path }]);
+    }else{
     setCrumbs([{ name: location?.state?.pathName === "/Approvepo" ? "Approve PO" : "Purchase Order", link: location?.state?.pathName === "/Approvepo" ? "/Approvepo" : "/PoMaster" }]);
+    }
   }, []);
 
   useEffect(() => {
@@ -1400,7 +1404,7 @@ function PoPdf() {
 
   return (
     <>
-      {location.state.pathName !== "/Approvepo" && <Box
+      {location?.state?.pathName !== "/Approvepo" && <Box
         display="flex"
         justifyContent="center"
         alignItems="center"
