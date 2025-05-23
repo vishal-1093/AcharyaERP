@@ -115,6 +115,7 @@ function AllPoList() {
       setAmout(amount)
     } else {
       setModalPreview(true);
+      setAmout(amount)
     }
     getPoData(id, type)
   };
@@ -143,7 +144,7 @@ function AllPoList() {
       navigate(`/CreateGrn/${purchaseOrderId}`)
     }
   }
-    const handleClickUpdate = (params) => {
+  const handleClickUpdate = (params) => {
     if (params.row.approverStatus === 0) {
       setAlertMessage({
         severity: "error",
@@ -288,7 +289,7 @@ function AllPoList() {
       const endpoint =
         type === "SRN"
           ? `/api/purchase/getGRNByPOId/${id}`
-          : `/api/purchase/getPurchaseOrderById?id=${id}`;
+          : `/api/purchase/getGRNByPOId/${id}`;
 
       const res = await axios.get(endpoint);
       const purchaseOrder = res?.data?.data?.purchaseOrder;
@@ -296,7 +297,7 @@ function AllPoList() {
       if (type === "SRN") {
         setSrnPoRows(res?.data?.data);
       } else {
-        setPoRows(purchaseItems);
+        setPoRows(res?.data?.data);
       }
     } catch (error) {
       console.error("Failed to fetch PO data:", error);
@@ -506,7 +507,7 @@ function AllPoList() {
         <GridIndex rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel} />
       </Box>
-      <ModalWrapper title={`GRN Details`} open={modalPreview} setOpen={setModalPreview}>
+      <ModalWrapper title="GRN Details" open={modalPreview} setOpen={setModalPreview}>
         <Grid container justifyContent="center" alignItems="center" marginTop={2}>
           <TableContainer component={Paper} sx={{ maxHeight: 500, borderRadius: 2, boxShadow: 3 }}>
             <Table stickyHeader size="small" aria-label="modern styled table">
@@ -514,16 +515,20 @@ function AllPoList() {
                 <TableRow sx={{ backgroundColor: 'primary.main' }}>
                   {[
                     'Item Name',
+                    'PO No',
+                    'PO Amount',
                     'GRN No',
                     'Quantity',
                     'Rate',
+                    'Discount (%)',
+                    'Discount Total',
+                    'GST (%)',
+                    'GST Total',
                     'Total Amount',
                     'Unit',
-                    'Make',
-                    'Serial No',
                     'Description',
                     'Created Name',
-                    'Created Date'
+                    'Created Date',
                   ].map((header, index) => (
                     <TableCell
                       key={index}
@@ -531,6 +536,7 @@ function AllPoList() {
                         fontWeight: 'bold',
                         backgroundColor: 'primary.main',
                         color: '#ffffff',
+                        whiteSpace: 'nowrap',
                       }}
                     >
                       {header}
@@ -540,31 +546,41 @@ function AllPoList() {
               </TableHead>
 
               <TableBody>
-                {poData?.map((item, index) => (
-                  <TableRow
-                    key={index}
-                    hover
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: '#f0f8ff',
-                        transition: '0.3s',
-                      },
-                      borderRadius: 2,
-                    }}
-                  >
-                    <TableCell sx={{ fontWeight: 500 }}>{item.itemName}</TableCell>
-                    <TableCell align="right">{item.poReferenceNo ?? ""}</TableCell>
-                    <TableCell align="right">{item.quantity ?? 0}</TableCell>
-                    <TableCell align="right">₹{item.rate ?? 0}</TableCell>
-                    <TableCell align="right">₹{item.totalAmount ?? 0}</TableCell>
-                    <TableCell>{item.measureShortName}</TableCell>
-                    <TableCell>{item.envItemsInStoresId?.make}</TableCell>
-                    <TableCell>{item.envItemsInStoresId?.item_serial_no}</TableCell>
-                    <TableCell>{item.envItemsInStoresId?.item_description}</TableCell>
-                    <TableCell>{item.createdUsername}</TableCell>
-                    <TableCell> {moment(item.created_date).format("DD-MM-YYYY")}</TableCell>
-                  </TableRow>
-                ))}
+                {poData?.map((item, index) => {
+                  const rate = item.enterQty ? item.costTotal / item.enterQty : 0;
+
+                  return (
+                    <TableRow
+                      key={index}
+                      hover
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: '#f0f8ff',
+                          transition: '0.3s',
+                        },
+                        borderRadius: 2,
+                      }}
+                    >
+                      <TableCell sx={{ fontWeight: 500 }}>{item.itemName}</TableCell>
+                      <TableCell>{item.purchaseRefNo}</TableCell>
+                      <TableCell align="right">₹{Number(poAmount).toFixed(2)}</TableCell>
+                      <TableCell align="right">{item.grnNo ?? ''}</TableCell>
+                      <TableCell align="right">{item.enterQty ?? item.quantity ?? 0}</TableCell>
+                      <TableCell align="right">₹{rate.toFixed(2)}</TableCell>
+
+                      <TableCell align="right">{item.discount ? `${item.discount}%` : '0%'}</TableCell>
+                      <TableCell align="right">₹{Number(item.discountTotal || 0).toFixed(2)}</TableCell>
+                      <TableCell align="right">{item.gst ? `${item.gst}%` : '0%'}</TableCell>
+                      <TableCell align="right">₹{Number(item.gstTotal || 0).toFixed(2)}</TableCell>
+
+                      <TableCell align="right">₹{Number(item.totalAmount || 0).toFixed(2)}</TableCell>
+                      <TableCell>{item.uomShortName ?? ''}</TableCell>
+                      <TableCell>{item.invoiceDescription ?? 'N/A'}</TableCell>
+                      <TableCell>{item.createdUserName ?? ''}</TableCell>
+                      <TableCell>{moment(item.createdDate).format("DD-MM-YYYY")}</TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>

@@ -9,7 +9,7 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import axios from "../../../services/Api";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import numberToWords from "number-to-words";
@@ -281,6 +281,7 @@ const styles = StyleSheet.create({
 });
 
 function GrnPdf() {
+  const location = useLocation();
   const [data, setData] = useState([]);
   const [total, setTotal] = useState();
   const [costValue, setCostValue] = useState();
@@ -289,9 +290,15 @@ function GrnPdf() {
 
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
+  const fromPath = location?.state?.path;
 
   useEffect(() => {
-    setCrumbs([{ name: "GRN Index", link: "/GRNIndex" }]);
+    if (fromPath) {
+      setCrumbs([{ name: "Po Payment History", link: fromPath }]);
+    } else {
+      setCrumbs([{ name: "GRN Index", link: "/GRNIndex" }]);
+
+    }
     getPdfData();
   }, []);
 
@@ -542,7 +549,7 @@ function GrnPdf() {
 
               <View style={styles.rate}>
                 <Text style={styles.timeTableTdStyleMainAmount}>
-                {isSRN ? obj.enterQuantity : obj?.rate}
+                  {isSRN ? obj.enterQuantity : obj?.rate}
                 </Text>
               </View>
 
