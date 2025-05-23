@@ -92,6 +92,7 @@ function StudentRefundDetails({ id, studentDataResponse }) {
   const [refundReceiptFormatData, setRefundReceiptFormatData] = useState([]);
   const [rowDueTotal, setRowDueTotal] = useState();
   const [cancelAdmissionStatus, setCancelAdmissionStatus] = useState(false);
+  const [errorOpen, setErrorOpen] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -386,8 +387,10 @@ function StudentRefundDetails({ id, studentDataResponse }) {
 
     if (cancelStatus) {
       setTestData(formattedData);
+      setErrorOpen(true);
     } else {
       setTestData(negativeYearData);
+      setErrorOpen(true);
     }
   };
 
@@ -721,9 +724,11 @@ function StudentRefundDetails({ id, studentDataResponse }) {
         ) : (
           <>
             <Grid item xs={12} align="center" mt={2}>
-              <Typography variant="subtitle2" color="red">
-                STUDENT HAS NO ANY RECEIPTS
-              </Typography>
+              {errorOpen && (
+                <Typography variant="subtitle2" color="red">
+                  NO EXCESS FEE PAID
+                </Typography>
+              )}
             </Grid>
           </>
         )}

@@ -372,16 +372,18 @@ const JournalVoucherPdf = () => {
                         sx={bookmanFont}
                       >
                         Narration:{" "}
-                        {/* {voucherData?.[0]?.type !== "Salary-JV"
+                        {voucherData?.[0]?.type !== "Salary-JV" &&
+                        voucherData?.[0]?.type !== "REFUND-JV"
                           ? voucherData?.[0]?.voucher_head
-                          : ""}{" "} */}
+                          : ""}{" "}
                         {voucherData?.[0]?.remarks
                           ? ` ${voucherData?.[0]?.remarks}`
                           : ""}{" "}
-                        {/* {voucherData?.[0]?.created_username &&
-                        voucherData?.[0]?.type !== "Salary-JV"
+                        {voucherData?.[0]?.created_username &&
+                        voucherData?.[0]?.type !== "Salary-JV" &&
+                        voucherData?.[0]?.type !== "REFUND-JV"
                           ? ` created by ${voucherData?.[0]?.draftCreatedName}`
-                          : ""} */}
+                          : ""}
                       </Typography>
                     </>
                   </TableCell>
@@ -468,7 +470,8 @@ const JournalVoucherPdf = () => {
             <Typography variant="body1" sx={bookmanFont}>
               Verified By
               <br />
-              {voucherData?.[0]?.verifier_name}
+              {voucherData?.[0]?.verifier_name ??
+                voucherData?.[0]?.jvVerifier_name}
             </Typography>
           </Grid>
         </Grid>

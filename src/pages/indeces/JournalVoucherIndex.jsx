@@ -255,7 +255,12 @@ function JournalVoucherIndex() {
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
-    { field: "verifierName", headerName: "Verified By", flex: 1 },
+    {
+      field: "verifierName",
+      headerName: "Verified By",
+      flex: 1,
+      valueGetter: (value, row) => row.verifierName ?? row.jvVerifier_name,
+    },
     {
       field: "envAttachment_path",
       headerName: "Attachment",
@@ -500,19 +505,16 @@ function JournalVoucherIndex() {
             <Grid container>
               <Grid item xs={12} md={12}>
                 {!!fileUrl ? (
-                  <>
-                    <iframe
-                      src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-                      title="PDF Viewer"
-                      width="100%"
-                      height="100%"
-                      style={{
-                        border: "none",
-                        minHeight: "100vh",
-                        marginTop: "1rem",
-                      }}
-                    ></iframe>
-                  </>
+                  <iframe
+                    src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                    width="100%"
+                    height="100%"
+                    style={{
+                      border: "none",
+                      minHeight: "100vh",
+                      marginTop: "1rem",
+                    }}
+                  ></iframe>
                 ) : (
                   <></>
                 )}
