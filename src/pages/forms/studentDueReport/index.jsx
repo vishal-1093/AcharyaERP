@@ -122,10 +122,10 @@ const StudentDueReport = () => {
                     return
                 }
                 const { newAddmissionDueReports, totalEligibleStudent, totalReceivableAmount, totalStudent } = data
-                const academyYear = newAddmissionDueReports?.length > 0 && newAddmissionDueReports[0]?.acYear || "2025-2026"
+                const academicYear = newAddmissionDueReports?.length > 0 && newAddmissionDueReports[0]?.acYear || "2025-2026"
                 const NEWFALLBACKCRUMB = [
                     {
-                        text: `Due Amount For ${academyYear}`,
+                        text: `Due Amount For ${academicYear}`,
                         action: () => { },
                         isParent: false
                     }
@@ -138,7 +138,7 @@ const StudentDueReport = () => {
                             if (!params.row.isClickable)
                                 return <Typography fontWeight="bold">{params.row.inst}</Typography>
 
-                            return <Button onClick={() => getBranchData(params.row)} sx={{ padding: 0, fontWeight: "bold" }}>
+                            return <Button onClick={() => getBranchData(params.row, params?.row?.acYearId)} sx={{ padding: 0, fontWeight: "bold" }}>
                                 {params.row.inst}
                             </Button>
                         }
@@ -154,11 +154,11 @@ const StudentDueReport = () => {
                 ]
 
                 const dataRows = newAddmissionDueReports.map(obj => {
-                    const { schoolNameShort, schoolName, studentDueCount, feeReceivable, schoolId } = obj
+                    const { schoolNameShort, schoolName, studentDueCount, feeReceivable, schoolId, acYearId } = obj
                     if (feeReceivable > 0){
                         return {
                             id: schoolId, inst: schoolName, studentDueCount, isLastRow: false,
-                             total: feeReceivable, isClickable: feeReceivable > 0 ? true : false
+                             total: feeReceivable, isClickable: feeReceivable > 0 ? true : false, acYearId
                         }
                     }
                      else return {}
@@ -166,6 +166,7 @@ const StudentDueReport = () => {
                 dataRows.push({
                     id: Date.now(),
                     inst: "",
+                    acYearId: "",
                     studentDueCount: totalStudent ? totalStudent : 0,
                     // eligible: totalEligibleStudent ? totalEligibleStudent : 0,
                     total: totalReceivableAmount ? totalReceivableAmount : 0,
@@ -183,10 +184,11 @@ const StudentDueReport = () => {
             })
     }
 
-    const getBranchData = (selectedInst) => {
+    const getBranchData = (selectedInst, acYear="") => {
         setShowButton(false)
         setLoading(true)
-        axios.get(`/api/student/branchWiseDueReport?schoolId=${selectedInst.id}`)
+        const url = acYear ? `/api/student/branchWiseDueReport?schoolId=${selectedInst.id}&acYearId=${acYear}` : `/api/student/branchWiseDueReport?schoolId=${selectedInst.id}`
+        axios.get(url)
             .then(res => {
                 setBreadCrumbs([
                     {

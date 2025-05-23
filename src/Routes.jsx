@@ -9444,6 +9444,26 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+             <Route
+              exact
+              path="/FacultyFeedbackMaster-course-inst"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  {/* <FacultyFeedbackReportByCourse /> */}
+                  <FacultyFeedbackReportCourseForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-course-dept"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  {/* <FacultyFeedbackReportByCourse /> */}
+                  <FacultyFeedbackReportCourseForm />
+                </Suspense>
+              }
+            />
             <Route
               exact
               path="/facultyFeedbackMasterCourseIndex"

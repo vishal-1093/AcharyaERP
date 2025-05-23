@@ -367,10 +367,6 @@ const initialValues = {
     searchItem: "",
     isConsultant: "REG",
 };
-const schoolID = JSON.parse(sessionStorage.getItem("userData"))?.school_id;
-const deptID = JSON.parse(sessionStorage.getItem("userData"))?.dept_id;
-
-const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -383,26 +379,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.body}`]: {
-        textAlign: "center",
-        padding: 3,
-        border: "1px solid rgba(224, 224, 224, 1)",
-        "&:nth-of-type(3)": {
-            textAlign: "left",
-        },
-        "&:nth-of-type(4)": {
-            width: "7%",
-        },
-        "&:nth-of-type(5)": {
-            textAlign: "left",
-        },
-        "&:nth-of-type(6)": {
-            textAlign: "left",
-        },
-    },
-}));
-
-const SectionStyledTableCellBody = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.body}`]: {
         textAlign: "center",
         padding: 3,
@@ -422,6 +398,14 @@ const SectionStyledTableCellBody = styled(TableCell)(({ theme }) => ({
     },
 }));
 
+const SectionStyledTableCellBody = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.body}`]: {
+        textAlign: "center",
+        padding: 3,
+        border: "1px solid rgba(224, 224, 224, 1)",
+    },
+}));
+
 
 const HtmlTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -437,71 +421,28 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     },
 }));
 
-const dayLable = {
-    A: "Absent",
-    P: "Present",
-    N: "New Joinee",
-    R: "Relieved",
-    L: "Leave",
-    MA: "Manual Attendance",
-    WO: "Week Off",
-    DH: "Declared Holiday",
-    GH: "General Holiday",
-    OD: "Official On Duty",
-    AL: "Absent Leave",
-};
-
 function FacultyFeedbackReportByCourse() {
-    const { pathname } = useLocation();
-    const [values, setValues] = useState(initialValues);
-    const [schoolOptions, setSchoolOptions] = useState([]);
-    const [departmentOptions, setDepartmentOptions] = useState([]);
-    const [employeeList, setEmployeeList] = useState([]);
+  //  const [values, setValues] = useState(initialValues);
     const [rows, setRows] = useState([]);
-    const [days, setDays] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [filterBtnLoading, setFilterBtnLoading] = useState(false);
+    // const [days, setDays] = useState([]);
     const [loading, setLoading] = useState(false)
     const [column, setColumn] = useState()
     const [sectionKeys, setSectionKeys] = useState([])
     const [allCourses, setAllCourses] = useState([])
     const [courseSectionMap, setCourseSectionMap] = useState([])
+    const [acYear, setAcYear] = useState()
     const [tab, setTab] = useState('course')
-        // const [values, setValues] = useState(initValues);
-        const [academicYearOptions, setAcademicYearOptions] = useState([]);
-        const [yearSemOptions, setYearSemOptions] = useState([]);
-        const [courseList, setCourseList] = useState([])
-         const [programSplList, setProgramSplList] = useState([])
-    const { setAlertMessage, setAlertOpen } = useAlert();
-    const setCrumbs = useBreadcrumbs();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(50);
+    const { setAlertMessage, setAlertOpen } = useAlert();
+    const setCrumbs = useBreadcrumbs();
     const location = useLocation();
     const queryParams = location.state;
 
     useEffect(() => {
-        setCrumbs([{ name: "Faculty Feedback - Course" }]);
-        getSchoolDetails();
-        // handleSubmit("notClick");
-        // if (pathname.toLowerCase() === "/attendancesheet-inst") {
-        //     setValues((prev) => ({
-        //         ...prev,
-        //         schoolId: schoolID,
-        //     }));
-        // }
-        // if (pathname.toLowerCase() === "/attendancesheet-dept") {
-        //     setValues((prev) => ({
-        //         ...prev,
-        //         schoolId: schoolID,
-        //         deptId: deptID
-        //     }));
-        // }
+        setCrumbs([{ name: "Faculty Feedback Master - course", link:"/FacultyFeedbackMaster-course" }, { name: "Faculty Feedback Report- Course" }]);
         getAllFacultySubject()
     }, []);
-
-    // useEffect(() => {
-    //     getDepartmentOptions();
-    // }, [values.schoolId]);
 
     useEffect(() => {
         setRows([])
@@ -510,7 +451,7 @@ function FacultyFeedbackReportByCourse() {
 
     const getAllFacultySubject = () => {
         setLoading(true)
-        const { course_id, year, sem, employee_id, ...query } = queryParams
+        const { year, sem, employee_id, acYear, ...query } = queryParams
         const yearAndSem = query?.yearSem && query?.yearSem?.split("/")
         const selectedYear = yearAndSem?.length > 0 ? yearAndSem[0] : ""
         const selectedSem = yearAndSem?.length > 0 ? yearAndSem[1] : ""
@@ -524,10 +465,10 @@ function FacultyFeedbackReportByCourse() {
                 const { data } = res.data
                 const columnData = data?.length > 0 && data?.map((col, index) => {
                     return {
-                        // field: `course_name-${index}`,
                         field: col?.course_code,
                         headerName: col?.course_code,
-                        flex: 1, align: 'center',
+                        flex: 1,
+                        align: 'center',
                         headerAlign: 'center',
                         renderCell: () => (
                             <Tooltip title={col?.course_name || ''} arrow>
@@ -558,7 +499,7 @@ function FacultyFeedbackReportByCourse() {
 
     const getFeedbackReport = () => {
         setLoading(true)
-        const { program_specialization_id, year_sem, ...params } = queryParams
+        const { dept_id, year_sem, acYear, ...params } = queryParams
         //   const baseUrl = "api/student/getFeedbackRatingReportSectionWiseReport"
         const baseUrl = tab === 'course' ? "/api/student/getFeedbackRatingReportCourseWise" : "api/student/getFeedbackRatingReportSectionWiseReport"
         axios.get(baseUrl, { params })
@@ -636,124 +577,6 @@ function FacultyFeedbackReportByCourse() {
             })
     }
 
-    const getSchoolDetails = async () => {
-        await axios
-            .get(`/api/institute/school`)
-            .then((res) => {
-                const optionData = [];
-                res.data.data.forEach((obj) => {
-                    optionData.push({
-                        value: obj.school_id,
-                        label: obj.school_name_short,
-                    });
-                });
-                setSchoolOptions(optionData);
-            })
-            .catch((err) => console.error(err));
-    };
-
-    const getDepartmentOptions = async () => {
-        if (values.schoolId) {
-            await axios
-                .get(`/api/fetchdept1/${values.schoolId}`)
-                .then((res) => {
-                    const data = [];
-                    res.data.data.forEach((obj) => {
-                        data.push({
-                            value: obj.dept_id,
-                            label: obj.dept_name_short,
-                        });
-                    });
-                    setDepartmentOptions(data);
-                })
-                .catch((err) => console.error(err));
-        }
-    };
-
-    const handleChangeAdvance = (name, newValue) => {
-        setValues((prev) => ({
-            ...prev,
-            [name]: newValue,
-            ...(name === "schoolId" &&
-                (newValue === "" || newValue === null) && { deptId: "" }),
-        }));
-    };
-
-    const debouncedSearch = useMemo(
-        () =>
-            _.debounce((value) => {
-                const filteredRows = employeeList.filter((obj) => {
-                    return Object.values(obj).some((item) =>
-                        item?.toString().toLowerCase().includes(value.toLowerCase())
-                    );
-                });
-                setRows(filteredRows);
-                setPage(0);
-            }, 500), // 500ms debounce time
-        [employeeList] // dependencies
-    );
-
-    const handleChangeSearch = (e) => {
-        debouncedSearch(e.target.value);
-    };
-
-    const handleSubmit = async (type) => {
-        const month = moment(values.month).format("MM");
-        const year = moment(values.month).format("YYYY");
-
-        const daysTemp = [];
-        const getDays = new Date(year, month, 0).getDate();
-
-        for (let i = 1; i <= getDays; i++) {
-            daysTemp.push({
-                value: i,
-                day: dayNames[new Date(year + "-" + month + "-" + i).getDay()],
-            });
-        }
-
-        const temp = {
-            year,
-            month,
-            school_id: (pathname.toLowerCase() === "/attendancesheet-inst" || pathname.toLowerCase() === "/attendancesheet-dept") ? schoolID : values.schoolId,
-            dept_id: pathname.toLowerCase() === "/attendancesheet-dept" ? deptID : values.deptId,
-            empTypeShortName: values.isConsultant,
-            sort: "year",
-            page: 0,
-            page_size: 10000,
-        };
-
-        if (type == "click") {
-            setFilterBtnLoading(true);
-        }
-        try {
-            setIsLoading(true);
-            // Construct the query string based on the `temp` object, including only keys with values.
-            const queryParams = Object.keys(temp)
-                .filter((key) => temp[key] !== undefined && temp[key] !== null)
-                .map((key) => `${key}=${encodeURIComponent(temp[key])}`)
-                .join("&");
-
-            // Construct the full URL with the dynamic query string.
-            const res = await axios.get(
-                `/api/employee/employeeAttendance?${queryParams}`
-            );
-            setEmployeeList(res.data.data?.Paginated_data.content);
-            setRows(res.data.data?.Paginated_data.content);
-            setDays(daysTemp);
-            setIsLoading(false);
-            setFilterBtnLoading(false);
-            setPage(0);
-        } catch (err) {
-            setIsLoading(false);
-            setFilterBtnLoading(false);
-            setAlertMessage({
-                severity: "error",
-                message: err.response ? err.response.data.message : "An error occurred",
-            });
-            setAlertOpen(true);
-        }
-    };
-
     function daysTableHead() {
         return column?.map((obj, i) => {
             return <StyledTableCell key={i}>{obj.headerName}</StyledTableCell>;
@@ -793,14 +616,12 @@ function FacultyFeedbackReportByCourse() {
                                     textAlign: "center",
                                 }}
                             >
-                                {values?.isConsultant === "true" ? "Consultant" : ""}
-                                Faculty Feedback Report for the Academy Year - 2024-2025
-                                {/* {" " + moment(values.month).format("MMMM YYYY")} */}
+                                {`Faculty Feedback Report for the Academic Year - ${queryParams?.acYear}`}
                             </TableCell>
                         </TableRow>
                         <TableRow>
                             <StyledTableCell>Sl No</StyledTableCell>
-                            <StyledTableCell>Employee Name</StyledTableCell>
+                            <StyledTableCell sx={{alignItems:"center", textAlign:"left !important"}}>Employee Name</StyledTableCell>
                             {daysTableHead()}
                         </TableRow>
                     </TableHead>
@@ -816,19 +637,19 @@ function FacultyFeedbackReportByCourse() {
                                             </Typography>
                                         </StyledTableCellBody>
 
-                                        <StyledTableCellBody>
+                                        <StyledTableCellBody sx={{textAlign: "left !important"}}>
                                             <Typography variant="subtitle2" color="textSecondary">
                                                 <HtmlTooltip
                                                     title={
                                                         <Box>
                                                             <Typography>
-                                                                {obj.employee_name?.toLowerCase()}
+                                                                {obj.employee_name}
                                                             </Typography>
                                                         </Box>
                                                     }
                                                 >
                                                     <span>
-                                                        {obj.employee_name?.toLowerCase()}
+                                                        {obj.employee_name}
                                                     </span>
                                                 </HtmlTooltip>
                                             </Typography>
@@ -844,7 +665,7 @@ function FacultyFeedbackReportByCourse() {
                         ) : (
                             <TableRow>
                                 <TableCell
-                                    colSpan={10 + days.length}
+                                    colSpan={2 + column?.length}
                                     sx={{ textAlign: "center" }}
                                 >
                                     <Typography variant="subtitle2">No Records</Typography>
@@ -864,7 +685,7 @@ function FacultyFeedbackReportByCourse() {
                 />
             </TableContainer>
         ),
-        [rows, page, rowsPerPage, days]
+        [rows, page, rowsPerPage]
     );
 
     // const sectiontableData = useMemo(
@@ -920,16 +741,14 @@ function FacultyFeedbackReportByCourse() {
                 <TableHead>
                     <TableRow>
                         <TableCell
-                            colSpan={2 + column?.length}
+                            colSpan={4 + sectionKeys?.length}
                             sx={{
                                 backgroundColor: "primary.main",
                                 color: "headerWhite.main",
                                 textAlign: "center",
                             }}
                         >
-                            {values?.isConsultant === "true" ? "Consultant" : ""} Attendance
-                            Faculty Feedback Report - Section for the Academy Year - 2024-2025
-                            {/* {" " + moment(values.month).format("MMMM YYYY")} */}
+                         {`Faculty Feedback Report for the Academic Year - ${queryParams?.acYear}`}
                         </TableCell>
                     </TableRow>
                     <TableRow>
@@ -995,163 +814,13 @@ function FacultyFeedbackReportByCourse() {
     return (
         <>
             <Box>
-                {/* <Grid mt={2} mb={2} container columnSpacing={3} rowSpacing={3}>
-                    <Grid item xs={12} md={1}>
-                        <CustomDatePicker
-                            name="month"
-                            label="Month"
-                            value={values.month}
-                            handleChangeAdvance={handleChangeAdvance}
-                            views={["month", "year"]}
-                            openTo="month"
-                            inputFormat="MM/YYYY"
-                            required
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} md={2}>
-                        <CustomAutocomplete
-                            name="schoolId"
-                            label="School"
-                            value={values.schoolId}
-                            options={schoolOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                            disabled={pathname.toLowerCase() !== "/attendancesheet"}
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} md={2}>
-                        <CustomAutocomplete
-                            name="deptId"
-                            label="Department"
-                            value={values.deptId}
-                            options={departmentOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                            disabled={pathname.toLowerCase() === "/attendancesheet-dept"}
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={2}>
-                        <CustomAutocomplete
-                            name="isConsultant"
-                            label="Employee Type"
-                            value={values.isConsultant}
-                            options={[
-                                { value: "REG", label: "Regular" },
-                                { value: "CON", label: "Consultant" },
-                            ]}
-                            handleChangeAdvance={handleChangeAdvance}
-                        />
-                    </Grid>
-
-                    <Grid item xs={12} md={1}>
-                        <Button
-                            variant="contained"
-                            onClick={() => handleSubmit("click")}
-                            disabled={
-                                filterBtnLoading ||
-                                values.month === null ||
-                                values.month === "Invalid Date"
-                            }
-                        >
-                            {filterBtnLoading ? (
-                                <CircularProgress size={25} color="blue" />
-                            ) : (
-                                "Submit"
-                            )}
-                        </Button>
-                    </Grid>
-                    <Grid item xs={12} md={2} align="right">
-                        <ExportButton rows={rows} name={values} />
-                    </Grid>
-                    <Grid item xs={12} md={2} align="right">
-                        <TextField
-                            name="searchItem"
-                            values={values.searchItem}
-                            onChange={handleChangeSearch}
-                            size="small"
-                            fullWidth
-                            InputProps={{
-                                endAdornment: <SearchIcon />,
-                            }}
-                        />
-                    </Grid>
-                </Grid> */}
-                <Grid
-                    container
-                    alignItems="center"
-                    rowSpacing={3}
-                    columnSpacing={3}
-                    mt={2}
-                    mb={2}
-                >
-                    <Grid item xs={12} md={2.6}>
-                        <CustomAutocomplete
-                            name="acYearId"
-                            label="Academic Year"
-                            value={values.acYearId}
-                            options={academicYearOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                        // checks={checks.acYearId}
-                        // errors={errorMessages.acYearId}
-                        // required
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={2.6}>
-                        <CustomAutocomplete
-                            name="yearSem"
-                            label="Year/Sem"
-                            value={values.yearSem}
-                            options={yearSemOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                        //  required
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={2.6}>
-                        <CustomAutocomplete
-                            name="programSpecializationId"
-                            label="Program Spelization"
-                            value={values.programSpecializationId}
-                            options={programSplList || []}
-                            handleChangeAdvance={handleChangeAdvance}
-                        //  required
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={2.6}>
-                        <CustomAutocomplete
-                            name="courseId"
-                            label="Course"
-                            value={values.courseId}
-                            options={courseList || []}
-                            handleChangeAdvance={handleChangeAdvance}
-                        //  required
-                        />
-                    </Grid>
-                    <Grid item xs={12} md={1.6}>
-                        <Button
-                            variant="contained"
-                            onClick={() => handleSubmit("click")}
-                        // disabled={
-                        //     filterBtnLoading ||
-                        //     values.month === null ||
-                        //     values.month === "Invalid Date"
-                        // }
-                        >
-                            {/* {filterBtnLoading ? (
-                                <CircularProgress size={25} color="blue" />
-                            ) : (
-                                "Submit"
-                            )} */}
-                            Submit
-                        </Button>
-                    </Grid>
-                </Grid>
                 <Tabs value={tab} onChange={handleChangeTab}>
                     <Tab value="course" label="Course" />
                     <Tab value="course-and-section" label="Course And Section" />
                 </Tabs>
 
-                <Grid container>
-                    {isLoading ? (
+                <Grid container mt={2}>
+                    {loading ? (
                         <Grid item xs={12} md={10} align="center">
                             <OverlayLoader />
                         </Grid>

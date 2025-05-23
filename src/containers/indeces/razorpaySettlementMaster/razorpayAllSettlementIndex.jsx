@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import moment from "moment";
 import CustomFilter from "../../../components/Inputs/CustomCommonFilter";
+import useAlert from "../../../hooks/useAlert";
 
 const RazorPaySettlementIndex = () => {
     const [rows, setRows] = useState([])
@@ -13,9 +14,7 @@ const RazorPaySettlementIndex = () => {
     const [date, setDate] = useState()
     const { pathname } = useLocation();
     const navigate = useNavigate()
-    const roleShortName = JSON.parse(
-        sessionStorage.getItem("AcharyaErpUser")
-    )?.roleShortName;
+    const { setAlertMessage, setAlertOpen } = useAlert();
 
     useEffect(() => {
         updateSettlementDataintoDB()
@@ -57,6 +56,11 @@ const RazorPaySettlementIndex = () => {
             .catch(err => {
                 console.log(err)
                 setLoading(false)
+                 setAlertMessage({
+                        severity: "error",
+                        message: "Failed to Fetch, Please try after sometime",
+                    });
+                    setAlertOpen(true);
             })
     }
 

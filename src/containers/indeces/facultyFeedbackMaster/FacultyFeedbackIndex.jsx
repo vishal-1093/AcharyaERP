@@ -54,7 +54,7 @@ const FacultyFeedbackIndex = () => {
 
         getSchoolDetails();
         getAcademicYearDetails();
-        getData();
+     //  getData();
 
     }, []);
 
@@ -97,7 +97,6 @@ const FacultyFeedbackIndex = () => {
             default:
                 baseURL = roleShortName !== "SAA" ? `/api/student/classFeedbackAnswersEmployeeDetails?emp_id=${userID}` : `/api/student/classFeedbackAnswersEmployeeDetails`;
         }
-
         await axios.get(baseURL, { params })
             .then((res) => {
                 const { content } = res?.data?.data?.Paginated_data
@@ -295,7 +294,7 @@ const FacultyFeedbackIndex = () => {
             {showFilter ? (
               <CustomFilter filterableColumns={columns} handleChange={handleFilterChange} selectedFilters={selectedFilters}/>
             ): <></>} */}
-            <GridIndex rows={rows} columns={columns} getRowId={row => row.class_feedback_answers_id} />
+            <GridIndex rows={rows} columns={columns} getRowId={row => row.class_feedback_answers_id} loading={loading}/>
             <FacultyCourseDetailModal
                 open={showCourseModel}
                 setOpen={setShowCourseModel}
