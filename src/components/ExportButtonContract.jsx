@@ -71,9 +71,9 @@ const ExportButtonContract = ({ rows, name, sclName }) => {
         "employeeName",
         "institute",
         "department",
-        "fromDate",
-        "toDate",
-        "payDays",
+        // "fromDate",
+        // "toDate",
+        // "payDays",
         "payingAmount",
         "tds",
         "netPay",
@@ -90,9 +90,9 @@ const ExportButtonContract = ({ rows, name, sclName }) => {
         employeeName: "Consultant",
         institute: "INST",
         department: "Dept",
-        fromDate: "From Date",
-        toDate: "To Date",
-        payDays: "Pay Days",
+        // fromDate: "From Date",
+        // toDate: "To Date",
+        // payDays: "Pay Days",
         payingAmount: "Monthly Fee",
         tds: "TDS",
         netPay: "Net Pay",
@@ -118,10 +118,10 @@ const ExportButtonContract = ({ rows, name, sclName }) => {
       const totalNetPay = rows.reduce((sum, row) => sum + parseFloat(row.netPay || 0), 0);
 
       const totalRow = Array(columnOrder.length).fill("");
-      totalRow[7] = "Total";
-      totalRow[8] = totalMonthlyFee.toFixed(2);
-      totalRow[9] = totalTDS.toFixed(2);
-      totalRow[10] = totalNetPay.toFixed(2);
+      totalRow[4] = "Total";
+      totalRow[5] = totalMonthlyFee.toFixed(2);
+      totalRow[6] = totalTDS.toFixed(2);
+      totalRow[7] = totalNetPay.toFixed(2);
       tableRows.push(totalRow);
 
       var totalPagesExp = "{total_pages_count_string}";
