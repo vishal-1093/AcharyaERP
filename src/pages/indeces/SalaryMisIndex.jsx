@@ -623,6 +623,7 @@ const SalaryMisIndex = () => {
             label="Salary Report Type"
             handleChangeAdvance={handleChangeAdvance}
             options={salaryReportTypeList}
+            required
           />
         </Grid>
         {salaryReportType == "bank" && <Grid item xs={12} md={2}>

@@ -30,7 +30,8 @@ const initialState = {
   attachment: null,
   loading: false
 };
-const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const loggedInUser = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
+const requiredAttachment = ["attachment"];
 
 const LaptopIssueForm = () => {
   const [
@@ -67,12 +68,27 @@ const LaptopIssueForm = () => {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      (auid) && getStudentDetail()
+      (auid) && isIssuedOrNot()
     }, 1000);
     return () => {
       clearTimeout(handler);
     };
   }, [auid]);
+
+  const isIssuedOrNot = async () => {
+    try {
+      const res = await axios.get(`/api/student/checkAuidForLaptop/${auid}`);
+      if(res.status == 200 || res.status == 201){
+        getStudentDetail()
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: `Laptop is already issued to this ${auid} !!`,
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const getStudentDetail = async () => {
     try {
@@ -150,7 +166,7 @@ const LaptopIssueForm = () => {
   const errorAttachmentMessages = {
     attachment: [
       "This field is required",
-      "Please upload a PDF",
+      "Please upload a PDF || JPEG || JPG || PNG",
       "Maximum size 2 MB",
     ],
   };
@@ -166,6 +182,17 @@ const LaptopIssueForm = () => {
     ],
   };
 
+   const isAttachmentValid = () => {
+    for (let i = 0; i < requiredAttachment.length; i++) {
+      const field = requiredAttachment[i];
+      if (Object.keys(checkAttachment).includes(field)) {
+        const ch = checkAttachment[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![field]) return false;
+    }
+    return true;
+  };
+
   const setLoading = (val) => {
     setState((prevState) => ({
       ...prevState,
@@ -173,18 +200,19 @@ const LaptopIssueForm = () => {
     }));
   };
 
+  const handleSubmit = async () => {
+      getAttachmentUploadResponse();
+  };
+
   const getAttachmentUploadResponse = async () => {
     try {
       setLoading(true);
       const formData = new FormData();
       formData.append("laptop_issue_id", rowDetails?.id)
-      attachment?.name?.endsWith(".pdf") && formData.append("file", attachment);
-      (attachment?.name?.endsWith(".jpeg") ||
-        attachment?.name?.endsWith(".jpg") ||
-        attachment?.name?.endsWith(".png") && formData.append("image_file", attachment))
+      formData.append("file1", attachment);
       const res = await axios.post(`api/student/laptopIssueUploadFile`, formData);
       if (res.status == 200 || res.status == 201) {
-        return res;
+        getDetailsByLaptopIssueId(rowDetails?.id);
       }
     } catch (error) {
       setLoading(false)
@@ -198,37 +226,45 @@ const LaptopIssueForm = () => {
     }
   };
 
-  console.log("rowData=======",rowDetails)
-
-  const handleSubmit = async () => {
+  const getDetailsByLaptopIssueId = async (laptopIssueId) => {
     try {
-      const attachmentRes = await getAttachmentUploadResponse();
+      const res = await axios.get(`/api/student/getLaptopIssue/${laptopIssueId}`);
+      if (res.status == 200 || res.status == 201) {
+        updateData(res.data.data)
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+      setLoading(false)
+    }
+  };
+
+  const updateData  = async(data) => {
+    try {
       const payload = {
-        "laptop_issue_id": rowDetails?.id,
-        "student_id": studentDetail?.school_id,
+        "laptop_issue_id": data.laptop_issue_id,
+        "student_id": studentDetail?.student_id,
         "issued_date": new Date(),
-        "issued_by": userId,
+        "issued_by": loggedInUser?.userId,
+        "issued_by_name": loggedInUser?.userName,
+        "attachment_path": data.attachment_path,
+        "attachment_type": data.attachment_type,
         "status": true,
-        "serialNo": rowDetails?.serialNo,
-        "ack_date": rowDetails?.ack_date,
-        "grn_ref_no": rowDetails?.grn_ref_no,
-        "description": rowDetails?.description,
-        "type": rowDetails?.type,
-        "year_sem": studentDetail?.current_sem ? studentDetail?.current_sem : studentDetail?.current_year,
-        "attachment_path": attachment?.name,
-        "attachment_type": null,
-        "acknowledgment_path": null,
-        "acknowledgment_type": null,
+        "serialNo": data.serialNo,
+        "ac_year_id":data.ac_year_id,
+        "po_ref_no":data.po_ref_no,
+        "grn_ref_no": data.grn_ref_no,
+        "type": data.type,
+        "year_sem": studentDetail.current_sem ? studentDetail.current_sem : studentDetail.current_year,
         "active": true,
-        // "created_date": "2025-05-14T10:54:31.468+00:00",
-        // "modified_date": "2025-05-14T10:54:31.468+00:00",
-        // "created_by": 1,
-        // "modified_by": null,
-        // "created_username": "Amadmin",
-        // "modified_username": null
       };
       const res = await axios.put(`api/student/updateLaptopIssue/${rowDetails?.id}`, payload);
-      if (attachmentRes && (res.status == 200 || res.status == 201)) {
+      if (res.status == 200 || res.status == 201) {
         navigate("/laptop-issue");
         setAlertMessage({
           severity: "success",
@@ -329,7 +365,7 @@ const LaptopIssueForm = () => {
               variant="contained"
               color="primary"
               onClick={handleSubmit}
-              disabled={totalDue != 0 || !studentDetail || !attachment || loading}
+              disabled={totalDue != 0 || !studentDetail || !attachment || !isAttachmentValid() || loading}
             >
               {loading ? (
                 <CircularProgress

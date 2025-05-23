@@ -774,6 +774,11 @@ const PaymentVoucherIndex = lazy(() =>
 const SalaryVoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/SalaryVoucherForm.jsx")
 );
+
+const ConsultantVoucherForm = lazy(() =>
+  import("./pages/forms/accountMaster/ConsultantVoucherForm.jsx")
+);
+
 const DraftJournalVoucherIndex = lazy(() =>
   import("./pages/indeces/DraftJournalVoucherIndex.jsx")
 );
@@ -1106,6 +1111,14 @@ const StudentHistory = lazy(() =>
 );
 const StudentHistoryIndex = lazy(() =>
   import("./containers/indeces/studentReportingMaster/StudentHistoryIndex")
+);
+
+const StudentDepromote = lazy(() =>
+  import("./pages/forms/studentReportingMaster/StudentDepromote.jsx")
+);
+
+const StudentDepromoteIndex = lazy(() =>
+  import("./containers/indeces/studentReportingMaster/DepromoteIndex.jsx")
 );
 
 const EmployeeCalendar = lazy(() => import("./components/employeeCalendar"));
@@ -1948,8 +1961,12 @@ const DDDetailReport = lazy(() =>
   import("./pages/indeces/DDDetailsReport.jsx")
 );
 const SalaryMisIndex = lazy(() => import("./pages/indeces/SalaryMisIndex.jsx"));
-const LaptopIssueIndex = lazy(()=>import("./containers/indeces/laptopIssue/Index.jsx"));
-const LaptopIssueForm = lazy(()=>import("./containers/indeces/laptopIssue/LaptopIssueForm.jsx"));
+const LaptopIssueIndex = lazy(() =>
+  import("./containers/indeces/laptopIssue/Index.jsx")
+);
+const LaptopIssueForm = lazy(() =>
+  import("./containers/indeces/laptopIssue/LaptopIssueForm.jsx")
+);
 
 const Health = lazy(() => import("./pages/Health.jsx"));
 const SalarySheetMaster = lazy(() =>
@@ -4096,6 +4113,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/consultant-voucher"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ConsultantVoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/draft-journals"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -5062,6 +5088,26 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StudentHistoryIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/StudentDepromote"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentDepromote />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/StudentDepromoteIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentDepromoteIndex />
                 </Suspense>
               }
             />
@@ -9988,20 +10034,18 @@ function RouteConfig() {
             path={"/laptop-issue"}
             element={<Navigate replace to="/laptop-issue-index" />}
           />
-          {["/laptop-issue-index", "/laptop-issue-history"].map(
-            (path) => (
-              <Route
-                exact
-                key={path}
-                path={path}
-                element={
-                  <Suspense fallback={<OverlayLoader />}>
-                    <LaptopIssueIndex />
-                  </Suspense>
-                }
-              />
-            )
-          )}
+          {["/laptop-issue-index", "/laptop-issue-history"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <LaptopIssueIndex />
+                </Suspense>
+              }
+            />
+          ))}
           <Route
             exact
             path={"/laptop-issue-form"}

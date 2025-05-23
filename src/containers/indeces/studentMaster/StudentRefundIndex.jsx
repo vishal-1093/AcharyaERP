@@ -40,6 +40,7 @@ const StyledTableCells = styled(TableCell)(({ theme }) => ({
 }));
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
 function StudentRefundIndex() {
   const [rows, setRows] = useState([]);
@@ -52,6 +53,12 @@ function StudentRefundIndex() {
   const [approveOpen, setApproveOpen] = useState(false);
   const [receiptData, setReceiptData] = useState([]);
   const [values, setValues] = useState({ remarks: "" });
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    approver_date: false,
+    approver_name: false,
+    approver_remarks: false,
+    refund_remarks: false,
+  });
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -77,15 +84,15 @@ function StudentRefundIndex() {
           <IconButton color="primary">
             <CheckCircleIcon
               fontSize="small"
-              onClick={() =>
-                navigate(`/StudentRefundPdf`, {
-                  state: {
-                    id: params.row.refund_reference_no,
-                    schoolId: params.row.school_id,
-                    fcYearId: params.row.financial_year_id,
-                  },
-                })
-              }
+              // onClick={() =>
+              //   navigate(`/StudentRefundPdf`, {
+              //     state: {
+              //       id: params.row.refund_reference_no,
+              //       schoolId: params.row.school_id,
+              //       fcYearId: params.row.financial_year_id,
+              //     },
+              //   })
+              // }
             />
           </IconButton>
         ) : params.row.created_by === userId ? (
@@ -119,6 +126,24 @@ function StudentRefundIndex() {
       flex: 1,
       valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
+    },
+
+    { field: "approver_name", headerName: "Approved By", flex: 1 },
+    {
+      field: "approver_date",
+      headerName: "Approved Date",
+    },
+
+    {
+      field: "approver_remarks",
+      headerName: "Approver Remarks",
+      flex: 1,
+    },
+
+    {
+      field: "refund_remarks",
+      headerName: "Refund Remarks",
+      flex: 1,
     },
 
     // {
@@ -197,6 +222,8 @@ function StudentRefundIndex() {
       approver_remarks: values.remarks,
       approver_status: 1,
       refund_status: "Approved",
+      approver_id: userID,
+      approver_date: moment(new Date()).format("DD-MM-YYYY"),
     }));
 
     receiptData?.map((obj) => {
@@ -232,6 +259,8 @@ function StudentRefundIndex() {
       verifier_id: userID,
       verified_status: 1,
       verified_date: new Date(),
+      created_username: receiptData?.[0]?.created_username,
+      created_by: receiptData?.[0]?.created_by,
     };
 
     receiptData?.forEach((obj) => {
@@ -250,15 +279,23 @@ function StudentRefundIndex() {
         ),
         draftCreatedName: obj.created_username,
         pay_to: receiptData?.[0]?.student_name,
-        payment_mode: 1,
+        payment_mode: 4,
         reference_number: null,
-        remarks: `BEING REFUND GENERATED FOR ${receiptData?.[0]?.auid}, ${receiptData?.[0]?.student_name}, ${receiptData?.[0]?.receipt_no}. DFDS & DATE , ${receiptData?.[0]?.refund_remarks}, DUE ADMISSION CANCELLATION`,
+        remarks: `Being Refund Generated For ${receiptData?.[0]?.auid}, ${
+          receiptData?.[0]?.student_name
+        }, Receipt No. ${receiptData?.[0]?.receipt_no} & ${moment(
+          new Date()
+        ).format("DD-MM-YYYY")} , ${
+          receiptData?.[0]?.refund_remarks
+        }, Due Admission Cancellation`,
         school_id: receiptData?.[0]?.school_id,
         voucher_head_id: obj.voucher_head_new_id,
         type: "REFUND-JV",
         verifier_id: userID,
         verified_status: 1,
         verified_date: new Date(),
+        created_username: receiptData?.[0]?.created_username,
+        created_by: receiptData?.[0]?.created_by,
       });
     });
 
@@ -401,7 +438,7 @@ function StudentRefundIndex() {
             </Button>
             <Button
               sx={{ ml: 2 }}
-              onClick={handleReject}
+              // onClick={handleReject}
               variant="contained"
               color="error"
             >
@@ -421,7 +458,12 @@ function StudentRefundIndex() {
         >
           Create
         </Button>
-        <GridIndex rows={rows} columns={columns} />
+        <GridIndex
+          rows={rows}
+          columns={columns}
+          setColumnVisibilityModel={setColumnVisibilityModel}
+          columnVisibilityModel={columnVisibilityModel}
+        />
       </Box>
     </>
   );

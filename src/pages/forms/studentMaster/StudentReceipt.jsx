@@ -732,7 +732,7 @@ function StudentReceipt() {
               student_id: studentId,
               fee_template_id: feetemplateId,
               student_name: studentData.student_name,
-              school_name: studentData.school_name,
+              school_name: studentData.school_name_short,
               school_id: studentData.school_id,
               transaction_no:
                 values.transactionType === "RTGS"

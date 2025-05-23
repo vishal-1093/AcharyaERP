@@ -1,6 +1,6 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
-import { Button, IconButton, Typography } from "@mui/material";
+import { Button, Grid, IconButton, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
@@ -55,6 +55,8 @@ function PaymentVoucherApprove() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [envData, setEnvData] = useState({});
+  const [fileUrl, setFileUrl] = useState(null);
+  const [attachmentModal, setAttachmentModal] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -168,7 +170,8 @@ function PaymentVoucherApprove() {
       );
 
       const url = URL.createObjectURL(response.data);
-      window.open(url);
+      setFileUrl(url);
+      setAttachmentModal(true);
     } catch (error) {
       console.log(error);
       setAlertMessage({
@@ -203,6 +206,7 @@ function PaymentVoucherApprove() {
       credit_total: obj.debit_total,
       credit: obj.debit,
       created_name: obj.created_username,
+      date: moment(new Date()).format("DD-MM-YYYY"),
     }));
 
     try {
@@ -356,6 +360,37 @@ function PaymentVoucherApprove() {
           </Button>
         </div>
       </ModalWrapper>
+
+      {!!attachmentModal && (
+        <ModalWrapper
+          title=""
+          maxWidth={700}
+          open={attachmentModal}
+          setOpen={setAttachmentModal}
+        >
+          <Grid container>
+            <Grid item xs={12} md={12}>
+              {!!fileUrl ? (
+                <>
+                  <iframe
+                    src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                    title="PDF Viewer"
+                    width="100%"
+                    height="100%"
+                    style={{
+                      border: "none",
+                      minHeight: "100vh",
+                      marginTop: "1rem",
+                    }}
+                  ></iframe>
+                </>
+              ) : (
+                <></>
+              )}
+            </Grid>
+          </Grid>
+        </ModalWrapper>
+      )}
 
       <ModalWrapper
         open={fundTransferOpen}
