@@ -34,10 +34,13 @@ const JournalVoucherPdf = () => {
   const location = useLocation();
   const grnIndexStatus = location?.state?.grnIndexStatus;
   const indexStatus = location?.state?.indexStatus;
+  const fromPath = location?.state?.path;
 
   useEffect(() => {
     getPaymentVoucherData();
-    if (grnIndexStatus) {
+    if (fromPath) {
+      setCrumbs([{ name: "Po Payment History", link: fromPath }]);
+    }else if (grnIndexStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/journalmaster/grn" }]);
     } else if (indexStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/VoucherMaster" }]);

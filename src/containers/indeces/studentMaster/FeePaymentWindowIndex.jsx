@@ -356,7 +356,7 @@ function FeePaymentWindowIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/ReferenceBooks/${id}`)
+          .delete(`/api/finance/deactivateFeePaymentWindow/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -366,7 +366,7 @@ function FeePaymentWindowIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/activateReferenceBooks/${id}`)
+          .delete(`/api/finance/activateFeePaymentWindow${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

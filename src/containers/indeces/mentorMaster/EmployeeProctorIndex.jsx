@@ -88,8 +88,8 @@ function EmployeeProctorIndex() {
   }, []);
 
   useEffect(() => {
-    getData();
     getDepartmentOptions();
+    getData();
   }, [values.schoolId]);
 
   useEffect(() => {
@@ -470,29 +470,29 @@ function EmployeeProctorIndex() {
         </Typography>
       ),
     },
-    {
-      field: "callCount",
-      type: "action",
-      align: "right",
-      headerAlign: "right",
-      flex: 1,
-      headerName: "IVR History",
-      renderCell: (params) => (
-        <Typography
-          variant="subtitle2"
-          onClick={() => handleHistory(params)}
-          sx={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            color: "primary.main",
-            textTransform: "capitalize",
-            cursor: "pointer",
-          }}
-        >
-          {params.value}
-        </Typography>
-      )
-    },
+    // {
+    //   field: "callCount",
+    //   type: "action",
+    //   align: "right",
+    //   headerAlign: "right",
+    //   flex: 1,
+    //   headerName: "IVR History",
+    //   renderCell: (params) => (
+    //     <Typography
+    //       variant="subtitle2"
+    //       onClick={() => handleHistory(params)}
+    //       sx={{
+    //         overflow: "hidden",
+    //         textOverflow: "ellipsis",
+    //         color: "primary.main",
+    //         textTransform: "capitalize",
+    //         cursor: "pointer",
+    //       }}
+    //     >
+    //       {params.value}
+    //     </Typography>
+    //   )
+    // },
     {
       field: "designation_short_name",
       headerName: "Designation",
