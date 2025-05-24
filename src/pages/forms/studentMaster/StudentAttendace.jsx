@@ -1,4 +1,4 @@
-import { useState, lazy, useEffect, useRef } from "react";
+import { React, useState, Fragment, lazy, useEffect, useRef } from "react";
 import axios from "../../../services/Api";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import {
@@ -665,51 +665,67 @@ const StudentTable = ({ Data, dynamicHeaders, getModalData }) => {
                   <StyledTableCell>{index + 1}</StyledTableCell>
                   <StyledTableCell>{row.auid}</StyledTableCell>
                   <StyledTableCell>{row.studentName}</StyledTableCell>
-                  {row.dateOfReporting ? (
-                    <StyledTableCell>
-                      {moment(row.dateOfReporting).format("DD-MM-YYYY")}
-                    </StyledTableCell>
-                  ) : (
-                    <StyledTableCell></StyledTableCell>
-                  )}
-                  {row.studentAttendanceDetail.map((subject, subIndex) => (
-                    <>
-                      <StyledTableCell1
-                        onClick={() =>
-                          getModalData(
-                            subject.student_id,
-                            subject.course_id,
-                            true,
-                            row.batchAssignmentIds || row.sectionAssignmentIds
-                          )
-                        }
-                        style={{
-                          color: "green",
-                          cursor: "pointer",
-                        }}
-                      >
-                        {subject.present}
-                      </StyledTableCell1>
-                      <StyledTableCell1
-                        onClick={() =>
-                          getModalData(
-                            subject.student_id,
-                            subject.course_id,
-                            false,
-                            row.batchAssignmentIds || row.sectionAssignmentIds,
-                            subject.total - subject.present
-                          )
-                        }
-                        style={{
-                          color: "red",
-                          cursor: "pointer",
-                        }}
-                      >
-                        {subject.total - subject.present}
-                      </StyledTableCell1>
-                      <StyledTableCell1>{subject.percentage}</StyledTableCell1>
-                    </>
-                  ))}
+                  <StyledTableCell>
+                    {row.dateOfReporting
+                      ? moment(row.dateOfReporting).format("DD-MM-YYYY")
+                      : ""}
+                  </StyledTableCell>
+
+                  {dynamicHeaders.map((courseCode, i) => {
+                    const subject = row.studentAttendanceDetail.find(
+                      (s) =>
+                        s.course_assignment_id ===
+                        courseCode.course_assignment_id
+                    );
+
+                    if (subject) {
+                      return (
+                        <Fragment key={i}>
+                          <StyledTableCell1
+                            onClick={() =>
+                              getModalData(
+                                subject.student_id,
+                                subject.course_id,
+                                true,
+                                row.batchAssignmentIds ||
+                                  row.sectionAssignmentIds
+                              )
+                            }
+                            style={{ color: "green", cursor: "pointer" }}
+                          >
+                            {subject.present}
+                          </StyledTableCell1>
+                          <StyledTableCell1
+                            onClick={() =>
+                              getModalData(
+                                subject.student_id,
+                                subject.course_id,
+                                false,
+                                row.batchAssignmentIds ||
+                                  row.sectionAssignmentIds,
+                                subject.total - subject.present
+                              )
+                            }
+                            style={{ color: "red", cursor: "pointer" }}
+                          >
+                            {subject.total - subject.present}
+                          </StyledTableCell1>
+                          <StyledTableCell1>
+                            {subject.percentage}
+                          </StyledTableCell1>
+                        </Fragment>
+                      );
+                    } else {
+                      // Display placeholders if no match
+                      return (
+                        <Fragment key={i}>
+                          <StyledTableCell1>-</StyledTableCell1>
+                          <StyledTableCell1>-</StyledTableCell1>
+                          <StyledTableCell1>-</StyledTableCell1>
+                        </Fragment>
+                      );
+                    }
+                  })}
                 </TableRow>
               ))}
             </TableBody>

@@ -23,24 +23,21 @@ import numberToWords from "number-to-words";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
 
-const JournalVoucherPdf = () => {
+const StudentRefundPdf = () => {
   const [voucherData, setVoucherData] = useState([]);
   const [hideButtons, setHideButtons] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  const { id } = useParams();
+
   const pathname = useLocation();
-  const { schoolId, fcYearId } = pathname.state;
+  const { id, schoolId, fcYearId } = pathname.state;
   const location = useLocation();
   const grnIndexStatus = location?.state?.grnIndexStatus;
   const indexStatus = location?.state?.indexStatus;
-  const fromPath = location?.state?.path;
 
   useEffect(() => {
     getPaymentVoucherData();
-    if (fromPath) {
-      setCrumbs([{ name: "Po Payment History", link: fromPath }]);
-    }else if (grnIndexStatus) {
+    if (grnIndexStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/journalmaster/grn" }]);
     } else if (indexStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/VoucherMaster" }]);
@@ -50,9 +47,12 @@ const JournalVoucherPdf = () => {
   const getPaymentVoucherData = async () => {
     try {
       const response = await axios.get(
-        `/api/finance/getJournalVoucherByVoucherNumber/${id}/${schoolId}/${fcYearId}`
+        `/api/finance/getRefundRequestData/${id}/${schoolId}/${fcYearId}`
       );
       const { data } = response?.data;
+
+      console.log(data);
+
       setVoucherData(data || []);
     } catch (err) {
       console.error(err);
@@ -375,16 +375,14 @@ const JournalVoucherPdf = () => {
                         sx={bookmanFont}
                       >
                         Narration:{" "}
-                        {voucherData?.[0]?.type !== "Salary-JV" &&
-                        voucherData?.[0]?.type !== "REFUND-JV"
+                        {voucherData?.[0]?.type !== "Salary-JV"
                           ? voucherData?.[0]?.voucher_head
                           : ""}{" "}
                         {voucherData?.[0]?.remarks
                           ? ` ${voucherData?.[0]?.remarks}`
                           : ""}{" "}
                         {voucherData?.[0]?.created_username &&
-                        voucherData?.[0]?.type !== "Salary-JV" &&
-                        voucherData?.[0]?.type !== "REFUND-JV"
+                        voucherData?.[0]?.type !== "Salary-JV"
                           ? ` created by ${voucherData?.[0]?.draftCreatedName}`
                           : ""}
                       </Typography>
@@ -473,8 +471,7 @@ const JournalVoucherPdf = () => {
             <Typography variant="body1" sx={bookmanFont}>
               Verified By
               <br />
-              {voucherData?.[0]?.verifier_name ??
-                voucherData?.[0]?.jvVerifier_name}
+              {voucherData?.[0]?.verifier_name}
             </Typography>
           </Grid>
         </Grid>
@@ -483,4 +480,4 @@ const JournalVoucherPdf = () => {
   );
 };
 
-export default JournalVoucherPdf;
+export default StudentRefundPdf;

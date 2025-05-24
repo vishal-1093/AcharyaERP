@@ -255,7 +255,12 @@ function JournalVoucherIndex() {
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
-    { field: "verifierName", headerName: "Verified By", flex: 1 },
+    {
+      field: "verifierName",
+      headerName: "Verified By",
+      flex: 1,
+      valueGetter: (value, row) => row.verifierName ?? row.jvVerifier_name,
+    },
     {
       field: "envAttachment_path",
       headerName: "Attachment",
@@ -501,9 +506,14 @@ function JournalVoucherIndex() {
               <Grid item xs={12} md={12}>
                 {!!fileUrl ? (
                   <iframe
+                    src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                     width="100%"
-                    style={{ height: "100vh" }}
-                    src={fileUrl}
+                    height="100%"
+                    style={{
+                      border: "none",
+                      minHeight: "100vh",
+                      marginTop: "1rem",
+                    }}
                   ></iframe>
                 ) : (
                   <></>

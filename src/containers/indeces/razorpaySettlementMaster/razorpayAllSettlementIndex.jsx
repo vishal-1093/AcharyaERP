@@ -1,47 +1,36 @@
 import { useEffect, useState } from "react"
-import { Box, Breadcrumbs, Button, Grid, Typography } from "@mui/material"
+import { Box, Breadcrumbs, Button, CircularProgress, Divider, Grid, Typography } from "@mui/material"
 import GridIndex from "../../../components/GridIndex"
 import axios from "../../../services/Api";
 import { useNavigate, useLocation } from "react-router-dom";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import moment from "moment";
 import CustomFilter from "../../../components/Inputs/CustomCommonFilter";
+import ModalWrapper from "../../../components/ModalWrapper";
 import useAlert from "../../../hooks/useAlert";
 
 const RazorPaySettlementIndex = () => {
     const [rows, setRows] = useState([])
     const [loading, setLoading] = useState(false)
     const [date, setDate] = useState()
+    const [refetchDate, setRefetchDate] = useState()
+    const [isRefetchModelOpen, setIsRefetchModelOpen] = useState(false)
     const { pathname } = useLocation();
     const navigate = useNavigate()
-    const { setAlertMessage, setAlertOpen } = useAlert();
-
-    useEffect(() => {
-        updateSettlementDataintoDB()
-        // getAllSettlementData()
-    }, [])
+     const { setAlertMessage, setAlertOpen } = useAlert();
+    const roleShortName = JSON.parse(
+        sessionStorage.getItem("AcharyaErpUser")
+    )?.roleShortName;
 
     useEffect(() => {
         getAllSettlementData()
     }, [date])
 
-    const updateSettlementDataintoDB = () => {
-        setLoading(true)
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth() + 1; // getMonth() returns 0-11
-        const day = today.getDate();
-        axios.post(`/api/razorPaySettlements?year=${year}&month=${month}&day=${day}`)
-            .then(res => {
-                getAllSettlementData()
-            })
-    }
-
     const getAllSettlementData = () => {
         setLoading(true)
 
         const tabName = pathname.split("/").filter(Boolean)[1]
-        const formatedDate = moment(date).format("YYYY-MM-DD")
+        const formatedDate = date ? moment(date).format("YYYY-MM-DD") : ""
         let params = {
             ...(tabName !== 'pending-settlement' && date && { settledDate: formatedDate }),
             ...(tabName === 'pending-settlement' && date && { date: formatedDate }),
@@ -82,6 +71,43 @@ const RazorPaySettlementIndex = () => {
     const handleChangeAdvance = (name, newValue) => {
         setDate(newValue)
     };
+
+   const handleRefetchInputChange = (name, newValue) => {
+        setRefetchDate(newValue)
+    }; 
+
+    const refetchSettlement = () =>{
+        setRefetchDate("")
+         setIsRefetchModelOpen(true)
+    }
+
+    const handleRefetchSubmit = () =>{
+        refetchSettlementData(refetchDate)
+    }
+
+       const refetchSettlementData = () => {
+        setLoading(true)
+        const settlementRefetchdate = new Date(refetchDate);
+        const year = settlementRefetchdate?.getFullYear();
+        const month = settlementRefetchdate?.getMonth() + 1; 
+        const day = settlementRefetchdate?.getDate();
+        axios.post(`/api/razorPaySettlements?year=${year}&month=${month}&day=${day}`)
+            .then(res => {
+                 setLoading(false);
+                setDate(refetchDate)
+                getAllSettlementData()
+                setIsRefetchModelOpen(false)
+            }).catch((err) => {
+        console.log(err);
+        setAlertMessage({
+                        severity: "error",
+                        message: "Failed to refetch, Please try after sometime",
+                    });
+                    setAlertOpen(true);
+        setLoading(false);
+      });
+    }
+
 
     const columns = [
         {
@@ -131,15 +157,15 @@ const RazorPaySettlementIndex = () => {
                 }
             }
         },
-        {
-            field: "totalDebit",
-            headerName: "Transfer Amount",
-            flex: 1,
-            type: "number",
-            align: 'right',
-            headerAlign: 'center',
-            headerClassName: "header-bg"
-        },
+        // {
+        //     field: "totalDebit",
+        //     headerName: "Transfer Amount",
+        //     flex: 1,
+        //     type: "number",
+        //     align: 'right',
+        //     headerAlign: 'center',
+        //     headerClassName: "header-bg"
+        // },
         {
             field: "uniformAmount",
             headerName: "Uniform Amount",
@@ -178,9 +204,80 @@ const RazorPaySettlementIndex = () => {
         }
     ]
 
+     const RefetchSettlementField = () => {
+        return (
+          <Grid
+            container
+            direction="column"
+            spacing={3}
+            sx={{ p: 1 }}
+          >
+            <Grid item sx={{ width: "100%" }}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={10}>
+                 <CustomDatePicker
+                    name="refetchDate"
+                    label="Settlement Date"
+                    value={refetchDate || ""}
+                    handleChangeAdvance={handleRefetchInputChange}
+                    maxDate={new Date()}
+                />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item>
+              <Box display="flex" justifyContent="flex-end">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{ borderRadius: 1, px: 2 }}
+                  disabled={!refetchDate || loading}
+                  onClick={handleRefetchSubmit}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>{"Save"}</strong>
+                  )}
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        )
+      }
+
     return (
+        <>
+         <ModalWrapper
+                open={isRefetchModelOpen}
+                setOpen={setIsRefetchModelOpen}
+                maxWidth={400}
+                title={
+                  <Box
+                    sx={{
+                      width: "100%",
+                      textAlign: "center",
+                      fontWeight: 600,
+                      fontSize: "1.3rem",
+                      color: "primary.main",
+                      paddingBottom: 1,
+                    }}
+                  >
+                    <Typography variant="h6" mb={1}>
+                     Refetch Settlement
+                    </Typography>
+                    <Divider />
+                  </Box>
+                }
+              >
+                {RefetchSettlementField()}
+              </ModalWrapper>
         <Box sx={{ position: "relative", mt: 2, mb: 3 }}>
-            <Box sx={{ position: "absolute", top: -80, right: 0 }}>
+            <Box sx={{ position: "absolute", top: -80, right: 0, display:"flex", gap:3 }}>
                 <CustomDatePicker
                     name="settlementDate"
                     label="Settlement Date"
@@ -188,6 +285,15 @@ const RazorPaySettlementIndex = () => {
                     handleChangeAdvance={handleChangeAdvance}
                     maxDate={new Date()}
                 />
+                 <Button
+                    style={{ borderRadius: 7 }}
+                    variant="contained"
+                    color="primary"
+                    onClick={refetchSettlement}
+                    sx={{height: '38px'}}
+                >
+                  Refetch
+                </Button>
             </Box>
             <GridIndex
                 rows={rows}
@@ -197,6 +303,7 @@ const RazorPaySettlementIndex = () => {
                 getRowId={row => row.settlementId}
             />
         </Box>
+        </>
     )
 }
 

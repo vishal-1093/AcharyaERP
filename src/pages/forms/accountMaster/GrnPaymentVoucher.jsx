@@ -576,6 +576,14 @@ function GrnPaymentVoucher({ paymentData, data }) {
           />
         </Grid>
 
+        <Grid item xs={12} align="center">
+          {values.voucherData.length > 1 && (
+            <Typography variant="subtile2" color="red">
+              You cannot select two vendors !!!!
+            </Typography>
+          )}
+        </Grid>
+
         <Grid item xs={12}>
           <TableContainer component={Paper} elevation={3}>
             <Table size="small">
@@ -709,7 +717,12 @@ function GrnPaymentVoucher({ paymentData, data }) {
           <Button
             variant="contained"
             onClick={handleCreate}
-            disabled={loading || !requiredFieldsValid() || !rowValid}
+            disabled={
+              loading ||
+              !requiredFieldsValid() ||
+              !rowValid ||
+              values?.voucherData?.length > 1
+            }
           >
             {loading ? (
               <CircularProgress

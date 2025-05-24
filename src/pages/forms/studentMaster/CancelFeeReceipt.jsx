@@ -235,14 +235,14 @@ function CancelFeeReceipt() {
           }
         } else {
           if (
-            res.data.data.payment_details.length > 0 ||
-            res.data.data.student_details.length > 0
+            res.data.data.payment_details?.length > 0 ||
+            res.data.data.student_details?.length > 0
           ) {
             setStudentData(res.data.data.student_details[0]);
             setVoucherData(res.data.data.payment_details);
             setVoucherDataOne(res.data.data);
             setStudentDetailsOpen(true);
-            const uniqueChars = res.data.data.payment_details.filter(
+            const uniqueChars = res.data.data.payment_details?.filter(
               (obj, index) => {
                 return (
                   index ===
@@ -257,7 +257,7 @@ function CancelFeeReceipt() {
 
             const { student_details, payment_details, ...rest } = res.data.data;
             const temp = {};
-            res.data.data.payment_details.forEach((item) => {
+            res.data.data.payment_details?.forEach((item) => {
               temp[item.paid_year] = Object?.values(rest)
                 ?.map((obj) => obj[item.paid_year])
                 .reduce((a, b) => a + b);
@@ -551,7 +551,7 @@ function CancelFeeReceipt() {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {voucherHeadNames.map((obj) => {
+                          {voucherHeadNames?.map((obj) => {
                             return (
                               <>
                                 <TableRow>

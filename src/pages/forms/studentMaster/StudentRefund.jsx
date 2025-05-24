@@ -8,15 +8,13 @@ import {
   CardHeader,
   CircularProgress,
   Grid,
-  Typography,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
-import { useParams } from "react-router-dom";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import StudentDetailsByAuid from "../../../components/StudentDetailsByAuid";
-const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
+
+const StudentDetailsByAuid = lazy(() =>
+  import("../../../components/StudentDetailsByAuid")
+);
 const StudentRefundDetails = lazy(() =>
   import("../../../components/StudentRefundDetails")
 );
@@ -25,14 +23,13 @@ const initialValues = {
   auid: "",
 };
 
-function StudentLedger() {
+function StudentRefund() {
   const [values, setValues] = useState(initialValues);
-  const [id, setId] = useState();
   const [loading, setLoading] = useState(false);
   const [allExpand, setAllExpand] = useState({});
-  const [isPrintClick, setIsPrintClick] = useState(false);
+  const [studentData, setStudentData] = useState([]);
+  const [open, setOpen] = useState(false);
 
-  const { auid } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
@@ -51,39 +48,24 @@ function StudentLedger() {
     ],
   };
 
-  //   useEffect(() => {
-  //     if (auid) {
-  //       setValues((prev) => ({ ...prev, ["auid"]: auid }));
-  //     }
-  //   }, [auid]);
-
-  useEffect(() => {
-    handleSubmit();
-  }, [values.auid]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async () => {
-    const { auid } = values;
     if (Object.values(checks).flat().includes(false)) return;
     try {
       setLoading(true);
-      const { data: response } = await axios.get(
-        `/api/student/getStudentDetailsByAuid/${values.auid}`
+      const response = await axios.get(
+        `/api/student/studentDetailsByAuidInactiveData/${values.auid}`
       );
-      const responseData = response.data;
-      if (Object.keys(responseData).length === 0) {
-        setAlertMessage({
-          severity: "error",
-          message: "AUID is not present !!",
-        });
-        setAlertOpen(true);
-        return;
+
+      if (response.data.data.length > 0) {
+        setOpen(true);
+        setStudentData(response.data.data[0]);
       } else {
-        setId(responseData.student_id);
+        setOpen(false);
       }
     } catch (err) {
       console.error(err);
@@ -156,19 +138,13 @@ function StudentLedger() {
                   </Button>
                 </Grid>
 
-                {id && (
+                {open && (
                   <Grid item xs={12} id="ledger">
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
-                      <StudentDetailsByAuid
-                        id={values.auid}
-                        // header={
-                        //   isPrintClick ? "Student Ledger" : "Student Details"
-                        // }
-                        isPrintClick={isPrintClick}
-                      />
+                      <StudentDetailsByAuid studentData={studentData} />
                       <StudentRefundDetails
-                        id={id}
-                        isPrintClick={isPrintClick}
+                        id={studentData?.student_id}
+                        studentDataResponse={studentData}
                       />
                     </Box>
                   </Grid>
@@ -182,4 +158,4 @@ function StudentLedger() {
   );
 }
 
-export default StudentLedger;
+export default StudentRefund;

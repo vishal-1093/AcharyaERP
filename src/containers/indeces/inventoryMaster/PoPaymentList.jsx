@@ -17,6 +17,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import BeenhereIcon from '@mui/icons-material/Beenhere';
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const modalPrintContents = {
@@ -71,6 +72,7 @@ function PoPaymentList() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [values, setValues] = useState(initialValues);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const setCrumbs = useBreadcrumbs();
 
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     created_date: false,
@@ -85,8 +87,8 @@ function PoPaymentList() {
     ]);
   };
 
-  const printPo = async (rowValue, status) => {
-    navigate(`/PoPdf/${rowValue.purchaseOrderId}`, { state: { letterHeadStatus: status } })
+  const printPo = async (rowValue) => {
+    navigate(`/PoPdf/${rowValue.purchaseOrderId}`, { state: { letterHeadStatus: true } })
   };
 
   const setPrintModalOpen = () => {
@@ -114,6 +116,7 @@ function PoPaymentList() {
       setAmout(amount)
     } else {
       setModalPreview(true);
+      setAmout(amount)
     }
     getPoData(id, type)
   };
@@ -149,8 +152,17 @@ function PoPaymentList() {
       headerAlign: "right",
       align: "right",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.poAmount ? Math.round(row.poAmount) : "",
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          style={{ color: "blue", cursor: "pointer" }}
+          onClick={() => navigate(`/PoPdf/${params.row.purchaseOrderId}`, { state: { letterHeadStatus: false, path: "po-payment-history" } })
+          }
+
+        >
+          {params.row.poAmount}
+        </Typography>
+      )
     },
     { field: "type", headerName: "Po Type", flex: 1, hide: true },
     { field: "paymentType", headerName: "Payment Type", flex: 1, hide: true },
@@ -160,8 +172,18 @@ function PoPaymentList() {
       headerAlign: "right",
       align: "right",
       flex: 1,
-      valueGetter: (value, row) =>
-        row.grnStatus ? Math.round(row.grnStatus) : "",
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          style={{ color: "blue", cursor: "pointer" }}
+          // onClick={() => navigate(`/GRNPdf/${params?.row?.grnNo.replace(/\//g, "_")}`, {
+          //   state: { path: "po-payment-history" },
+          // })}
+          onClick={() => handlePreview(params.row.purchaseOrderId, params.row?.type, params.row?.poAmount)}
+        >
+          {params.row.grnStatus}
+        </Typography>
+      )
     },
     {
       field: "jvStatus",
@@ -169,22 +191,34 @@ function PoPaymentList() {
       flex: 1,
       headerAlign: "right",
       align: "right",
-      renderCell: (params) => (
+      renderCell: (params) => {
+        const rawValue = params.row.jvStatus;
+        const numericValue = Number(rawValue);
 
-        <Typography
-          style={{ color: "blue", cursor: "pointer" }}
-          onClick={() =>
-            handleGeneratePdf(
-              params.row.journalVoucherNumber,
-              params.row.school_id,
-              params.row.fcYearId
-            )
-          }
-        >
-          {params.row.jvStatus}
-        </Typography>
-      )
+        // If the value is 0 (or 0.00, "0", etc.), show nothing
+        if (!numericValue) return null;
+
+        const roundedValue = Math.round(numericValue);
+
+        return (
+          <Typography
+            variant="subtitle2"
+            style={{ color: "blue", cursor: "pointer" }}
+            onClick={() =>
+              handleGeneratePdf(
+                params.row.journalVoucherNumber,
+                params.row.school_id,
+                params.row.fcYearId
+              )
+            }
+          >
+            {roundedValue}
+          </Typography>
+        );
+      }
     },
+
+
     {
       field: "paymentStatus",
       headerName: "Payment",
@@ -194,12 +228,13 @@ function PoPaymentList() {
       renderCell: (params) => (
 
         <Typography
+          variant="subtitle2"
           style={{ color: "blue", cursor: "pointer" }}
           onClick={() =>
             navigate(
-              `/payment-voucher-pdf/${params.row.journalVoucherNumber}`,
+              `/payment-voucher-pdf/${params.row.paymentVoucherId}`,
               {
-                state: { advancePdfStatus: true },
+                state: { advancePdfStatus: true, path: "po-payment-history" },
               }
             )
           }
@@ -304,6 +339,7 @@ function PoPaymentList() {
   ];
 
   useEffect(() => {
+    setCrumbs([{}]);
     getData(values.filterList[0].value);
     getSchoolData()
   }, []);
@@ -317,7 +353,7 @@ function PoPaymentList() {
       const endpoint =
         type === "SRN"
           ? `/api/purchase/getGRNByPOId/${id}`
-          : `/api/purchase/getPurchaseOrderById?id=${id}`;
+          : `/api/purchase/getGRNByPOId/${id}`;
 
       const res = await axios.get(endpoint);
       const purchaseOrder = res?.data?.data?.purchaseOrder;
@@ -325,7 +361,7 @@ function PoPaymentList() {
       if (type === "SRN") {
         setSrnPoRows(res?.data?.data);
       } else {
-        setPoRows(purchaseItems);
+        setPoRows(res?.data?.data);
       }
     } catch (error) {
       console.error("Failed to fetch PO data:", error);
@@ -458,7 +494,7 @@ function PoPaymentList() {
     fcYearId
   ) => {
     navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
-      state: { grnIndexStatus: true, schoolId, fcYearId },
+      state: { grnIndexStatus: true, schoolId, fcYearId, path: "po-payment-history" },
     });
   };
   return (
@@ -552,7 +588,43 @@ function PoPaymentList() {
         <GridIndex rows={rows} columns={columns} columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel} />
       </Box>
-      {/* <ModalWrapper title={`GRN Details`} open={modalPreview} setOpen={setModalPreview}>
+      <ModalWrapper
+        title="Cancel Summary"
+        maxWidth={600}
+        open={feedbackOpen}
+        setOpen={setFeedbackOpen}
+      >
+        <Grid
+          container
+          justifyContent="flex-start"
+          alignItems="center"
+          rowSpacing={2}
+          columnSpacing={2}
+          marginTop={2}
+        >
+          <Grid item xs={12} md={8}>
+            <CustomTextField
+              multiline
+              rows={2}
+              name="cancelRemarks"
+              label="Summary"
+              value={values.cancelRemarks}
+              handleChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} align="right">
+            <Button
+              variant="contained"
+              onClick={handleCancel}
+              sx={{ borderRadius: 2 }}
+              disabled={!values.cancelRemarks}
+            >
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
+      <ModalWrapper title="GRN Details" open={modalPreview} setOpen={setModalPreview}>
         <Grid container justifyContent="center" alignItems="center" marginTop={2}>
           <TableContainer component={Paper} sx={{ maxHeight: 500, borderRadius: 2, boxShadow: 3 }}>
             <Table stickyHeader size="small" aria-label="modern styled table">
@@ -560,18 +632,20 @@ function PoPaymentList() {
                 <TableRow sx={{ backgroundColor: 'primary.main' }}>
                   {[
                     'Item Name',
+                    'PO No',
+                    'PO Amount',
                     'GRN No',
                     'Quantity',
                     'Rate',
+                    'Discount (%)',
+                    'Discount Total',
+                    'GST (%)',
+                    'GST Total',
                     'Total Amount',
                     'Unit',
-                    'Make',
-                    'Serial No',
-                    'Available',
-                    'Issued',
                     'Description',
                     'Created Name',
-                    'Created Date'
+                    'Created Date',
                   ].map((header, index) => (
                     <TableCell
                       key={index}
@@ -579,6 +653,7 @@ function PoPaymentList() {
                         fontWeight: 'bold',
                         backgroundColor: 'primary.main',
                         color: '#ffffff',
+                        whiteSpace: 'nowrap',
                       }}
                     >
                       {header}
@@ -588,38 +663,47 @@ function PoPaymentList() {
               </TableHead>
 
               <TableBody>
-                {poData?.map((item, index) => (
-                  <TableRow
-                    key={index}
-                    hover
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: '#f0f8ff',
-                        transition: '0.3s',
-                      },
-                      borderRadius: 2,
-                    }}
-                  >
-                    <TableCell sx={{ fontWeight: 500 }}>{item.itemName}</TableCell>
-                    <TableCell align="right">{item.poReferenceNo ?? ""}</TableCell>
-                    <TableCell align="right">{item.quantity ?? 0}</TableCell>
-                    <TableCell align="right">₹{item.rate ?? 0}</TableCell>
-                    <TableCell align="right">₹{item.totalAmount ?? 0}</TableCell>
-                    <TableCell>{item.measureShortName}</TableCell>
-                    <TableCell>{item.envItemsInStoresId?.make}</TableCell>
-                    <TableCell>{item.envItemsInStoresId?.item_serial_no}</TableCell>
-                    <TableCell align="right">{item.balanceQuantity ?? 0}</TableCell>
-                    <TableCell align="right">{item.quantity ?? 0}</TableCell>
-                    <TableCell>{item.envItemsInStoresId?.item_description}</TableCell>
-                    <TableCell>{item.createdUsername}</TableCell>
-                    <TableCell> {moment(item.created_date).format("DD-MM-YYYY")}</TableCell>
-                  </TableRow>
-                ))}
+                {poData?.map((item, index) => {
+                  const rate = item.enterQty ? item.costTotal / item.enterQty : 0;
+
+                  return (
+                    <TableRow
+                      key={index}
+                      hover
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: '#f0f8ff',
+                          transition: '0.3s',
+                        },
+                        borderRadius: 2,
+                      }}
+                    >
+                      <TableCell sx={{ fontWeight: 500 }}>{item.itemName}</TableCell>
+                      <TableCell>{item.purchaseRefNo}</TableCell>
+                      <TableCell align="right">₹{Number(poAmount).toFixed(2)}</TableCell>
+                      <TableCell align="right">{item.grnNo ?? ''}</TableCell>
+                      <TableCell align="right">{item.enterQty ?? item.quantity ?? 0}</TableCell>
+                      <TableCell align="right">₹{rate.toFixed(2)}</TableCell>
+
+                      <TableCell align="right">{item.discount ? `${item.discount}%` : '0%'}</TableCell>
+                      <TableCell align="right">₹{Number(item.discountTotal || 0).toFixed(2)}</TableCell>
+                      <TableCell align="right">{item.gst ? `${item.gst}%` : '0%'}</TableCell>
+                      <TableCell align="right">₹{Number(item.gstTotal || 0).toFixed(2)}</TableCell>
+
+                      <TableCell align="right">₹{Number(item.totalAmount || 0).toFixed(2)}</TableCell>
+                      <TableCell>{item.uomShortName ?? ''}</TableCell>
+                      <TableCell>{item.invoiceDescription ?? 'N/A'}</TableCell>
+                      <TableCell>{item.createdUserName ?? ''}</TableCell>
+                      <TableCell>{moment(item.createdDate).format("DD-MM-YYYY")}</TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
         </Grid>
       </ModalWrapper>
+
       <ModalWrapper title={`SRN Details`} maxWidth={1200} open={modalSRNPreview} setOpen={setModalSRNPreview}>
         <Grid container justifyContent="center" alignItems="center" marginTop={2}>
           <TableContainer component={Paper} sx={{ maxHeight: 500, borderRadius: 2, boxShadow: 3 }}>
@@ -679,43 +763,6 @@ function PoPaymentList() {
           </TableContainer>
         </Grid>
       </ModalWrapper>
-      <ModalWrapper
-        title="Cancel Summary"
-        maxWidth={600}
-        open={feedbackOpen}
-        setOpen={setFeedbackOpen}
-      >
-        <Grid
-          container
-          justifyContent="flex-start"
-          alignItems="center"
-          rowSpacing={2}
-          columnSpacing={2}
-          marginTop={2}
-        >
-          <Grid item xs={12} md={8}>
-            <CustomTextField
-              multiline
-              rows={2}
-              name="cancelRemarks"
-              label="Summary"
-              value={values.cancelRemarks}
-              handleChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12} align="right">
-            <Button
-              variant="contained"
-              onClick={handleCancel}
-              sx={{ borderRadius: 2 }}
-              disabled={!values.cancelRemarks}
-            >
-              Submit
-            </Button>
-          </Grid>
-        </Grid>
-      </ModalWrapper> */}
-
     </>
   );
 }

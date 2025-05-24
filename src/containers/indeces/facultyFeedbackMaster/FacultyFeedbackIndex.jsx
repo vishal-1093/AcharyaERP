@@ -54,8 +54,6 @@ const FacultyFeedbackIndex = () => {
 
         getSchoolDetails();
         getAcademicYearDetails();
-     //  getData();
-
     }, []);
 
     useEffect(() => {

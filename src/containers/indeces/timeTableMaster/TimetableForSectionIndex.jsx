@@ -94,6 +94,7 @@ function TimetableForSectionIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSelectOpen, setModalSelectOpen] = useState(false);
   const [ids, setIds] = useState([]);
+  const [timetableIds, setTimeTableIds] = useState([]);
 
   const [values, setValues] = useState(initialValues);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
@@ -536,6 +537,7 @@ function TimetableForSectionIndex() {
       paginationData?.rows?.find((row) => row?.id === id)
     );
     setIds(selectedRowsData?.map((val) => val?.time_table_employee_id));
+    setTimeTableIds(selectedRowsData?.map((val) => val?.id));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
@@ -612,6 +614,16 @@ function TimetableForSectionIndex() {
   const handleActive = async (params) => {
     const id = params.row.id;
 
+    const response = await axios
+      .get(`/api/student/checkTimeTableStatus/${timetableIds.toString()}`)
+      .then((res) => {
+        return res.data.data;
+      });
+
+    const filterRes = response.every((obj) => !obj.presentStatus);
+
+    console.log(filterRes);
+
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
@@ -655,7 +667,17 @@ function TimetableForSectionIndex() {
           title: "",
           message: "Please select the checkbox !!!",
         });
-    setModalOpen(true);
+
+    if (filterRes) {
+      setModalOpen(true);
+    } else {
+      const attendanceTaken = response.find((obj) => obj.presentStatus);
+      setAlertMessage({
+        severity: "error",
+        message: `Attendance is taken for time_table_id ${attendanceTaken.time_table_id}`,
+      });
+      setAlertOpen(true);
+    }
   };
 
   const handleSelectOpen = () => {
