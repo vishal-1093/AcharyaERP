@@ -70,7 +70,7 @@ function CancelHostelReceipt() {
   useEffect(() => {
     getFinancialYearData();
     getSchoolDetails();
-    setCrumbs([{ name: "Cancel Hostel Receipt" }]);
+    setCrumbs([{ name: "Cancel Hostel Receipt",link:"/feereceipt-cancel-index" }]);
   }, []);
 
   const getSchoolDetails = async () => {
@@ -234,7 +234,7 @@ function CancelHostelReceipt() {
         <Grid
           container
           alignItems="center"
-          justifyContent="center"
+          justifyContent="flex-start"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
@@ -261,12 +261,12 @@ function CancelHostelReceipt() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} md={6} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !(values.financialYearId && values.receiptNo)}
               onClick={handleCreate}
             >
               {loading ? (
@@ -276,7 +276,7 @@ function CancelHostelReceipt() {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                <strong>Go</strong>
+                <strong>Submit</strong>
               )}
             </Button>
           </Grid>

@@ -415,7 +415,7 @@ export const GenerateLaptopIssueAcknowledge = (
     )
   };
 
-  const MainContent = (ackData) => {
+  const MainContent = () => {
     return (
       <View style={styles.layout}>
         <Text style={styles.declarationTxt}>Laptop Declaration Form</Text>
