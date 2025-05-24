@@ -1,33 +1,15 @@
 import React, { useEffect, useState } from "react"
 import axios from "../../../services/Api"
-import { Box, Button, CircularProgress, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, styled, tableCellClasses, Paper, Checkbox, FormGroup, FormControlLabel, Typography, Tab, Tabs } from "@mui/material"
+import { Box, Button, Grid } from "@mui/material"
 import FormWrapper from "../../../components/FormWrapper"
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete"
 import useAlert from "../../../hooks/useAlert"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useLocation, useNavigate } from "react-router-dom"
-import ProgramSpecializationIndex from "../../../containers/indeces/academicMaster/ProgramSpecializationIndex"
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.auzColor,
-        color: theme.palette.headerWhite.main,
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-    },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    "&:nth-of-type(odd)": {
-        backgroundColor: theme.palette.action.hover,
-    },
-}));
 
 const initValues = {
     acYearId: "",
     courseId: "",
-    // programSpecializationId: "",
     yearSem: "",
     acYear: "",
     departmentId: "",
@@ -37,30 +19,27 @@ const initValues = {
 const requiredFields = ["acYearId", "yearSem"]
 
 const FacultyFeedbackReportCourseForm = () => {
-    const [loading, setLoading] = useState(false);
     const [values, setValues] = useState(initValues);
     const [academicYearOptions, setAcademicYearOptions] = useState([]);
     const [yearSemOptions, setYearSemOptions] = useState([]);
     const [departmentOptions, setDepartmentOptions] = useState([])
     const [schoolOptions, setSchoolOptions] = useState([])
+    const [employeeIds, setEmployeeIds] = useState([])
     const setCrumbs = useBreadcrumbs();
     const { setAlertMessage, setAlertOpen } = useAlert();
     const { pathname } = useLocation();
     const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-    const { school_id: schoolID, dept_id: departmentID } = JSON.parse(sessionStorage.getItem("userData"));
+    const schoolID = JSON.parse(sessionStorage?.getItem("userData"))?.school_id;
+     const departmentID = JSON.parse(sessionStorage?.getItem("userData"))?.dept_id;
     const navigate = useNavigate()
 
     const checks = {
         acYearId: [values.acYearId !== ""],
-        departmentId: [values.departmentId !== ""],
-        // courseId: [values.courseId !== ""],
         yearSem: [values.yearSem !== ""]
     };
 
     const errorMessages = {
         acYearId: ["This field required"],
-        departmentId: ["This field required"],
-        // courseId: ["This field required"],
         yearSem: ["This field required"]
     };
 
@@ -78,8 +57,7 @@ const FacultyFeedbackReportCourseForm = () => {
 
     useEffect(() => {
             getAllDepartment();
-        }, [schoolID, values?.schoolId]);
-
+    }, [schoolID, values?.schoolId]);
 
     const getAllDepartment = async() => {
         if (values.schoolId || schoolID) {
@@ -149,44 +127,7 @@ const FacultyFeedbackReportCourseForm = () => {
             });
     };
 
-    const getAllEmployee = async() =>{
-    //   if( pathname === '/FacultyFeedbackMaster-course-dept'){
-    //    await axios
-    //         .get(`api/employee/getEmployeeIdBasedOnHod?employee_id=${userID}`)
-    //         .then((res) => {
-    //             const {data} = res?.data
-    //             const empData = data?.length > 0 && data?.map((emp)=> emp.emp_id)
-
-    //             return empData?.length > 0 ? empData : []
-    //         })
-    //         .catch((error) => {
-    //             console.error(error)
-    //             setAlertMessage({
-    //                 severity: "error",
-    //                 message: "Something went wrong, Please try again!!",
-    //             });
-    //             setAlertOpen(true);
-    //         });
-    //     }else{
-    //         if(values?.departmentId){
-    //          const school_id= values.schoolId ? values.schoolId : schoolID;
-    //         await axios
-    //         .get(`api/employee/getEmployeeIdBasedOnSclAndDept?dept_id=${values.departmentId}&school_id=${school_id}`)
-    //         .then((res) => {
-    //              const {data} = res?.data
-    //             const empData = data?.length > 0 && data?.map((emp)=> emp?.emp_id)
-    //             return empData?.length > 0 ? empData : []
-    //         })
-    //         .catch((error) => {
-    //             console.error(error)
-    //             setAlertMessage({
-    //                 severity: "error",
-    //                 message: "Something went wrong, Please try again!!",
-    //             });
-    //             setAlertOpen(true);
-    //         });
-    //     }
-    //     }
+    const getAllEmployee = async(departmentId="") =>{
     try {
     if (pathname === '/FacultyFeedbackMaster-course-dept') {
       const res = await axios.get(`api/employee/getEmployeeIdBasedOnHod?employee_id=${userID}`);
@@ -194,9 +135,9 @@ const FacultyFeedbackReportCourseForm = () => {
       const empData = data?.length > 0 ? data.map((emp) => emp.emp_id) : [];
       return empData;
     } else {
-      if (values?.departmentId) {
+      if (departmentId) {
         const school_id = values.schoolId ? values.schoolId : schoolID;
-        const res = await axios.get(`api/employee/getEmployeeIdBasedOnSclAndDept?dept_id=${values.departmentId}&school_id=${school_id}`);
+        const res = await axios.get(`api/employee/getEmployeeIdBasedOnSclAndDept?dept_id=${departmentId}&school_id=${school_id}`);
         const { data } = res?.data;
         const empData = data?.length > 0 ? data.map((emp) => emp.emp_id) : [];
         return empData;
@@ -249,8 +190,12 @@ const FacultyFeedbackReportCourseForm = () => {
     };
 
     const getYearSemData = async () => {
+        const dept_id = values?.departmentId ? values?.departmentId : departmentID
+        const employeeIDs = await getAllEmployee(dept_id)
+         setEmployeeIds(employeeIDs)
+         const empIds = employeeIDs ?.length > 0  ? employeeIDs.join(',') : ""
         await axios
-            .get(`/api/student/getFeedbackYearSemDetailsData?employee_id=${userID}`)
+            .get(`/api/student/getFeedbackYearSemDetailsData?employee_id=${empIds}`)
             .then((res) => {
                 setYearSemOptions(
                     res?.data?.data?.map((obj) => ({
@@ -277,8 +222,7 @@ const FacultyFeedbackReportCourseForm = () => {
             });
             setAlertOpen(true);
         } else {
-            const employeeData = await getAllEmployee()
-            const empIds = employeeData ?.length > 0  ? employeeData.join(',') : ""
+            const empIds = employeeIds ?.length > 0  ? employeeIds.join(',') : ""
             const yearAndSem = values?.yearSem && values?.yearSem?.split("/")
             const year = yearAndSem?.length > 0 ? yearAndSem[0] : ""
             const sem = yearAndSem?.length > 0 ? yearAndSem[1] : ""
@@ -286,14 +230,22 @@ const FacultyFeedbackReportCourseForm = () => {
             const params = {
                 employee_id: userID,
                 ac_year_id: values?.acYearId,
-                dept_id: ((pathname === "/FacultyFeedbackMaster-course-inst") || (pathname === "/FacultyFeedbackMaster-course-dept")) ? departmentID : values?.dept_id,
+                dept_id: ((pathname === "/FacultyFeedbackMaster-course-inst") || (pathname === "/FacultyFeedbackMaster-course-dept")) ? departmentID : values?.departmentId,
                 sem,
                 year,
                 year_sem,
                 acYear: values?.acYear,
                 employee_id: empIds
             }
-            navigate(`/facultyFeedbackMasterCourseIndex`, { state: params });
+            if(pathname === "/FacultyFeedbackMaster-course-inst"){
+               navigate(`/facultyFeedbackMasterCourseIndex-inst`, { state: params });
+            }
+            else if(pathname === "/FacultyFeedbackMaster-course-dept"){
+                 navigate(`/facultyFeedbackMasterCourseIndex-dept`, { state: params });
+            }
+            else{
+               navigate(`/facultyFeedbackMasterCourseIndex`, { state: params });
+            }
         }
     }
                
@@ -328,9 +280,6 @@ const FacultyFeedbackReportCourseForm = () => {
                                 options={schoolOptions || []}
                                 handleChangeAdvance={handleChangeAdvance}
                                 disabled={((pathname === "/FacultyFeedbackMaster-course-inst") || (pathname === "/FacultyFeedbackMaster-course-dept")) ? true : false}
-                            // checks={checks.courseId}
-                            // errors={errorMessages.courseId}
-                            // required
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -341,9 +290,6 @@ const FacultyFeedbackReportCourseForm = () => {
                                 options={departmentOptions || []}
                                 handleChangeAdvance={handleChangeAdvance}
                                 disabled={pathname === "/FacultyFeedbackMaster-course-dept" ? true : false}
-                            // checks={checks.courseId}
-                            // errors={errorMessages.courseId}
-                            // required
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -358,31 +304,6 @@ const FacultyFeedbackReportCourseForm = () => {
                                 required
                             />
                         </Grid>
-
-                        {/* <Grid item xs={12} md={6}>
-                            <CustomAutocomplete
-                                name="programSpecializationId"
-                                label="Program Spelization"
-                                value={values.programSpecializationId}
-                                options={programSplList || []}
-                                handleChangeAdvance={handleChangeAdvance}
-                                checks={checks.programSpecializationId}
-                                errors={errorMessages.programSpecializationId}
-                                required
-                            />
-                        </Grid> */}
-                        {/* <Grid item xs={12} md={6}>
-                            <CustomAutocomplete
-                                name="courseId"
-                                label="Course"
-                                value={values.courseId}
-                                options={courseList || []}
-                                handleChangeAdvance={handleChangeAdvance}
-                                // checks={checks.courseId}
-                                // errors={errorMessages.courseId}
-                                // required
-                            />
-                        </Grid> */}
                     </Grid>
                     <Grid
                         container
@@ -398,15 +319,7 @@ const FacultyFeedbackReportCourseForm = () => {
                                 color="primary"
                                 onClick={handleSubmit}
                             >
-                                {loading ? (
-                                    <CircularProgress
-                                        size={25}
-                                        color="blue"
-                                        style={{ margin: "2px 13px" }}
-                                    />
-                                ) : (
-                                    <strong>Submit</strong>
-                                )}
+                               Submit
                             </Button>
                         </Grid>
                     </Grid>

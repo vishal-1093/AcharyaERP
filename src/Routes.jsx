@@ -46,8 +46,7 @@ import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
 import RazorPayPendingSettlementDetail from "./containers/indeces/razorpaySettlementMaster/razorpayPendingSettlement.jsx";
-import FacultyFeedbackReportCourseForm from "./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportCourseForm.jsx";
-//import FacultyFeedbackReportByCourse from "./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportByCourse.jsx";
+
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
 );
@@ -65,6 +64,16 @@ const FacultyFeedbackReportBySection = lazy(() =>
     "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx"
   )
 );
+
+const FacultyFeedbackReportCourseForm = lazy(()=>
+  import(
+    "./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportCourseForm.jsx"
+  )
+);
+
+const FacultyFeedbackReportByCourse = lazy(()=>
+  import("./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportByCourse.jsx")
+)
 
 const EmpDocumentCollection = lazy(() =>
   import("./components/EmpDocumentCollectionPdf")
@@ -93,10 +102,6 @@ const StudentFeedbackReportMaster = lazy(() =>
 const FacultyFeedbackMaster = lazy(() =>
   import("./pages/masters/FacultyFeedbackMaster")
 );
-
-const FacultyFeedbackReportByCourse = lazy(()=>
-  import("./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportByCourse.jsx")
-)
 
 const StudentRazorPayWindowUniform = lazy(() =>
   import("./pages/forms/StudentPaymentMaster/StudentRazorPayWindowUniform.jsx")
@@ -9439,7 +9444,6 @@ function RouteConfig() {
               path="/FacultyFeedbackMaster-course"
               element={
                 <Suspense fallback={<OverlayLoader />}>
-                  {/* <FacultyFeedbackReportByCourse /> */}
                   <FacultyFeedbackReportCourseForm />
                 </Suspense>
               }
@@ -9449,7 +9453,6 @@ function RouteConfig() {
               path="/FacultyFeedbackMaster-course-inst"
               element={
                 <Suspense fallback={<OverlayLoader />}>
-                  {/* <FacultyFeedbackReportByCourse /> */}
                   <FacultyFeedbackReportCourseForm />
                 </Suspense>
               }
@@ -9459,7 +9462,6 @@ function RouteConfig() {
               path="/FacultyFeedbackMaster-course-dept"
               element={
                 <Suspense fallback={<OverlayLoader />}>
-                  {/* <FacultyFeedbackReportByCourse /> */}
                   <FacultyFeedbackReportCourseForm />
                 </Suspense>
               }
@@ -9474,7 +9476,24 @@ function RouteConfig() {
               }
             />
             
-            
+            <Route
+              exact
+              path="/facultyFeedbackMasterCourseIndex-inst"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportByCourse />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/facultyFeedbackMasterCourseIndex-dept"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportByCourse />
+                </Suspense>
+              }
+            />
           </>
           <>
             <Route
