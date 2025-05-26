@@ -36,6 +36,8 @@ import EmployeeFTEDownload from "../components/EmployeeFTEDownload";
 import DownloadAppointmentPdf from "../components/EmployeeAppointmentDownload";
 import ContractEmployeePaymentHistory from "../pages/indeces/ContractEmployeePaymentHistory";
 import PersonIcon from "@mui/icons-material/Person";
+// import CustomToggle from "./Inputs/CustomToggle";
+// import CustomFilter from "./Inputs/CustomCommonFilter";
 
 const useStyles = makeStyles({
   redRow: {
@@ -130,6 +132,10 @@ function EmployeeIndex({ tab }) {
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
   const [program, setProgram] = useState([]);
+  // const [showFilter, setShowFilter] = useState(false);
+  // const [selectedFilters, setSelectedFilters] = useState([]);
+  // const [filterValues, setFilterValues] = useState({});
+  // const [filterModel, setFilterModel] = useState({ items: [] });
    const [columnVisibilityModel, setColumnVisibilityModel] = useState({
       employee_name: false,    
       designation_short_name: tab === "Consultant" ? false : true,
@@ -335,7 +341,12 @@ function EmployeeIndex({ tab }) {
     if (deptId) baseURL += `&dept_id=${deptId}`;
     if (designation_id) baseURL += `&designation_id=${designation_id}`;
     if (jobType) baseURL += `&job_type_id=${jobType}`;
-
+      //  if(Object.keys(filterValues)?.length >0){
+      //   for(let key in filterValues){
+      //      baseURL +=`&${key}=${filterValues[key]}`
+      //   }
+      //  }
+      
     try {
       const response = await axios.get(baseURL);
 
@@ -532,6 +543,7 @@ function EmployeeIndex({ tab }) {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
+    //  type: "date",
      // hide: tab === "Consultant" ? true : true,
       renderCell: (params) => {
         return (
@@ -1266,6 +1278,63 @@ function EmployeeIndex({ tab }) {
       });
   };
 
+  // const handleFilterChange = (event) =>{
+  //      setSelectedFilters(event.target.value)
+  //      const newSelected = event.target.value
+  //      setFilterValues(prev => {
+  //   const updated = {};
+  //   newSelected.forEach((field) => {
+  //     if (prev[field]) {
+  //       updated[field] = prev[field];
+  //     }
+  //   });
+  //   return updated;
+  // });
+  //   }
+
+//   const handleFilterChange = (event) => {
+//   const newSelected = event.target.value;
+//   const removed = selectedFilters.filter(f => !newSelected.includes(f));
+//   const newFilterValues = { ...filterValues };
+//   removed.forEach(field => delete newFilterValues[field]);
+
+//   setSelectedFilters(newSelected);
+//   setFilterValues(newFilterValues);
+
+//   // Also remove filters from model
+//   setFilterModel(prev => ({
+//     ...prev,
+//     items: prev.items.filter(item => newSelected.includes(item.field)),
+//   }));
+// };
+
+
+//   const handleFilterValueChange = (field, value) => {
+//   setFilterValues(prev => ({
+//     ...prev,
+//     [field]: value,
+//   }));
+//   getData({ ...filterValues, [field]: value });
+// };
+
+
+// const handleFilterValueChange = (field, value) => {
+//   setFilterValues(prev => ({ ...prev, [field]: value }));
+
+//   setFilterModel(prev => {
+//     const newItems = prev.items.filter(item => item.field !== field);
+//     if (value) {
+//       newItems.push({
+//         id: field,
+//         field,
+//         operator: "contains",
+//         value,
+//       });
+//     }
+//     return { ...prev, items: newItems };
+//   });
+// };
+
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
       {/* User Creation  */}
@@ -1668,6 +1737,22 @@ function EmployeeIndex({ tab }) {
         </Box>
       </ModalWrapper>
 
+      {/* Custom Filter */}
+       <CustomToggle
+                isVisible={showFilter}
+                onToggle={() => setShowFilter(prev => !prev)}
+                label="Filters"
+            />
+            {showFilter ? (
+              <CustomFilter
+               filterableColumns={columns}
+               handleChange={handleFilterChange}
+               selectedFilters={selectedFilters} 
+               filterValues={filterValues}
+              onFieldValueChange={handleFilterValueChange}
+              />
+            ): <></>}
+
       <GridIndex
         rows={rows}
         columns={columns}
@@ -1675,6 +1760,8 @@ function EmployeeIndex({ tab }) {
         loading={isLoading}
         columnVisibilityModel={columnVisibilityModel}
         setColumnVisibilityModel={setColumnVisibilityModel}
+        // filterModel={filterModel}
+        // setFilterModel={setFilterModel}
       />
       {open && (
         <EmployeeIDCardDownload
