@@ -331,10 +331,9 @@ function FacultyFeedbackReportByCourse() {
     );
 
     const sectionTableData = useMemo(() => (
-        // <TableContainer component={Paper} elevation={3}>
           <Paper elevation={3}>
-        <Box sx={{ overflowX: 'auto' }}>
-            <Table size="small" sx={{ minWidth: 1000 }}>
+        <Box sx={{ overflowX: 'auto', width: '100%' }}>
+            <Table size="small" sx={{ minWidth: 1200 }}>
                 <TableHead>
                     <TableRow>
                         <TableCell
@@ -414,11 +413,8 @@ function FacultyFeedbackReportByCourse() {
                     setPage(0);
                 }}
             />
-        {/* </TableContainer> */}
         </Paper>
     ), [rows, sectionKeys, allCourses, page, rowsPerPage]);
-
-
 
     return (
         <>

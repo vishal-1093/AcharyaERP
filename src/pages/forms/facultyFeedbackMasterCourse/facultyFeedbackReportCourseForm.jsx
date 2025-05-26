@@ -139,7 +139,7 @@ const FacultyFeedbackReportCourseForm = () => {
         const school_id = values.schoolId ? values.schoolId : schoolID;
         const res = await axios.get(`api/employee/getEmployeeIdBasedOnSclAndDept?dept_id=${departmentId}&school_id=${school_id}`);
         const { data } = res?.data;
-        const empData = data?.length > 0 ? data.map((emp) => emp.emp_id) : [];
+        const empData = data?.length > 0 ? data?.map((emp) => emp.emp_id) : [];
         return empData;
       }
     }
