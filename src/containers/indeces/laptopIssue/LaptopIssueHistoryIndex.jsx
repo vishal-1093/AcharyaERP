@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy } from "react";
-import GridIndex from "../../../components/TotalGridIndex.jsx";
+import GridIndex from "../../../components/GridIndex.jsx";
 import {
   Box,
   IconButton,
@@ -42,6 +42,10 @@ function LaptopIssueHistoryIndex() {
   const [{ rows, loading, isPhotoModalOpen, photoUrl, isAcknowledgeModalOpen, ackUrl, isAckModalOpen, attachment, rowDetails,
     isAckDownloadModalOpen, ackDownloadFileUrl, ackDownloadPhotoFileUrl, photoImageUrl,acYearId,academicYearOptions }, setValues] = useState(initialValues);
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    created_date: false,
+    created_username: false
+  });
 
   useEffect(() => {
     getAcYear();
@@ -63,13 +67,26 @@ function LaptopIssueHistoryIndex() {
       flex: 1,
     },
     {
+      field: "grn_ref_no",
+      headerName: "GRN Ref No.",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "po_ref_no",
+      headerName: "PO Ref No.",
+      flex: 1,
+      hideable: false,
+    },
+    {
       field: "serialNo",
       headerName: "Serial No.",
       flex: 1,
+      hideable: false,
     },
     {
-      field: "grn_ref_no",
-      headerName: "GRN Ref No.",
+      field: "type",
+      headerName: "Type",
       flex: 1,
       hideable: false,
     },
@@ -84,6 +101,17 @@ function LaptopIssueHistoryIndex() {
       flex: 1,
       valueGetter: (value, row) =>
         row.issued_date ? moment(row.issued_date).format("DD-MM-YYYY") : "",
+    },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+    },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      valueGetter: (value, row) => (moment(row.created_date).format("DD-MM-YYYY"))
     },
     {
       field: "attachment",
@@ -295,8 +323,8 @@ function LaptopIssueHistoryIndex() {
   const getData = async (acyearId=null) => {
     try {
       setLoading(true);
-      const apiUrl = `/api/student/fetchAllLaptopIssueHistory?page=0&page_size=1000000&sort=created_date`;
-      const acYearUrl = `/api/student/fetchAllLaptopIssueHistory?page=0&page_size=1000000&sort=created_date&ac_year_id=${acyearId}`
+      const apiUrl = `/api/student/fetchAllLaptopIssueHistory?page=0&page_size=1000000&sort=issued_date`;
+      const acYearUrl = `/api/student/fetchAllLaptopIssueHistory?page=0&page_size=1000000&sort=issued_date&ac_year_id=${acyearId}`
       const res = await axios.get(acyearId ? acYearUrl : apiUrl);
       if (res.status == 200 || res.status == 201) {
         setValues((prevState) => ({
@@ -403,7 +431,9 @@ function LaptopIssueHistoryIndex() {
       </Grid>
       <Box sx={{ position: "relative", marginTop: { xs: 8, md: 2 } }}>
         <Box sx={{ position: "absolute", width: "100%", }}>
-          <GridIndex rows={rows} columns={columns} loading={loading} />
+          <GridIndex rows={rows} columns={columns} loading={loading} 
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}/>
         </Box>
       </Box>
 

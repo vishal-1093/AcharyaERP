@@ -83,8 +83,23 @@ const LaptopIssueForm = () => {
 
   const isIssuedOrNot = async () => {
     try {
+      const res = await axios.get(`/api/student/checkAuidForLaptop/${auid}`);
+      if(res.status ==200 || res.status == 201){
+        getFeeTemplateData();
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message:  `This ${auid} is already issued !!`,
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getFeeTemplateData = async () => {
+    try {
       const res = await axios.get(`api/finance/getFeeTemplateDataBasedONAuid/${auid}`);
-      if(res.status == 200 || res.status == 201){
+      if (res.status == 200 || res.status == 201) {
         getStudentDetail(res.data.data)
       }
     } catch (error) {
@@ -361,6 +376,8 @@ const LaptopIssueForm = () => {
               name="remarks"
               label="Fee Note"
               value={remarks}
+              multiline
+              rows={5}
               disabled
             />
           </Grid>

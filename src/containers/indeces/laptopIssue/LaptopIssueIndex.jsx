@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy } from "react";
-import GridIndex from "../../../components/TotalGridIndex.jsx";
+import GridIndex from "../../../components/GridIndex.jsx";
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import CSVPNG from "../../../assets/csvPng.png";
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 const ModalWrapper = lazy(() => import("../../../components/ModalWrapper.jsx"));
 const CustomFileInput = lazy(() =>
@@ -29,12 +30,17 @@ const initialValues = {
   loading: false,
   isUploadModalOpen: false
 };
+const loggedInUser = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
 const requiredAttachment = ["attachment"];
 
 function LaptopIssueIndex() {
   const [{ acYearId,csvAcYearId, academicYearOptions, attachment, rows, isUploadModalOpen, loading }, setValues] = useState(initialValues);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    created_date: false,
+    created_username: false
+  });
 
   useEffect(() => {
     getAcYear();
@@ -43,27 +49,41 @@ function LaptopIssueIndex() {
 
   const columns = [
     {
-      field: "grn_ref_no", headerName: "GRN Ref No.", flex: 1
+      field: "grn_ref_no", headerName: "GRN Ref No.", flex: 1,hideable: false,
     },
     {
       field: "po_ref_no",
       headerName: "PO Ref No.",
       flex: 1,
+      hideable: false,
     },
     {
       field: "serialNo",
       headerName: "Serial No.",
       flex: 1,
+      hideable: false,
     },
     {
       field: "type",
       headerName: "Type",
       flex: 1,
+      hideable: false,
     },
     {
       field: "ac_year",
       headerName: "Academic Year",
       flex: 1,
+    },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+    },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      valueGetter:(value,row)=>(moment(row.created_date).format("DD-MM-YYYY"))
     },
     {
       field: "issue",
@@ -191,6 +211,8 @@ function LaptopIssueIndex() {
       const formData = new FormData();
       formData.append("file", fileAttachment);
       formData.append("ac_year_id",csvAcYearId);
+      formData.append("created_by", loggedInUser?.userId);
+      formData.append("created_username", loggedInUser?.userName);
       const res = await axios.post(`api/student/laptopIssueCsvUpload`, formData);
       if (res.status == 200 || res.status == 201) {
         setAlertMessage({
@@ -245,7 +267,9 @@ function LaptopIssueIndex() {
 
       <Box sx={{ position: "relative", marginTop: { xs: 8, md: 2 } }}>
         <Box sx={{ position: "absolute", width: "100%" }}>
-          <GridIndex rows={rows} columns={columns} loading={loading} />
+          <GridIndex rows={rows} columns={columns} loading={loading} 
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}/>
         </Box>
       </Box>
 
@@ -276,7 +300,7 @@ function LaptopIssueIndex() {
                 sx={{ border: "3px dashed #4A57A9", borderRadius: "10px", backgroundColor: "#f7f7ff", cursor: "pointer" }}>
                 <IconButton >
                   <img src={CSVPNG} alt="sample" width="30px" height="30px" />
-                  <Typography variant="body2" gutterBottom>Sample Download</Typography>
+                  <Typography variant="subtitle2" gutterBottom>Sample Download</Typography>
                 </IconButton>
               </Grid>
               <Grid item xs={12} mt={5}>

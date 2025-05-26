@@ -17,9 +17,10 @@ const styles = StyleSheet.create({
   },
   image: {
     position: "absolute",
-    width: "100%"
+    width: "99%"
   },
-  layout: { margin: "100px 2px 30px 40px" },
+  layout: { margin: "110px 2px 30px 40px" },
+  layout1: {margin: "100px 2px 30px 40px"},
   alignCenterFlex: {
     display: "flex",
     flexDirection: "row",
@@ -417,7 +418,7 @@ export const GenerateLaptopIssueAcknowledge = (
 
   const MainContent = () => {
     return (
-      <View style={styles.layout}>
+      <View style={school_name_short.toLowerCase() == "ags" ? styles.layout1: styles.layout}>
         <Text style={styles.declarationTxt}>Laptop Declaration Form</Text>
         <StudentDetailTable />
         <Text style={styles.declarationTxt}>Laptop Details</Text>
