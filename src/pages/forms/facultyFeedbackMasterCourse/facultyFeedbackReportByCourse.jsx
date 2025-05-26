@@ -164,7 +164,7 @@ function FacultyFeedbackReportByCourse() {
                     const courseSection = {};
                     data?.forEach((item) => {
                         const empKey = item.empId;
-                        const course = `${item.course_name}-${item.course_code}`;
+                        const course = item.course_code;
                         const section = item.section_name;
                         const value = item.avg_ratings_percentage;
 
@@ -250,7 +250,7 @@ function FacultyFeedbackReportByCourse() {
                                     textAlign: "center",
                                 }}
                             >
-                                {`Faculty Feedback Report for the Academic Year - ${queryParams?.acYear}`}
+                                {`Faculty Feedback Report for the Academic Year - ${queryParams?.acYear} and Semester - ${queryParams?.sem || 0}`}
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -345,7 +345,7 @@ function FacultyFeedbackReportByCourse() {
                                 textAlign: "center",
                             }}
                         >
-                            {`Faculty Feedback Report for the Academic Year - ${queryParams?.acYear}`}
+                            {`Faculty Feedback Report for the Academic Year - ${queryParams?.acYear} and Semester - ${queryParams?.sem || 0}`}
                         </TableCell>
                     </TableRow>
                     <TableRow>
