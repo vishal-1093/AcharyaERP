@@ -752,7 +752,7 @@ function BankImportIndex() {
       <ModalWrapper
         open={isRefetchModelOpen}
         setOpen={setIsRefetchModelOpen}
-        maxWidth={400}
+        maxWidth={600}
         title={
           <Box
             sx={{
