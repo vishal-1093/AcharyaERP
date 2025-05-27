@@ -14,7 +14,8 @@ import {
     tooltipClasses,
     Typography,
     Divider,
-    Button
+    Button,
+    CircularProgress
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import axios from "../../../services/Api";
@@ -26,29 +27,13 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import OverlayLoader from "../../../components/OverlayLoader";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 
 const initialValues = {
     fcYearId: null,
     monthId: null,
     date: ""
 };
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.headerWhite.main,
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-    },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    "&:nth-of-type(odd)": {
-        backgroundColor: theme.palette.action.hover,
-    },
-}));
-
 
 function StudentUniformTransactionIndex() {
     const [rows, setRows] = useState([]);
@@ -59,7 +44,8 @@ function StudentUniformTransactionIndex() {
     const [loading, setLoading] = useState(false)
     const [updatedValues, setUpdatedValues] = useState({})
     const [showUpdateBankAmountModel, setShowUpdateBankAmountModel] = useState(false)
-
+    const [refetchDate, setRefetchDate] = useState()
+    const [isRefetchModelOpen, setIsRefetchModelOpen] = useState(false)
     const { setAlertMessage, setAlertOpen } = useAlert();
     const setCrumbs = useBreadcrumbs();
 
@@ -79,12 +65,13 @@ function StudentUniformTransactionIndex() {
     }, [values.fcYearId, values.monthId])
 
     const getData = async () => {
-        const { fcYearId, monthId } = values
+        // const { fcYearId, monthId } = values
+         const { fcYearId } = values
 
         const baseUrl = '/api/finance/getUniformTransactions'
         let params = {
             ...(fcYearId && { fcYearId }),
-            ...(monthId && { month: monthId }),
+            // ...(monthId && { month: monthId }),
         }
         setLoading(true)
         await axios
@@ -186,6 +173,31 @@ function StudentUniformTransactionIndex() {
             });
 
     }
+
+     const handleRefetch = async() =>{
+           await axios
+            .get(`/fetch-receipts-java&datee=2025-04-30`)
+            .then((res) => {
+                 console.log("res++++", res)
+            })
+            .catch((err) => {
+                console.log("err++++", err)
+            });
+    }
+
+      const handleRefetchSubmit = () =>{
+      //  refetchUniformTransactionData()
+       console.log("refetch")
+    }
+
+     const handleRefetchInputChange = (name, newValue) => {
+        setRefetchDate(newValue)
+    };
+
+         const refetchUniformTransactionData = () => {
+            console.log("refetch transaction")
+       
+        }
 
     const columns = [
         {
@@ -395,6 +407,52 @@ function StudentUniformTransactionIndex() {
         )
     }
 
+     const RefetchUniformTransaction = () => {
+            return (
+              <Grid
+                container
+                direction="column"
+                spacing={3}
+                sx={{ p: 1 }}
+              >
+                <Grid item sx={{ width: "100%" }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={10}>
+                     <CustomDatePicker
+                        name="refetchDate"
+                        label="Settlement Date"
+                        value={refetchDate || ""}
+                        handleChangeAdvance={handleRefetchInputChange}
+                        maxDate={new Date()}
+                    />
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Grid item>
+                  <Box display="flex" justifyContent="flex-end">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      sx={{ borderRadius: 1, px: 2 }}
+                      disabled={!refetchDate || loading}
+                      onClick={handleRefetchSubmit}
+                    >
+                      {loading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        <strong>{"Save"}</strong>
+                      )}
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            )
+          }
+
 
     return (
         <Box sx={{ position: "relative" }}>
@@ -434,9 +492,33 @@ function StudentUniformTransactionIndex() {
             >
                 {BankAmountUpdateData()}
             </ModalWrapper>
+            <ModalWrapper
+                            open={isRefetchModelOpen}
+                            setOpen={setIsRefetchModelOpen}
+                            maxWidth={400}
+                            title={
+                              <Box
+                                sx={{
+                                  width: "100%",
+                                  textAlign: "center",
+                                  fontWeight: 600,
+                                  fontSize: "1.3rem",
+                                  color: "primary.main",
+                                  paddingBottom: 1,
+                                }}
+                              >
+                                <Typography variant="h6" mb={1}>
+                                 Refetch Uniform Transaction
+                                </Typography>
+                                <Divider />
+                              </Box>
+                            }
+                          >
+                            {RefetchUniformTransaction()}
+                          </ModalWrapper>
             <Box>
-                <Grid container alignItems="center" mt={2} gap={2} sx={{ display: "flex", justifyContent: "flex-start", }}>
-                    <Grid item xs={2} md={2.4}>
+                <Grid container alignItems="center" gap={4} sx={{ display: "flex", justifyContent: "flex-end", }}>
+                    <Grid item xs={8} md={2.4}>
                         <CustomAutocomplete
                             label="Financial Year"
                             name="fcYearId"
@@ -446,20 +528,21 @@ function StudentUniformTransactionIndex() {
                             required={true}
                         />
                     </Grid>
-                    <Grid item xs={12} md={2.4}>
-                        <CustomAutocomplete
-                            name="monthId"
-                            label="Month"
-                            options={MONTH_LIST_OPTION}
-                            handleChangeAdvance={handleChangeAdvance}
-                            value={values.monthId}
-                            required={true}
-                        />
-                    </Grid>
+                    {/* <Grid item xs={8} md={0.8}>
+                         <Button
+                                style={{ borderRadius: 7 }}
+                                variant="contained"
+                                color="primary"
+                                onClick={handleRefetch}
+                                sx={{height: '38px'}}
+                            >
+                              Refetch
+                            </Button>
+                    </Grid> */}
                 </Grid>
             </Box>
             <Box mt={2}>
-                <GridIndex rows={rows} columns={columns} getRowId={row => row.transactionDate} loading={loading} />
+                <GridIndex rows={rows} columns={columns} getRowId={(row, index) => row.transactionDate || `row-${index}`} loading={loading} />
             </Box>
         </Box>
     )

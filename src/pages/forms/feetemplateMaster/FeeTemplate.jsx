@@ -5,6 +5,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
+import { type } from "@testing-library/user-event/dist/cjs/utility/type.js";
 
 const CustomMultipleAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomMultipleAutocomplete")
@@ -36,6 +37,7 @@ const initialValues = {
   yearsemId: "",
   uniformStatus: "Yes",
   laptopStatus: "No",
+  remarks: "",
 
   feeTemplateName: "",
   feeYearOne: "",
@@ -56,6 +58,7 @@ const initialValues = {
   approvedStatus: "",
   approvedDate: null,
   isRegular: true,
+  remarks:""
 };
 
 const requiredFields = [
@@ -338,20 +341,18 @@ function FeeTemplate() {
   };
 
   const getAllFeetemplateDetails = async () => {
-    if (
-      values.acYearId &&
-      values.admcategoryId &&
-      values.admSubCategoryId &&
-      values.programTypeId &&
-      values.currencyTypeId &&
-      values.schoolId &&
-      values.programId
-    )
-      await axios
-        .get(
-          `/api/finance/allFeeTemplateDetail/${values.acYearId}/${values.admcategoryId}/${values.admSubCategoryId}/${values.programTypeId}/${values.currencyTypeId}/${values.schoolId}/${values.programId}`
-        )
-        .then((resOne) => {
+    try {
+      if (
+        values.acYearId &&
+        values.admcategoryId &&
+        values.admSubCategoryId &&
+        values.programTypeId &&
+        values.currencyTypeId &&
+        values.schoolId &&
+        values.programId
+      ) {
+        const resOne = await axios.get(`/api/finance/allFeeTemplateDetail/${values.acYearId}/${values.admcategoryId}/${values.admSubCategoryId}/${values.nationality}/${values.programTypeId}/${values.currencyTypeId}/${values.schoolId}/${values.programId}`);
+        if (resOne.status == 200 || resOne.status == 201) {
           const a = resOne.data.data.map(
             (obj) => obj.program_specialization_id
           );
@@ -367,13 +368,13 @@ function FeeTemplate() {
                     .filter((obj) =>
                       resOne.data.data.length > 0
                         ? resOne.data.data[0].program_specialization_id
-                            .split(",")
-                            .includes(
-                              obj.program_specialization_id.toString()
-                            ) === false
-                        : a.includes(
+                          .split(",")
+                          .includes(
                             obj.program_specialization_id.toString()
                           ) === false
+                        : a.includes(
+                          obj.program_specialization_id.toString()
+                        ) === false
                     )
                     .map((obj) => ({
                       value: obj.program_specialization_id,
@@ -381,14 +382,22 @@ function FeeTemplate() {
                     }))
                 );
               })
-              .catch((err) => console.error(err));
-        });
+
+        }
+      }
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const getFeetemplateData = async () => {
     await axios
       .get(`/api/finance/getFeeTemplateDetailsData/${id}`)
       .then(async (res) => {
+        const speIds = res?.data?.data?.program_specialization_id
+          ?.split(",")
+          ?.map((obj) => Number(obj));
+
         setValues((prev) => ({
           ...prev,
           acYearId: res.data.data.ac_year_id,
@@ -402,9 +411,9 @@ function FeeTemplate() {
           currencyTypeId: res.data.data.currency_type_id,
           schoolId: res.data.data.school_id,
           programId: res.data.data.program_id,
-          programSpeId: res.data.data.program_specialization_id,
+          programSpeId: speIds,
+          remarks: res.data.data.remarks,
           feeTemplateName: res.data.data.fee_template_name,
-          programSpecialization: res.data.data.program_specialization,
           yearsemId: res.data.data.lat_year_sem,
           uniformStatus: res.data.data.uniform_status ? "Yes" : "No",
           laptopStatus: res.data.data.laptop_status ? "Yes" : "No",
@@ -424,6 +433,7 @@ function FeeTemplate() {
           feeYearEleven: res.data.data.fee_year11_amt,
           feeYearTwelve: res.data.data.fee_year12_amt,
           feeYearTotal: res.data.data.fee_year_total_amount,
+          remarks: res.data.data.remarks
         }));
 
         setFeetempId(res.data.data.fee_template_id);
@@ -592,7 +602,7 @@ function FeeTemplate() {
       temp.school_id = values.schoolId;
       temp.program_id = values.programId;
       temp.program_specialization_id = values.programSpeId.toString();
-      temp.program_specialization = values.programSpecialization;
+      // temp.program_specialization = values.programSpecialization;
       temp.laptop_status = values.laptopStatus === "Yes" ? true : false;
       temp.uniform_status = values.uniformStatus === "Yes" ? true : false;
       temp.remarks = values.remarks;

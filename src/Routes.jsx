@@ -46,6 +46,7 @@ import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
 import RazorPayPendingSettlementDetail from "./containers/indeces/razorpaySettlementMaster/razorpayPendingSettlement.jsx";
+
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
 );
@@ -63,6 +64,16 @@ const FacultyFeedbackReportBySection = lazy(() =>
     "./containers/indeces/facultyFeedbackMaster/FacultyFeedbackReportBySection.jsx"
   )
 );
+
+const FacultyFeedbackReportCourseForm = lazy(()=>
+  import(
+    "./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportCourseForm.jsx"
+  )
+);
+
+const FacultyFeedbackReportByCourse = lazy(()=>
+  import("./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportByCourse.jsx")
+)
 
 const EmpDocumentCollection = lazy(() =>
   import("./components/EmpDocumentCollectionPdf")
@@ -1603,7 +1614,6 @@ const StudentCoursewiseAttendance = lazy(() =>
 const DetailedAttendancefilter = lazy(() =>
   import("./pages/forms/studentMaster/DetailedAttendancefilter")
 );
-// Faculty Details
 
 const FacultyDetails = lazy(() => import("./pages/masters/FacultyDetails.jsx"));
 
@@ -9513,6 +9523,61 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <FacultyFeedbackReportBySection />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-course"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportCourseForm />
+                </Suspense>
+              }
+            />
+             <Route
+              exact
+              path="/FacultyFeedbackMaster-course-inst"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportCourseForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/FacultyFeedbackMaster-course-dept"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportCourseForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/facultyFeedbackMasterCourseIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportByCourse />
+                </Suspense>
+              }
+            />
+            
+            <Route
+              exact
+              path="/facultyFeedbackMasterCourseIndex-inst"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportByCourse />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/facultyFeedbackMasterCourseIndex-dept"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FacultyFeedbackReportByCourse />
                 </Suspense>
               }
             />

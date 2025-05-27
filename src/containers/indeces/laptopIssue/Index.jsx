@@ -7,7 +7,7 @@ const LaptopIssueHistoryIndex = lazy(() => import("./LaptopIssueHistoryIndex"));
 
 const tabsData = [
   { label: "Laptop Issue", value: "index", component: LaptopIssueIndex },
-  { label: "Laptop Issued History", value: "history", component: LaptopIssueHistoryIndex },
+  { label: "Issued History", value: "history", component: LaptopIssueHistoryIndex },
 ];
 
 function Index() {

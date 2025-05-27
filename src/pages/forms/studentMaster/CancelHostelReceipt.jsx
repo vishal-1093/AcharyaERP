@@ -24,6 +24,7 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 
 const initialValues = {
   financialYearId: "",
@@ -49,10 +50,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 function CancelHostelReceipt() {
   const [values, setValues] = useState(initialValues);
   const [financialYearOptions, setFinancialYearOptions] = useState([]);
-  const [bookId, setBookId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [studentDetailsOpen, setStudentDetailsOpen] = useState(false);
-  const [voucherData, setVoucherData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -70,7 +68,9 @@ function CancelHostelReceipt() {
   useEffect(() => {
     getFinancialYearData();
     getSchoolDetails();
-    setCrumbs([{ name: "Cancel Hostel Receipt" }]);
+    setCrumbs([
+      { name: "Cancel Hostel Receipt", link: "/feereceipt-cancel-index" },
+    ]);
   }, []);
 
   const getSchoolDetails = async () => {
@@ -136,14 +136,30 @@ function CancelHostelReceipt() {
   const handleCreate = async () => {
     setStudentData([]);
     setVoucherHeads([]);
-    try {
-      const response = await axios.get(
-        `/api/finance/getHostelFeeReceiptVoucherHeadWiseDetails?financial_year_id=${values.financialYearId}&fee_receipt=${values.receiptNo}&receipt_type=HOS`
-      );
 
-      if (response.data.data.body.voucherheadwiseData.length > 0) {
+    let apiUrl;
+
+    try {
+      if (values.receiptType === "general") {
+        apiUrl = `/api/finance/getHostelFeeReceiptVoucherHeadWiseDetails?financial_year_id=${values.financialYearId}&fee_receipt=${values.receiptNo}&receipt_type=HOS`;
+      } else {
+        apiUrl = `api/finance/feeReceiptDetailForHostel?financialYearId=${values.financialYearId}&feeReceipt=${values.receiptNo}&feeReceiptId=7848&receiptType=HOSB`;
+      }
+
+      const response = await axios.get(`${apiUrl}`);
+
+      if (
+        values.receiptType === "general" &&
+        response.data.data.body.voucherheadwiseData.length > 0
+      ) {
         setStudentData(response.data.data.body.feeReceipt);
         setVoucherHeads(response.data.data.body.voucherheadwiseData);
+      } else if (
+        values.receiptType === "bulk" &&
+        response.data.data.voucherheadwiseData.length > 0
+      ) {
+        setStudentData(response.data.data.feeReceipt);
+        setVoucherHeads(response.data.data.voucherheadwiseData);
       } else {
         setAlertMessage({ severity: "error", message: "NO DATA FOUND !!!" });
         setAlertOpen(true);
@@ -173,10 +189,16 @@ function CancelHostelReceipt() {
         active: true,
       };
 
+      let deleteApiUrl;
+
+      if (values.receiptType === "general") {
+        deleteApiUrl = `/api/finance/inActivateFeeReceiptNumber?financial_year_id=${values.financialYearId}&fee_receipt=${values.receiptNo}&receipt_type=HOS`;
+      } else {
+        // deleteApiUrl = `api/finance/deactivateFeeReceiptOfHostel?feeReceiptId=712&hosFeeRcptVoucHeadIds=1,2,3`;
+      }
+
       try {
-        await axios.delete(
-          `/api/finance/inActivateFeeReceiptNumber?financial_year_id=${values.financialYearId}&fee_receipt=${values.receiptNo}&receipt_type=HOS`
-        );
+        await axios.delete(`${deleteApiUrl}`);
 
         try {
           const response2 = await axios.post(
@@ -239,12 +261,27 @@ function CancelHostelReceipt() {
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={3}>
+            <CustomSelect
+              name="receiptType"
+              label="Receipt Type"
+              value={values.receiptType}
+              items={[
+                { label: "General", value: "general" },
+                { label: "Bulk", value: "bulk" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="financialYearId"
               label="Financial Year"
               value={values.financialYearId}
               options={financialYearOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!values.receiptType}
               required
             />
           </Grid>
@@ -257,16 +294,19 @@ function CancelHostelReceipt() {
               handleChange={handleChange}
               checks={checks.booksAvailable}
               errors={errorMessages.booksAvailable}
+              disabled={!values.receiptType}
               required
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} md={3}>
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={
+                loading || !(values.financialYearId && values.receiptNo)
+              }
               onClick={handleCreate}
             >
               {loading ? (
@@ -276,7 +316,7 @@ function CancelHostelReceipt() {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                <strong>Go</strong>
+                <strong>Submit</strong>
               )}
             </Button>
           </Grid>
@@ -300,7 +340,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={5}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.auid}
+                        {studentData?.auid ?? "NA"}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -308,7 +348,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.school_name_short}
+                        {studentData?.school_name_short ?? "NA"}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -316,7 +356,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={5}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.student_name}
+                        {studentData?.student_name ?? "NA"}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -324,7 +364,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.program_name}
+                        {studentData?.program_name ?? "NA"}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -334,7 +374,7 @@ function CancelHostelReceipt() {
                       <Typography variant="body2" color="textSecondary">
                         {moment(studentData?.date_of_admission).format(
                           "DD-MM-YYYY"
-                        )}
+                        ) ?? "NA"}
                       </Typography>
                     </Grid>
 
@@ -343,7 +383,8 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <Typography variant="body2" color="textSecondary">
-                        {`${studentData?.current_year}/${studentData?.current_sem}`}
+                        {`${studentData?.current_year}/${studentData?.current_sem}` ??
+                          "NA"}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -351,7 +392,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={5}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.fee_template_name}
+                        {studentData?.fee_template_name ?? "NA"}
                       </Typography>
                     </Grid>
 
@@ -360,7 +401,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.mobile}
+                        {studentData?.mobile ?? "NA"}
                       </Typography>
                     </Grid>
                   </Grid>

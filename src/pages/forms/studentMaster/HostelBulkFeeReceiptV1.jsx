@@ -512,7 +512,7 @@ const HostelBulkFeeReceiptV1 = () => {
                   </Grid>
                   <Grid item xs={7.5}>
                     <Typography variant="body1">
-                      HOSB - {data?.[0]?.feeReceiptId}
+                      HOSB - {data?.[0]?.feeReceipt}
                     </Typography>
                   </Grid>
                 </Grid>
