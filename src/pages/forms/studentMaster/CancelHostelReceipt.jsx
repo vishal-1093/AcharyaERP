@@ -50,10 +50,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 function CancelHostelReceipt() {
   const [values, setValues] = useState(initialValues);
   const [financialYearOptions, setFinancialYearOptions] = useState([]);
-  const [bookId, setBookId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [studentDetailsOpen, setStudentDetailsOpen] = useState(false);
-  const [voucherData, setVoucherData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -71,7 +68,9 @@ function CancelHostelReceipt() {
   useEffect(() => {
     getFinancialYearData();
     getSchoolDetails();
-    setCrumbs([{ name: "Cancel Hostel Receipt",link:"/feereceipt-cancel-index" }]);
+    setCrumbs([
+      { name: "Cancel Hostel Receipt", link: "/feereceipt-cancel-index" },
+    ]);
   }, []);
 
   const getSchoolDetails = async () => {
@@ -257,7 +256,7 @@ function CancelHostelReceipt() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-start"
+          justifyContent="center"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
@@ -300,12 +299,14 @@ function CancelHostelReceipt() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6} align="right">
+          <Grid item xs={12} md={3}>
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading || !(values.financialYearId && values.receiptNo)}
+              disabled={
+                loading || !(values.financialYearId && values.receiptNo)
+              }
               onClick={handleCreate}
             >
               {loading ? (
@@ -339,7 +340,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={5}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.auid}
+                        {studentData?.auid ?? "NA"}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -347,7 +348,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.school_name_short}
+                        {studentData?.school_name_short ?? "NA"}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -355,7 +356,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={5}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.student_name}
+                        {studentData?.student_name ?? "NA"}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -363,7 +364,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.program_name}
+                        {studentData?.program_name ?? "NA"}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -373,7 +374,7 @@ function CancelHostelReceipt() {
                       <Typography variant="body2" color="textSecondary">
                         {moment(studentData?.date_of_admission).format(
                           "DD-MM-YYYY"
-                        )}
+                        ) ?? "NA"}
                       </Typography>
                     </Grid>
 
@@ -382,7 +383,8 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <Typography variant="body2" color="textSecondary">
-                        {`${studentData?.current_year}/${studentData?.current_sem}`}
+                        {`${studentData?.current_year}/${studentData?.current_sem}` ??
+                          "NA"}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={2}>
@@ -390,7 +392,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={5}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.fee_template_name}
+                        {studentData?.fee_template_name ?? "NA"}
                       </Typography>
                     </Grid>
 
@@ -399,7 +401,7 @@ function CancelHostelReceipt() {
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData?.mobile}
+                        {studentData?.mobile ?? "NA"}
                       </Typography>
                     </Grid>
                   </Grid>
