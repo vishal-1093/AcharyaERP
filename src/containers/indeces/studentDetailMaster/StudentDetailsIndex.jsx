@@ -151,6 +151,8 @@ function StudentDetailsIndex() {
     mentor: pathname.toLowerCase() === "/student-master-user" ? false : true,
     notes: false,
     audit_status: false,
+    laptop_status: false,
+    feeTemplateRemaks: false,
   });
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -729,21 +731,16 @@ function StudentDetailsIndex() {
         </IconButton>
       ),
     },
-    // {
-    //   field: "notes",
-    //   headerName: "Notes",
-    //   flex: 1,
-    // //  hide: true,
-    //   renderCell: (params) => (
-    //     <HtmlTooltip title={params?.row?.notes}>
-    //       <Typography variant="subtitle2">
-    //         {params?.row?.notes?.length > 5
-    //           ? params.row.notes.slice(0, 4) + "..."
-    //           : params.row.notes}
-    //       </Typography>
-    //     </HtmlTooltip>
-    //   ),
-    // },
+    {
+      field: "laptop_status",
+      headerName: "Laptop Status",
+      flex: 1,
+    },
+    {
+      field: "feeTemplateRemaks",
+      headerName: "Fee Template Remaks",
+      flex: 1,
+    },
     {
       field: "notes",
       headerName: "Notes",
