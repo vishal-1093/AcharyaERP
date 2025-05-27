@@ -16,6 +16,7 @@ import {
   TableBody,
   tableCellClasses,
   tooltipClasses,
+  Divider,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
@@ -86,6 +87,31 @@ const initialValues = {
   endDate: ""
 };
 
+const refetchInitialValues={
+  refetchDate: "",
+  refetchType: "",
+  refetchTypeId: ""
+}
+
+const refetchTypeOption = [
+  {
+    label: "payment",
+    value: 1
+  },
+  {
+    label: "journal",
+    value: 2
+  },
+  {
+    label: "receipt",
+    value: 3
+  },
+  {
+    label: "tally",
+    value: 4
+  }
+]
+
 function BankImportIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -103,10 +129,13 @@ function BankImportIndex() {
   const [bankOptions, setBankOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-    'auid': false,  
+    'auid': false,
     'email/phone': false,
-     'transaction_no': false
+    'transaction_no': false
   })
+  const [refetchDate, setRefetchDate] = useState()
+  const [refetchModalValues, setRefetchModalValues] = useState(refetchInitialValues)
+  const [isRefetchModelOpen, setIsRefetchModelOpen] = useState(false)
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -146,13 +175,13 @@ function BankImportIndex() {
       field: "auid",
       headerName: "AUID",
       flex: 1,
-    //  hide: true,
+      //  hide: true,
     },
     {
       field: "email/phone",
       headerName: "Email/Phone",
       flex: 1,
-    //  hide: true,
+      //  hide: true,
       renderCell: (params) => {
         const emailAndPhoneNo = getEmailAndPhoneNo(params)
         return <Typography
@@ -168,7 +197,7 @@ function BankImportIndex() {
       field: "transaction_no",
       headerName: "Transaction No",
       flex: 1,
-    //  hide: true,
+      //  hide: true,
     },
     {
       field: "inst",
@@ -232,37 +261,37 @@ function BankImportIndex() {
     getSchoolData()
   }, []);
 
-  useEffect(()=>{
-    if( filterValues?.dateRange === 'custom'){
-      if( filterValues.startDate && filterValues.endDate) getData();
-    }else{
+  useEffect(() => {
+    if (filterValues?.dateRange === 'custom') {
+      if (filterValues.startDate && filterValues.endDate) getData();
+    } else {
       getData()
     }
-  },[filterValues?.schoolId, filterValues?.bankId, filterValues?.startDate, filterValues?.endDate, filterValues?.dateRange])
+  }, [filterValues?.schoolId, filterValues?.bankId, filterValues?.startDate, filterValues?.endDate, filterValues?.dateRange])
 
   useEffect(() => {
     getBankData();
   }, [filterValues?.schoolId]);
 
   const getData = async () => {
-    const {schoolId, bankId, startDate, endDate, dateRange } = filterValues
+    const { schoolId, bankId, startDate, endDate, dateRange } = filterValues
     const baseUrl = '/api/student/fetchAllbankImportTransactionDetail'
 
     let params = {
-         sort: 'created_by',
-         page_size: 10000,
-         page:0,
-        ...(schoolId && { school_id: schoolId }),
-        ...(bankId && { bank_id: bankId }),
-        ...(dateRange && { date_range: dateRange }),
-        ...(startDate && { start_date: moment(startDate).format("YYYY-MM-DD")}),
-        ...(startDate && endDate && { end_date:  moment(endDate).format("YYYY-MM-DD")}),
+      sort: 'created_by',
+      page_size: 10000,
+      page: 0,
+      ...(schoolId && { school_id: schoolId }),
+      ...(bankId && { bank_id: bankId }),
+      ...(dateRange && { date_range: dateRange }),
+      ...(startDate && { start_date: moment(startDate).format("YYYY-MM-DD") }),
+      ...(startDate && endDate && { end_date: moment(endDate).format("YYYY-MM-DD") }),
     }
-    await axios.get(baseUrl, {params})
+    await axios.get(baseUrl, { params })
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
       })
-      .catch((err) =>{
+      .catch((err) => {
         console.error(err)
         setAlertMessage({
           severity: "error",
@@ -344,7 +373,7 @@ function BankImportIndex() {
               getData();
             }
           })
-          .catch((err) =>{
+          .catch((err) => {
             console.error(err)
             setAlertMessage({
               severity: "error",
@@ -360,7 +389,7 @@ function BankImportIndex() {
               getData();
             }
           })
-          .catch((err) =>{
+          .catch((err) => {
             console.error(err)
             setAlertMessage({
               severity: "error",
@@ -461,7 +490,7 @@ function BankImportIndex() {
         [name]: newValue,
         ["endDate"]: ""
       }));
-    }else if(name === "schoolId"){
+    } else if (name === "schoolId") {
       setFilterValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -475,6 +504,80 @@ function BankImportIndex() {
       }));
     }
   };
+
+  const handleRefetch = async () => {
+    setIsRefetchModelOpen(true)
+  }
+
+  const handleRefetchInputChange = (name, newValue) => {
+  if(name === 'refetchTypeId'){
+    const refetchTypeObj = refetchTypeOption?.find((item)=> item.value === newValue)
+    setRefetchModalValues((prev)=>({...prev, [name]: newValue, ['refetchType']: refetchTypeObj?.label}))
+  }
+    setRefetchModalValues((prev)=>({...prev, [name]: newValue}))
+  };
+  
+
+  const handleRefetchSubmit = () => {
+    let formatedDate;
+    if(refetchModalValues?.refetchType === 'receipt' || refetchModalValues?.refetchType === 'tally'){
+     formatedDate = moment(refetchModalValues?.refetchDate).format("YYYY-MM-DD")
+    }else{
+      formatedDate = moment(refetchModalValues?.refetchDate).format("DD-MM-YYYY")
+    }
+    window.open(`https://www.acharyainstitutes.in/index.php?r=acerp-api/import_jpr&type=${refetchModalValues?.refetchType}&date=${formatedDate}`, '_blank', 'noopener,noreferrer');
+    setIsRefetchModelOpen(false)
+    setRefetchModalValues(refetchInitialValues)
+  }
+
+  const RefetchUniformTransaction = () => {
+    return (
+      <Grid
+        container
+        direction="column"
+        spacing={3}
+        sx={{ p: 1 }}
+      >
+        <Grid item sx={{ width: "100%" }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <CustomAutocomplete
+                name="refetchTypeId"
+                label="Refetch Type"
+                value={refetchModalValues.refetchTypeId}
+                options={refetchTypeOption || []}
+                handleChangeAdvance={handleRefetchInputChange}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <CustomDatePicker
+                name="refetchDate"
+                label="Transaction Date"
+                value={refetchModalValues?.refetchDate}
+                handleChangeAdvance={handleRefetchInputChange}
+                maxDate={new Date()}
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item>
+          <Box display="flex" justifyContent="flex-end">
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ borderRadius: 1, px: 2 }}
+              disabled={!(refetchModalValues?.refetchDate && refetchModalValues?.refetchType)}
+              onClick={handleRefetchSubmit}
+            >
+              Submit
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
+    )
+  }
+
 
   return (
     <>
@@ -646,89 +749,125 @@ function BankImportIndex() {
         </Grid>
       </ModalWrapper>
 
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <Button
-          onClick={() => navigate("/BankMaster/BankImport/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
+      <ModalWrapper
+        open={isRefetchModelOpen}
+        setOpen={setIsRefetchModelOpen}
+        maxWidth={400}
+        title={
+          <Box
+            sx={{
+              width: "100%",
+              textAlign: "center",
+              fontWeight: 600,
+              fontSize: "1.3rem",
+              color: "primary.main",
+              paddingBottom: 1,
+            }}
+          >
+            <Typography variant="h6" mb={1}>
+              Refetch Details
+            </Typography>
+            <Divider />
+          </Box>
+        }
+      >
+        {RefetchUniformTransaction()}
+      </ModalWrapper>
 
-        <Button
-          onClick={() => navigate("/BankClearedHistory")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 120, top: -57, borderRadius: 2 }}
-          startIcon={<HistoryIcon />}
-        >
-          Cleared History
-        </Button>
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <Box sx={{ position: "absolute", right: 0, top: -57, display: "flex", gap: 1 }}>
+          <Button
+            onClick={() => navigate("/BankMaster/BankImport/New")}
+            variant="contained"
+            disableElevation
+            sx={{ borderRadius: 2 }}
+            startIcon={<AddIcon />}
+          >
+            Create
+          </Button>
+
+          <Button
+            onClick={() => navigate("/BankClearedHistory")}
+            variant="contained"
+            disableElevation
+            sx={{ borderRadius: 2 }}
+            startIcon={<HistoryIcon />}
+          >
+            Cleared History
+          </Button>
+          <Button
+            style={{ borderRadius: 7 }}
+            variant="contained"
+            color="primary"
+            onClick={handleRefetch}
+            sx={{ borderRadius: 2 }}
+          >
+            Refetch
+          </Button>
+        </Box>
         <Box>
-                  <Grid container alignItems="center" gap={2} mt={2} mb={2}>
-                    <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
-                      <CustomAutocomplete
-                        name="schoolId"
-                        label="School"
-                        value={filterValues.schoolId}
-                        options={schoolOptions}
-                        handleChangeAdvance={handleChangeAdvance}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
-                      <CustomAutocomplete
-                        name="bankId"
-                        label="Bank"
-                        value={filterValues.bankId}
-                        options={bankOptions}
-                        handleChangeAdvance={handleChangeAdvance}
-                      />
-                    </Grid>
-                  <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
-                    <CustomAutocomplete
-                      name="dateRange"
-                      label="Date Range"
-                      value={filterValues?.dateRange}
-                      options={filterList || []}
-                      handleChangeAdvance={handleChangeAdvance}
-                      required
-                    />
-                  </Grid>
-                  {filterValues.dateRange == "custom" && (
-                    <Grid item xs={12} md={2.2} mt={2}>
-                      <CustomDatePicker
-                        name="startDate"
-                        label="From Date"
-                        value={filterValues.startDate}
-                        handleChangeAdvance={handleChangeAdvance}
-                        maxDate={new Date()}
-                        required
-                      />
-                    </Grid>
-                  )}
-                  {filterValues.dateRange == "custom" && (
-                    <Grid item xs={12} md={2.2} mt={2}>
-                      <CustomDatePicker
-                        name="endDate"
-                        label="To Date"
-                        value={filterValues.endDate}
-                        handleChangeAdvance={handleChangeAdvance}
-                        disabled={!filterValues.startDate}
-                        maxDate={new Date()}
-                        minDate={filterValues?.startDate}
-                        required
-                      />
-                    </Grid>
-                  )}
-                  </Grid>
-                </Box>
+          <Grid container alignItems="center" gap={2} mt={2} mb={2}>
+            <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={filterValues.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+            <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
+              <CustomAutocomplete
+                name="bankId"
+                label="Bank"
+                value={filterValues.bankId}
+                options={bankOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+            <Grid item xs={12} md={filterValues.dateRange == "custom" ? 2.2 : 3}>
+              <CustomAutocomplete
+                name="dateRange"
+                label="Date Range"
+                value={filterValues?.dateRange}
+                options={filterList || []}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+            {filterValues.dateRange == "custom" && (
+              <Grid item xs={12} md={2.2} mt={2}>
+                <CustomDatePicker
+                  name="startDate"
+                  label="From Date"
+                  value={filterValues.startDate}
+                  handleChangeAdvance={handleChangeAdvance}
+                  maxDate={new Date()}
+                  required
+                />
+              </Grid>
+            )}
+            {filterValues.dateRange == "custom" && (
+              <Grid item xs={12} md={2.2} mt={2}>
+                <CustomDatePicker
+                  name="endDate"
+                  label="To Date"
+                  value={filterValues.endDate}
+                  handleChangeAdvance={handleChangeAdvance}
+                  disabled={!filterValues.startDate}
+                  maxDate={new Date()}
+                  minDate={filterValues?.startDate}
+                  required
+                />
+              </Grid>
+            )}
+          </Grid>
+        </Box>
         <GridIndex
-         rows={rows}
-         columns={columns} 
-         columnVisibilityModel={columnVisibilityModel}
-         setColumnVisibilityModel={setColumnVisibilityModel}
+          rows={rows}
+          columns={columns}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}
         />
       </Box>
     </>

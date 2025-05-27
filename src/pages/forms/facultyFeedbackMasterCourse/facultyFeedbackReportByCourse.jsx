@@ -20,7 +20,6 @@ import {
     tableCellClasses,
     tooltipClasses,
 } from "@mui/material";
-import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
 import useAlert from "../../../hooks/useAlert";
 import OverlayLoader from "../../../components/OverlayLoader";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -250,7 +249,7 @@ function FacultyFeedbackReportByCourse() {
                                     textAlign: "center",
                                 }}
                             >
-                                {`Faculty Feedback Report for the Academic Year - ${queryParams?.acYear} and Semester - ${queryParams?.sem || 0}`}
+                                {`Faculty Feedback Report for the Academic Year ${queryParams?.acYear}, ${queryParams?.sem || 0} Sem`}
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -344,7 +343,7 @@ function FacultyFeedbackReportByCourse() {
                                 textAlign: "center",
                             }}
                         >
-                            {`Faculty Feedback Report for the Academic Year - ${queryParams?.acYear} and Semester - ${queryParams?.sem || 0}`}
+                            {`Faculty Feedback Report for the Academic Year ${queryParams?.acYear}, ${queryParams?.sem || 0} Sem`}
                         </TableCell>
                     </TableRow>
                     <TableRow>
