@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy } from "react";
-import GridIndex from "../../../components/TotalGridIndex.jsx";
+import GridIndex from "../../../components/GridIndex.jsx";
 import {
   Box,
   IconButton,
@@ -13,6 +13,7 @@ import moment from "moment";
 import { GenerateLaptopIssueAcknowledge } from "./GenerateLaptopIssueAcknowledge.jsx";
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 const ModalWrapper = lazy(() => import("../../../components/ModalWrapper"));
 const CustomFileInput = lazy(() =>
   import("../../../components/Inputs/CustomFileInput.jsx")
@@ -31,16 +32,23 @@ const initialValues = {
   isAckDownloadModalOpen: false,
   ackDownloadFileUrl: null,
   ackDownloadPhotoFileUrl: null,
-  photoImageUrl: null
+  photoImageUrl: null,
+  acYearId: null,
+  academicYearOptions: [],
 };
 const requiredAttachment = ["attachment"];
 
 function LaptopIssueHistoryIndex() {
   const [{ rows, loading, isPhotoModalOpen, photoUrl, isAcknowledgeModalOpen, ackUrl, isAckModalOpen, attachment, rowDetails,
-    isAckDownloadModalOpen, ackDownloadFileUrl, ackDownloadPhotoFileUrl, photoImageUrl }, setValues] = useState(initialValues);
+    isAckDownloadModalOpen, ackDownloadFileUrl, ackDownloadPhotoFileUrl, photoImageUrl,acYearId,academicYearOptions }, setValues] = useState(initialValues);
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    created_date: false,
+    created_username: false
+  });
 
   useEffect(() => {
+    getAcYear();
     getData();
   }, []);
 
@@ -54,13 +62,31 @@ function LaptopIssueHistoryIndex() {
       flex: 1,
     },
     {
-      field: "serialNo",
-      headerName: "Serial No.",
+      field: "ac_year",
+      headerName: "Academic Year",
       flex: 1,
     },
     {
       field: "grn_ref_no",
       headerName: "GRN Ref No.",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "po_ref_no",
+      headerName: "PO Ref No.",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "serialNo",
+      headerName: "Serial No.",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "type",
+      headerName: "Type",
       flex: 1,
       hideable: false,
     },
@@ -75,6 +101,17 @@ function LaptopIssueHistoryIndex() {
       flex: 1,
       valueGetter: (value, row) =>
         row.issued_date ? moment(row.issued_date).format("DD-MM-YYYY") : "",
+    },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+    },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      valueGetter: (value, row) => (moment(row.created_date).format("DD-MM-YYYY"))
     },
     {
       field: "attachment",
@@ -113,18 +150,31 @@ function LaptopIssueHistoryIndex() {
       ]
     },
     {
-      field: "printacknowledge",
-      headerName: "Print Acknowledge",
+      field: "print",
+      headerName: "Print",
       flex: 1,
       type: "actions",
       getActions: (params) => [
         <IconButton onClick={() => onPrintAck(params.row)}>
            <Badge badgeContent="Print" color="primary"></Badge>
-          {/* <Typography  variant="paragraph" color="primary" sx={{fontSize:"15px"}}></Typography> */}
         </IconButton>
       ]
     },
   ];
+
+  const getAcYear = async () => {
+    try {
+      const res = await axios.get(`/api/academic/academic_year`);
+      if (res.status == 200 || res.status == 200) {
+        setValues((prevState) => ({
+          ...prevState,
+          academicYearOptions: res.data.data.map((li) => ({ "value": li.ac_year_id, "label": li.ac_year }))
+        }));
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  };
 
   const handleDownload = async (fileName) => {
     if (fileName.endsWith(".pdf")) {
@@ -262,10 +312,20 @@ function LaptopIssueHistoryIndex() {
     }))
   };
 
-  const getData = async () => {
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+    getData(newValue)
+  };
+
+  const getData = async (acyearId=null) => {
     try {
       setLoading(true);
-      const res = await axios.get(`/api/student/fetchAllLaptopIssueHistory?page=0&page_size=1000000&sort=created_date`);
+      const apiUrl = `/api/student/fetchAllLaptopIssueHistory?page=0&page_size=1000000&sort=issued_date`;
+      const acYearUrl = `/api/student/fetchAllLaptopIssueHistory?page=0&page_size=1000000&sort=issued_date&ac_year_id=${acyearId}`
+      const res = await axios.get(acyearId ? acYearUrl : apiUrl);
       if (res.status == 200 || res.status == 201) {
         setValues((prevState) => ({
           ...prevState,
@@ -358,9 +418,22 @@ function LaptopIssueHistoryIndex() {
 
   return (
     <Box>
-      <Box sx={{ position: "relative", marginTop: { xs: 8, md: 1 } }}>
+      <Grid container sx={{ marginTop: { xs: 1, md: -6 }, display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="acYearId"
+            label="Ac Year"
+            options={academicYearOptions}
+            value={acYearId}
+            handleChangeAdvance={handleChangeAdvance}
+          />
+        </Grid>
+      </Grid>
+      <Box sx={{ position: "relative", marginTop: { xs: 8, md: 2 } }}>
         <Box sx={{ position: "absolute", width: "100%", }}>
-          <GridIndex rows={rows} columns={columns} loading={loading} />
+          <GridIndex rows={rows} columns={columns} loading={loading} 
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}/>
         </Box>
       </Box>
 

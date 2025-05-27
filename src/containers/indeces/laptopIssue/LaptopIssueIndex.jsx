@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy } from "react";
-import GridIndex from "../../../components/TotalGridIndex.jsx";
+import GridIndex from "../../../components/GridIndex.jsx";
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import CSVPNG from "../../../assets/csvPng.png";
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 const ModalWrapper = lazy(() => import("../../../components/ModalWrapper.jsx"));
 const CustomFileInput = lazy(() =>
@@ -22,18 +23,24 @@ const CustomFileInput = lazy(() =>
 
 const initialValues = {
   acYearId: null,
+  csvAcYearId:null,
   academicYearOptions: [],
   attachment: null,
   rows: [],
   loading: false,
   isUploadModalOpen: false
 };
+const loggedInUser = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
 const requiredAttachment = ["attachment"];
 
 function LaptopIssueIndex() {
-  const [{ acYearId, academicYearOptions, attachment, rows, isUploadModalOpen, loading }, setValues] = useState(initialValues);
+  const [{ acYearId,csvAcYearId, academicYearOptions, attachment, rows, isUploadModalOpen, loading }, setValues] = useState(initialValues);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    created_date: false,
+    created_username: false
+  });
 
   useEffect(() => {
     getAcYear();
@@ -42,22 +49,41 @@ function LaptopIssueIndex() {
 
   const columns = [
     {
-      field: "grn_ref_no", headerName: "GRN Ref No.", flex: 1
+      field: "grn_ref_no", headerName: "GRN Ref No.", flex: 1,hideable: false,
     },
     {
       field: "po_ref_no",
       headerName: "PO Ref No.",
       flex: 1,
+      hideable: false,
     },
     {
       field: "serialNo",
       headerName: "Serial No.",
       flex: 1,
+      hideable: false,
     },
     {
       field: "type",
       headerName: "Type",
       flex: 1,
+      hideable: false,
+    },
+    {
+      field: "ac_year",
+      headerName: "Academic Year",
+      flex: 1,
+    },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+    },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      valueGetter:(value,row)=>(moment(row.created_date).format("DD-MM-YYYY"))
     },
     {
       field: "issue",
@@ -82,13 +108,7 @@ function LaptopIssueIndex() {
         }));
       }
     } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
-      });
-      setAlertOpen(true);
+      console.log(error)
     }
   };
 
@@ -154,6 +174,13 @@ function LaptopIssueIndex() {
     getData(newValue)
   };
 
+  const onHandleAcYear = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
   const handleFileRemove = (name) => {
     setValues((prev) => ({
       ...prev,
@@ -183,6 +210,9 @@ function LaptopIssueIndex() {
     try {
       const formData = new FormData();
       formData.append("file", fileAttachment);
+      formData.append("ac_year_id",csvAcYearId);
+      formData.append("created_by", loggedInUser?.userId);
+      formData.append("created_username", loggedInUser?.userName);
       const res = await axios.post(`api/student/laptopIssueCsvUpload`, formData);
       if (res.status == 200 || res.status == 201) {
         setAlertMessage({
@@ -237,13 +267,15 @@ function LaptopIssueIndex() {
 
       <Box sx={{ position: "relative", marginTop: { xs: 8, md: 2 } }}>
         <Box sx={{ position: "absolute", width: "100%" }}>
-          <GridIndex rows={rows} columns={columns} loading={loading} />
+          <GridIndex rows={rows} columns={columns} loading={loading} 
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}/>
         </Box>
       </Box>
 
       <ModalWrapper
         title="Laptop Issue File"
-        maxWidth={500}
+        maxWidth={600}
         open={isUploadModalOpen}
         setOpen={() => handleUpload()}
       >
@@ -261,18 +293,34 @@ function LaptopIssueIndex() {
               required
             />
           </Grid>
-          <Grid item xs={5} align="right">
-            <IconButton onClick={generateCSV}>
-              <img src={CSVPNG} alt="sample" width="30px" height="30px"/>
-              <Typography>Sample Download</Typography>
-            </IconButton>
+          <Grid item xs={5} align="center">
+            <Grid container>
+              <Grid item xs={12}
+                onClick={generateCSV}
+                sx={{ border: "3px dashed #4A57A9", borderRadius: "10px", backgroundColor: "#f7f7ff", cursor: "pointer" }}>
+                <IconButton >
+                  <img src={CSVPNG} alt="sample" width="30px" height="30px" />
+                  <Typography variant="subtitle2" gutterBottom>Sample Download</Typography>
+                </IconButton>
+              </Grid>
+              <Grid item xs={12} mt={5}>
+                <CustomAutocomplete
+                  name="csvAcYearId"
+                  label="Ac Year"
+                  options={academicYearOptions}
+                  value={csvAcYearId}
+                  handleChangeAdvance={onHandleAcYear}
+                  required
+                />
+              </Grid>
+            </Grid>
           </Grid>
           <Grid item mt={1} xs={12} textAlign="right">
             <Button
               onClick={() => onSubmit(attachment)}
               variant="contained"
               disableElevation
-              disabled={!isAttachmentValid()}
+              disabled={!isAttachmentValid() || !csvAcYearId}
             >
               Submit
             </Button>

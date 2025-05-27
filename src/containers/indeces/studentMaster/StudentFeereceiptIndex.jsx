@@ -429,6 +429,7 @@ function StudentFeereceiptIndex() {
           params.row.receipt_type.toLowerCase() === "bulk fee") &&
         params.row.student_id !== null ? (
           <IconButton
+          disabled={!params.row.active}
             onClick={() =>
               navigate(`/BulkFeeReceiptPdfV1`, {
                 state: {
@@ -438,9 +439,8 @@ function StudentFeereceiptIndex() {
                   financialYearId: params.row.financial_year_id,
                   linkStatus: true,
                 },
-              })
+              }) 
             }
-            sx={{ cursor: "pointer" }}
             color="primary"
           >
             <PrintIcon fontSize="small" />
@@ -449,6 +449,7 @@ function StudentFeereceiptIndex() {
             params.row.receipt_type.toLowerCase() === "bulk fee") &&
           params.row.student_id === null ? (
           <IconButton
+           disabled={!params.row.active}
             onClick={() =>
               navigate(`/BulkFeeReceiptPdfV1`, {
                 state: {
@@ -460,26 +461,26 @@ function StudentFeereceiptIndex() {
                 },
               })
             }
-            sx={{ cursor: "pointer" }}
             color="primary"
           >
             <PrintIcon fontSize="small" />
           </IconButton>
         ) : params.row.receipt_type.toLowerCase() === "hos" ? (
           <IconButton
+           disabled={!params.row.active}
             onClick={() =>
               navigate(`/HostelFeePdfV1`, {
                 state: { feeReceiptId: params.row.id, linkStatus: true },
               })
             }
             color="primary"
-            sx={{ cursor: "pointer" }}
           >
             <PrintIcon fontSize="small" />
           </IconButton>
         ) : params.row.receipt_type.toLowerCase() === "exam" ||
           params.row.receipt_type.toLowerCase() === "exam fee" ? (
           <IconButton
+           disabled={!params.row.active}
             onClick={() =>
               navigate(`/ExamReceiptPdfV1`, {
                 state: { feeReceiptId: params.row.id, linkStatus: true },
@@ -492,6 +493,7 @@ function StudentFeereceiptIndex() {
           </IconButton>
         ) : params.row.receipt_type.toLowerCase() === "hosb" ? (
           <IconButton
+           disabled={!params.row.active}
             onClick={() =>
               navigate(`/HostelBulkFeeReceiptV1`, {
                 state: {
@@ -502,12 +504,12 @@ function StudentFeereceiptIndex() {
               })
             }
             color="primary"
-            sx={{ cursor: "pointer" }}
           >
             <PrintIcon fontSize="small" />
           </IconButton>
         ) : (
           <IconButton
+           disabled={!params.row.active}
             onClick={() =>
               navigate(`/FeeReceiptDetailsPDFV1`, {
                 state: {
@@ -522,7 +524,6 @@ function StudentFeereceiptIndex() {
               })
             }
             color="primary"
-            sx={{ cursor: "pointer" }}
           >
             <PrintIcon fontSize="small" />
           </IconButton>

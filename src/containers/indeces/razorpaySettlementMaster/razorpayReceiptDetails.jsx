@@ -22,7 +22,7 @@ const RazorPayReceiptDetail = () => {
       { name: "Settlement Receipt" }
     ])
   }, [settlementId])
-
+  
   const getSettlementData = () => {
     setLoading(true)
     axios.get(`/api/getReceiptGeneratedSettlements?settlementId=${settlementId}`)
@@ -83,7 +83,7 @@ const RazorPayReceiptDetail = () => {
         columns={columns}
         loading={loading}
         rowSelectionModel={[]}
-        getRowId={row => row.auid}
+        getRowId={row => row.order_id}
       />
     </Box>
   )

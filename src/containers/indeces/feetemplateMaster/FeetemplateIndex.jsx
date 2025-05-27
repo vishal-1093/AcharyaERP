@@ -115,6 +115,7 @@ function FeetemplateIndex() {
   const [selectedRows, setSelectedRows] = useState([]);
   const [remarks, setRemarks] = useState([]);
   const [remarksOpen, setRemarksOpen] = useState(false);
+  const [gridLoading, setGridLoading] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     ac_year: false,
     school_name_short: false,
@@ -122,6 +123,7 @@ function FeetemplateIndex() {
     fee_admission_category_short_name: false,
     uniform_status: false,
     laptop_status: false,
+    remarks:false,
     created_username: false,
     created_date: false,
   });
@@ -203,6 +205,11 @@ function FeetemplateIndex() {
       headerName: "Laptop Status",
       valueGetter: (value, row) => (row.laptop_status ? "Yes" : "No"),
       hide: true,
+    },
+    {
+      field: "remarks",
+      headerName: "Fee Note",
+      flex: 1,
     },
     {
       field: "created_username",
@@ -292,7 +299,7 @@ function FeetemplateIndex() {
     },
 
     {
-      field: "remarks",
+      field: "addonNote",
       headerName: "Add-On Note",
       type: "actions",
       getActions: (params) => [
@@ -538,27 +545,31 @@ function FeetemplateIndex() {
   };
 
   const getData = async () => {
-    let API_URL;
-    if (
-      data.acYearId !== null &&
-      data.schoolId !== null &&
-      data.categoryId !== null
-    ) {
-      API_URL = `&ac_year_id=${data.acYearId}&school_id=${data.schoolId}&fee_admission_category_id=${data.categoryId}`;
-    } else if (data.acYearId !== null && data.schoolId !== null) {
-      API_URL = `&ac_year_id=${data.acYearId}&school_id=${data.schoolId}`;
-    } else if (data.acYearId !== null) {
-      API_URL = `&ac_year_id=${data.acYearId}`;
-    }
-
-    await axios
-      .get(
+    try {
+      setGridLoading(true);
+      let API_URL;
+      if (
+        data.acYearId !== null &&
+        data.schoolId !== null &&
+        data.categoryId !== null
+      ) {
+        API_URL = `&ac_year_id=${data.acYearId}&school_id=${data.schoolId}&fee_admission_category_id=${data.categoryId}`;
+      } else if (data.acYearId !== null && data.schoolId !== null) {
+        API_URL = `&ac_year_id=${data.acYearId}&school_id=${data.schoolId}`;
+      } else if (data.acYearId !== null) {
+        API_URL = `&ac_year_id=${data.acYearId}`;
+      }
+      const res = await axios.get(
         `/api/finance/fetchFeeTemplateDetailByAcYearId?page=${0}&page_size=${10000}&sort=created_date${API_URL}`
       )
-      .then((res) => {
+      if (res.status == 200 || res.status == 201) {
         setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
+        setGridLoading(false)
+      }
+    } catch (error) {
+      console.error(error)
+      setGridLoading(false);
+    }
   };
 
   const getStudentList = async (params) => {
@@ -734,7 +745,7 @@ function FeetemplateIndex() {
   };
 
   return (
-    <>
+    <Box sx={{position:"relative"}}>
       <CustomModal
         open={confirmModal}
         setOpen={setConfirmModal}
@@ -946,11 +957,11 @@ function FeetemplateIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
-      <Box sx={{ mt: 2 }}>
+      <Box>
         <Grid
           container
           justifyContent="right"
-          rowSpacing={2}
+          rowSpacing={1}
           columnSpacing={2}
           alignItems="center"
         >
@@ -1008,19 +1019,22 @@ function FeetemplateIndex() {
             </Button>
           </Grid>
           <Grid item xs={12} md={12}>
-            <GridIndex
-              rows={rows}
-              checkboxSelection
-              onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-              columns={columns}
-              getRowClassName={getRowClassName}
-              columnVisibilityModel={columnVisibilityModel}
-              setColumnVisibilityModel={setColumnVisibilityModel}
-            />
+            <Box sx={{position:"absolute",width:"100%"}}>
+              <GridIndex
+               rows={rows}
+               checkboxSelection
+               onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+               columns={columns}
+               getRowClassName={getRowClassName}
+               columnVisibilityModel={columnVisibilityModel}
+               setColumnVisibilityModel={setColumnVisibilityModel}
+               loading={gridLoading}
+              />
+            </Box>
           </Grid>
         </Grid>
       </Box>
-    </>
+    </Box>
   );
 }
 

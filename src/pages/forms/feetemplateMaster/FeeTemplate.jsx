@@ -58,6 +58,7 @@ const initialValues = {
   approvedStatus: "",
   approvedDate: null,
   isRegular: true,
+  remarks:""
 };
 
 const requiredFields = [
@@ -340,20 +341,18 @@ function FeeTemplate() {
   };
 
   const getAllFeetemplateDetails = async () => {
-    if (
-      values.acYearId &&
-      values.admcategoryId &&
-      values.admSubCategoryId &&
-      values.programTypeId &&
-      values.currencyTypeId &&
-      values.schoolId &&
-      values.programId
-    )
-      await axios
-        .get(
-          `/api/finance/allFeeTemplateDetail/${values.acYearId}/${values.admcategoryId}/${values.admSubCategoryId}/${values.programTypeId}/${values.currencyTypeId}/${values.schoolId}/${values.programId}`
-        )
-        .then((resOne) => {
+    try {
+      if (
+        values.acYearId &&
+        values.admcategoryId &&
+        values.admSubCategoryId &&
+        values.programTypeId &&
+        values.currencyTypeId &&
+        values.schoolId &&
+        values.programId
+      ) {
+        const resOne = await axios.get(`/api/finance/allFeeTemplateDetail/${values.acYearId}/${values.admcategoryId}/${values.admSubCategoryId}/${values.nationality}/${values.programTypeId}/${values.currencyTypeId}/${values.schoolId}/${values.programId}`);
+        if (resOne.status == 200 || resOne.status == 201) {
           const a = resOne.data.data.map(
             (obj) => obj.program_specialization_id
           );
@@ -369,13 +368,13 @@ function FeeTemplate() {
                     .filter((obj) =>
                       resOne.data.data.length > 0
                         ? resOne.data.data[0].program_specialization_id
-                            .split(",")
-                            .includes(
-                              obj.program_specialization_id.toString()
-                            ) === false
-                        : a.includes(
+                          .split(",")
+                          .includes(
                             obj.program_specialization_id.toString()
                           ) === false
+                        : a.includes(
+                          obj.program_specialization_id.toString()
+                        ) === false
                     )
                     .map((obj) => ({
                       value: obj.program_specialization_id,
@@ -383,8 +382,12 @@ function FeeTemplate() {
                     }))
                 );
               })
-              .catch((err) => console.error(err));
-        });
+
+        }
+      }
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const getFeetemplateData = async () => {
@@ -430,6 +433,7 @@ function FeeTemplate() {
           feeYearEleven: res.data.data.fee_year11_amt,
           feeYearTwelve: res.data.data.fee_year12_amt,
           feeYearTotal: res.data.data.fee_year_total_amount,
+          remarks: res.data.data.remarks
         }));
 
         setFeetempId(res.data.data.fee_template_id);

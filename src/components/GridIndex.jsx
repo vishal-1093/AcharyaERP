@@ -31,6 +31,19 @@ const gridStyle = {
     alignItems: "center !important",
    // justifyContent: "center !important",
   },
+   '& .MuiDataGrid-columnHeaderGroup': {
+    justifyContent: 'center !important',
+  },
+  '& .MuiDataGrid-columnHeaderTitleContainer': {
+    justifyContent: 'center !important',
+    width: '100%',
+  },
+  '& .MuiDataGrid-columnHeaderGroup .MuiDataGrid-columnHeaderTitle': {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    width: '100%',
+    justifyContent: 'center !important',
+  }
 };
 
 function GridIndex({

@@ -4,12 +4,14 @@ import {
   Box,
   Button,
   CircularProgress,
+  Typography,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs.js";
 import FormWrapper from "../../../components/FormWrapper.jsx";
 import axios from "../../../services/Api.js";
 import useAlert from "../../../hooks/useAlert.js";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons.jsx";
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField.jsx")
 );
@@ -28,6 +30,8 @@ const initialState = {
   pono: "",
   sno: "",
   attachment: null,
+  laptopStatus:null,
+  remarks:"",
   loading: false
 };
 const loggedInUser = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
@@ -45,6 +49,8 @@ const LaptopIssueForm = () => {
       grnrefno,
       sno,
       attachment,
+      laptopStatus,
+      remarks,
       loading
     },
     setState,
@@ -78,19 +84,36 @@ const LaptopIssueForm = () => {
   const isIssuedOrNot = async () => {
     try {
       const res = await axios.get(`/api/student/checkAuidForLaptop/${auid}`);
-      if(res.status == 200 || res.status == 201){
-        getStudentDetail()
+      if(res.status ==200 || res.status == 201){
+        getFeeTemplateData();
       }
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: `Laptop is already issued to this ${auid} !!`,
+        message:  `This ${auid} is already issued !!`,
       });
       setAlertOpen(true);
     }
   };
 
-  const getStudentDetail = async () => {
+  const getFeeTemplateData = async () => {
+    try {
+      const res = await axios.get(`api/finance/getFeeTemplateDataBasedONAuid/${auid}`);
+      if (res.status == 200 || res.status == 201) {
+        getStudentDetail(res.data.data)
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getStudentDetail = async (feeTemplateDetails) => {
     try {
       const res = await axios.get(`/api/student/studentDetailsByAuid/${auid}`);
       if (res.status == 200 || res.status == 201) {
@@ -99,9 +122,11 @@ const LaptopIssueForm = () => {
             ...prevState,
             studentDetail: res.data.data[0],
             studentName: res.data.data[0]?.student_name || "",
-            yearSem: `${res.data.data[0]?.current_year}/${res.data.data[0]?.current_sem}` || ""
+            yearSem: `${res.data.data[0]?.current_year}/${res.data.data[0]?.current_sem}` || "",
+            remarks: feeTemplateDetails?.remarks,
+            laptopStatus: feeTemplateDetails?.laptop_status
           }));
-          (res.data.data[0]?.student_id) && getStudentDue(res.data.data[0].student_id);
+            (res.data.data[0]?.student_id) && getStudentDue(res.data.data[0].student_id, feeTemplateDetails?.laptop_status);
         } else {
           setAlertMessage({
             severity: "error",
@@ -121,15 +146,21 @@ const LaptopIssueForm = () => {
     }
   };
 
-  const getStudentDue = async (studentId) => {
+  const getStudentDue = async (studentId,laptop_status) => {
     try {
       const res = await axios.get(`/api/student/getDueAmountForLaptop/${studentId}`);
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
           totalDue: res.data.data.totalDue
-        }))
-      }
+        }));
+       if (!laptop_status && loggedInUser?.roleId !=1) {
+            setAlertMessage({
+              severity: "error",
+              message: "Not Eligible for Laptop!!",
+            });
+            setAlertOpen(true);
+          }}
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -166,7 +197,7 @@ const LaptopIssueForm = () => {
   const errorAttachmentMessages = {
     attachment: [
       "This field is required",
-      "Please upload a PDF || JPEG || JPG || PNG",
+      "Please upload a JPEG || JPG || PNG",
       "Maximum size 2 MB",
     ],
   };
@@ -174,7 +205,6 @@ const LaptopIssueForm = () => {
   const checkAttachment = {
     attachment: [
       attachment !== "",
-      attachment?.name?.endsWith(".pdf") ||
       attachment?.name?.endsWith(".jpeg") ||
       attachment?.name?.endsWith(".jpg") ||
       attachment?.name?.endsWith(".png"),
@@ -337,19 +367,43 @@ const LaptopIssueForm = () => {
               label="Total Due"
               value={totalDue || 0}
               type="number"
+              helperText={totalDue > 0 ?<Typography color="error">{`Due exists!! laptop cannot be issued.`}</Typography> : ""}
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="remarks"
+              label="Fee Note"
+              value={remarks}
+              multiline
+              rows={5}
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomRadioButtons
+              name="laptopStatus"
+              value={laptopStatus}
+              label="Laptop Status"
+              items={[
+                { label: "Yes", value: "true" },
+                { label: "No", value: "false" },
+              ]}
               disabled
             />
           </Grid>
           <Grid item xs={12} md={4}>
             <CustomFileInput
               name="attachment"
-              label="PDF or JPEG or JPG or PNG  File Attachment"
+              label="JPEG or JPG or PNG  File Attachment"
               helperText="File Attachment - smaller than 2 MB"
               file={attachment}
               handleFileDrop={handleFileDrop}
               handleFileRemove={handleFileRemove}
               checks={checkAttachment.attachment}
               errors={errorAttachmentMessages.attachment}
+              disabled={auid == ""}
               required
             />
           </Grid>
@@ -357,7 +411,6 @@ const LaptopIssueForm = () => {
             item
             align="right"
             xs={12}
-            md={8}
             sx={{ display: "flex", justifyContent: "end", alignItems: "end" }}
           >
             <Button
@@ -365,8 +418,8 @@ const LaptopIssueForm = () => {
               variant="contained"
               color="primary"
               onClick={handleSubmit}
-              disabled={totalDue != 0 || !studentDetail || !attachment || !isAttachmentValid() || loading}
-            >
+              disabled={((totalDue != 0 || !laptopStatus || !studentDetail || !attachment || !isAttachmentValid() || loading) && loggedInUser?.roleId !=1) ||
+              ((!studentDetail || !attachment || !isAttachmentValid() || loading) && loggedInUser?.roleId ==1)}>
               {loading ? (
                 <CircularProgress
                   size={25}

@@ -88,15 +88,9 @@ function CancelFeeReceipt() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        const optionData = [];
-        res.data.data.forEach((obj) => {
-          optionData.push({
-            value: obj?.school_id,
-            label: obj?.school_name,
-            school_name_short: obj?.school_name_short,
-          });
-        });
-        setSchoolOptions(optionData);
+        const list = res.data.data?.filter((ele)=>!ele.school_name?.includes("Acharya Hostels"));
+        const schoolList = list?.map((li)=>({value:li.school_id,label:li.school_name,school_name_short:li.school_name_short}))
+        setSchoolOptions(schoolList);
       })
       .catch((err) => console.error(err));
   };
@@ -363,25 +357,6 @@ function CancelFeeReceipt() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          {/* <Grid item xs={12} md={3}>
-            <CustomSelect
-              name="receiptType"
-              value={values.receiptType}
-              label="Receipt Type"
-              items={[
-                {
-                  value: "general",
-                  label: "General",
-                },
-                {
-                  value: "Bulk",
-                  label: "Bulk",
-                },
-                { value: "hostel", label: "Hostel" },
-              ]}
-              handleChange={handleChange}
-            />
-          </Grid> */}
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="financialYearId"
@@ -421,7 +396,7 @@ function CancelFeeReceipt() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !( values.financialYearId && values.schoolId && values.receiptNo)}
               onClick={handleCreate}
             >
               {loading ? (

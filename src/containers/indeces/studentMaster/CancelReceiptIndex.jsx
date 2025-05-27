@@ -7,6 +7,7 @@ import {
   styled,
   Tooltip,
   tooltipClasses,
+  Menu, MenuItem,
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -51,6 +52,7 @@ function CancelReceiptIndex() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
+   const [anchorEl, setAnchorEl] = useState(null);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     transaction_type: false,
     bank_name: false,
@@ -252,6 +254,14 @@ function CancelReceiptIndex() {
     }
   };
 
+  const handleCancel = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+     setAnchorEl(null);
+  };
+
   return (
     <Box>
         <Grid
@@ -292,13 +302,28 @@ function CancelReceiptIndex() {
           )}
           <Grid xs={12} md={1}>
            <Button
-           onClick={() => navigate("/Cancelfeereceipt")}
-           variant="contained"
-           disableElevation
-           startIcon={<AddIcon />}
-         >
-          create
-           </Button>
+            aria-controls="cancel-menu"
+            onClick={handleCancel}
+            variant="contained"
+            disableElevation
+            startIcon={<AddIcon />}
+          >
+            create
+          </Button>
+          <Menu
+            id="cancel-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={()=>navigate("/Cancelfeereceipt")}>
+              College
+            </MenuItem>
+            <MenuItem onClick={()=>navigate("/CancelHostelReceipt")}>
+              Hostel
+            </MenuItem>
+          </Menu>
           </Grid>
         </Grid>
       <Box sx={{ position: "relative", marginTop: "10px" }}>
