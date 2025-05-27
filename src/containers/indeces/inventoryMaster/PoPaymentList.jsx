@@ -18,7 +18,7 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import BeenhereIcon from '@mui/icons-material/Beenhere';
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const { userId, roleShortName } = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
 
 const modalPrintContents = {
   title: "",
@@ -172,18 +172,20 @@ function PoPaymentList() {
       headerAlign: "right",
       align: "right",
       flex: 1,
-      renderCell: (params) => (
-        <Typography
-          variant="subtitle2"
-          style={{ color: "blue", cursor: "pointer" }}
-          // onClick={() => navigate(`/GRNPdf/${params?.row?.grnNo.replace(/\//g, "_")}`, {
-          //   state: { path: "po-payment-history" },
-          // })}
-          onClick={() => handlePreview(params.row.purchaseOrderId, params.row?.type, params.row?.poAmount)}
-        >
-          {params.row.grnStatus}
-        </Typography>
-      )
+      renderCell: (params) => {
+        const roundedValue = Math.round(params.row.grnStatus);
+        return (
+          <Typography
+            variant="subtitle2"
+            style={{ color: "blue", cursor: "pointer" }}
+            onClick={() =>
+              handlePreview(params.row.purchaseOrderId, params.row?.type, params.row?.poAmount)
+            }
+          >
+            {roundedValue}
+          </Typography>
+        );
+      }
     },
     {
       field: "jvStatus",
@@ -545,6 +547,7 @@ function PoPaymentList() {
                     value={values.startDate}
                     handleChangeAdvance={handleChangeAdvance}
                     required
+                    minDate={roleShortName !== "SAA" ? new Date(new Date().getFullYear(), 3, 1) : undefined}
                   />
                 </Grid>
 
@@ -556,6 +559,11 @@ function PoPaymentList() {
                     handleChangeAdvance={handleChangeAdvance}
                     disabled={!values.startDate}
                     required
+                    minDate={
+                      roleShortName !== "SAA"
+                        ? values.startDate || new Date(new Date().getFullYear(), 3, 1)
+                        : undefined
+                    }
                   />
                 </Grid>
               </>
