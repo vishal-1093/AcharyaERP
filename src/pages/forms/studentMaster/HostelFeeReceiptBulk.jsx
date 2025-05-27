@@ -639,9 +639,7 @@ function HostelFeeReceiptBulk() {
         student_id: studentData.student_id,
       };
 
-      console.log(payload);
-      console.log(ddPayload);
-      return false;
+      
 
       if (!requiredFieldsValid()) {
         setAlertMessage({
