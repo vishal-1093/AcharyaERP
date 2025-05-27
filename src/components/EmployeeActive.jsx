@@ -1738,7 +1738,7 @@ function EmployeeIndex({ tab }) {
       </ModalWrapper>
 
       {/* Custom Filter */}
-       <CustomToggle
+       {/* <CustomToggle
                 isVisible={showFilter}
                 onToggle={() => setShowFilter(prev => !prev)}
                 label="Filters"
@@ -1751,7 +1751,7 @@ function EmployeeIndex({ tab }) {
                filterValues={filterValues}
               onFieldValueChange={handleFilterValueChange}
               />
-            ): <></>}
+            ): <></>} */}
 
       <GridIndex
         rows={rows}
