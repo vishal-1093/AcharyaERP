@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
 
 export const GenerateSalaryMisReport = (
   schoolShortName,pageSNo,salaryType, data=[], date, columns,totalValue , totalGrossEarning,esimTotal,
-  attendanceColumns,attendanceRows,particularsColumns,earningRows,deductionRows
+  attendanceColumns,attendanceRows,particularsColumns,earningRows,deductionRows,employeeType,consultationTotal,consultantionTdsTotal,consultationPayableTotal
 ) => {
   const DispayRow = ({ children }) => (
     <View style={styles.tableRow}>{children}</View>
@@ -80,13 +80,15 @@ export const GenerateSalaryMisReport = (
     </View>
   );
 
-  const ReportData = ({data,schoolShortName, salaryType, pageIndex, date, listData, columns,totalValue,totalGrossEarning,esimTotal}) => (
+  const ReportData = ({data,schoolShortName, salaryType, pageIndex, date, listData, columns,totalValue,totalGrossEarning,esimTotal, employeeType,
+    consultationTotal,consultantionTdsTotal,consultationPayableTotal
+  }) => (
     <View style={{ ...styles.layout }}>
       <View>
         <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 14, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`${schoolShortName && salaryType !== "school" ? schoolShortName : `JMJ`} EDUCATION SOCIETY`}</Text>
       </View>
       <View style={{ marginBottom: "5px" }}>
-        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{date ? `${(salaryType)?.toUpperCase()} Report For The Month of ${moment(date).format("MMM").toUpperCase()} ${moment(date).format("YYYY")}` : `${(salaryType)?.toUpperCase()} Report For All Month`}</Text>
+        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{date && employeeType ? `${(employeeType)?.toUpperCase()} ${(salaryType)?.toUpperCase()} Report For The Month of ${moment(date).format("MMM").toUpperCase()} ${moment(date).format("YYYY")}` :  `${(salaryType)?.toUpperCase()} Report For The Month of ${moment(date).format("MMM").toUpperCase()} ${moment(date).format("YYYY")}`}</Text>
       </View>
       <View style={[styles.borderTable]}>
         <DispayRow>
@@ -138,8 +140,8 @@ export const GenerateSalaryMisReport = (
                      c.field == "pt" || c.field == "total_earning" || c.field == "totalNetPay" || c.field == "esi" || c.field == "esi_contribution_employee" || 
                      c.field == "pay_days" || c.field == "grossWages" || c.field == "edliWages" || c.field == "epfWages" || c.field == "epsWages" ||
                      c.field == "epscontriRemitted" || c.field == "epfContriRemitted" || c.field == "epfEpsDiffRemitted" || 
-                     c.field == "ncpDays" || c.field == "refundOfAdvances" ? "right" : c.field == "empcode" || c.field == "bank_account_no" ||
-                      c.field == "lic_number" || c.field == "schoolNameShort" ? "center": "left"}
+                     c.field == "ncpDays" || c.field == "refundOfAdvances" || c.field == "s715" || c.field == "s742" || c.field == "s725" ? "right" : c.field == "empcode" || c.field == "bank_account_no" ||
+                      c.field == "lic_number" || c.field == "schoolNameShort" || c.field == "school" ? "center": "left"}
                     labelType="text"
                   />))}
             </DispayRow>
@@ -156,16 +158,20 @@ export const GenerateSalaryMisReport = (
           {columns.filter((f) => !f.hide).map((c, idx) => (
             <DisplayCells
               key={idx}
-              label={salaryType == "esi" && salaryType != "school" &&  (columns.filter((f) => !f.hide).length - 5) == idx ? "Grand Total" : ((salaryType != "esi" && salaryType != "school" && salaryType != "tds" && salaryType !== "pt" && salaryType !== "epf") && (columns.filter((f) => !f.hide).length - 2) == idx) ? "Grand Total":
+              label={salaryType == "esi" && salaryType != "school" &&  (columns.filter((f) => !f.hide).length - 5) == idx ? "Grand Total" : ((salaryType != "esi" && salaryType != "school" && salaryType != "tds" && salaryType !== "pt" && salaryType !== "epf" && salaryType != "summary") && (columns.filter((f) => !f.hide).length - 2) == idx) ? "Grand Total":
                 ((salaryType != "esi" && salaryType != "school" && salaryType != "tds" && salaryType == "pt" && salaryType !== "epf") && (columns.filter((f) => !f.hide).length - 3) == idx) ? "Grand Total":
                 ((salaryType == "tds") && (columns.filter((f) => !f.hide).length - 3) == idx) ? "Grand Total" :
                 (salaryType != "esi" && salaryType == "school") && (columns.filter((f) => !f.hide).length - 2) == idx ? "Grand Total": 
+                (salaryType == "summary" && employeeType == "consultant") && (columns.filter((f) => !f.hide).length - 4) == idx ? "Grand Total": 
                 ((salaryType == "esi") && (columns.filter((f) => !f.hide).length - 3) == idx) ? new Intl.NumberFormat().format(totalGrossEarning) :
                 ((salaryType == "tds" || salaryType == "pt") && (columns.filter((f) => !f.hide).length - 2) == idx) ? new Intl.NumberFormat().format(totalGrossEarning) :
                 ((salaryType == "esi") && (columns.filter((f) => !f.hide).length - 2) == idx) ? new Intl.NumberFormat().format(totalValue) :
                 (salaryType == "esi" && (columns.filter((f) => !f.hide).length - 1) == idx) ? new Intl.NumberFormat().format(esimTotal):
-                 (salaryType != "esi" && (columns.filter((f) => !f.hide).length - 1) == idx)?  new Intl.NumberFormat().format(totalValue):
-                 salaryType == "epf" &&  (columns.filter((f) => !f.hide).length - 10) == idx ? "Grand Total": ""}
+                 (salaryType != "esi" && salaryType != "summary" && (columns.filter((f) => !f.hide).length - 1) == idx)?  new Intl.NumberFormat().format(totalValue):
+                 salaryType == "epf" &&  (columns.filter((f) => !f.hide).length - 10) == idx ? "Grand Total":
+                 (salaryType == "summary" && employeeType == "consultant" && (columns.filter((f) => !f.hide).length - 1) == idx)?  new Intl.NumberFormat().format(consultationPayableTotal):
+                 (salaryType == "summary" && employeeType == "consultant" && (columns.filter((f) => !f.hide).length - 2) == idx)?  new Intl.NumberFormat().format(consultantionTdsTotal):
+                 (salaryType == "summary" && employeeType == "consultant"&& (columns.filter((f) => !f.hide).length - 3) == idx)?  new Intl.NumberFormat().format(consultationTotal): ""}
               style="Times-Bold"
               right={1}
               bottom={1}
@@ -182,10 +188,10 @@ export const GenerateSalaryMisReport = (
     </View>
   );
 
-  const SummaryComponent = ({ attendanceRows, attendanceColumns, particularsColumns, earningRows, deductionRows }) => (
+  const SummaryComponent = ({ attendanceRows, attendanceColumns, particularsColumns, earningRows, deductionRows,employeeType }) => (
     <>
-      <AttendanceData attendanceRows={attendanceRows} attendanceColumns={attendanceColumns} />
-      <ParticularsData particularsColumns={particularsColumns} earningRows={earningRows} deductionRows={deductionRows} />
+      {employeeType == "regular" && <AttendanceData attendanceRows={attendanceRows} attendanceColumns={attendanceColumns} />}
+      {employeeType == "regular" && <ParticularsData particularsColumns={particularsColumns} earningRows={earningRows} deductionRows={deductionRows} />}
     </>
   );
 
@@ -195,7 +201,7 @@ export const GenerateSalaryMisReport = (
         <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 14, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`JMJ EDUCATION SOCIETY`}</Text>
       </View>
       <View style={{ marginBottom: "5px" }}>
-        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{date ? `${(salaryType)?.toUpperCase()} Report For The Month of ${moment(date).format("MMM").toUpperCase()} ${moment(date).format("YYYY")}` : `${(salaryType)?.toUpperCase()} Report For All Month`}</Text>
+        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{date ? `${(employeeType)?.toUpperCase()} ${(salaryType)?.toUpperCase()} Report For The Month of ${moment(date).format("MMM").toUpperCase()} ${moment(date).format("YYYY")}` : `${(salaryType)?.toUpperCase()} Report For All Month`}</Text>
       </View>
       <View style={[styles.borderTable]}>
         <DispayRow>
@@ -357,7 +363,7 @@ export const GenerateSalaryMisReport = (
     try {
       const HallTicketCopy = (
         <Document title={`Salary Mis`}>
-          {salaryType !== "summary" &&  data.map((ele, index) => (
+        {!(salaryType == "summary") &&  data.map((ele, index) => (
             <Page
               key={index}
               size="A4"
@@ -373,13 +379,29 @@ export const GenerateSalaryMisReport = (
               </View>
             </Page>
           ))}
-          {salaryType == "summary" &&  <Page
+          {(salaryType == "summary" &&  employeeType == "consultant") &&  data.map((ele, index) => (
+            <Page
+              key={index}
+              size="A4"
+              style={{ ...styles.pageLayout }}
+            >
+            <ReportData data={data} schoolShortName={schoolShortName} pageSNo={pageSNo} salaryType={salaryType} pageIndex={index} date={date} listData={ele}
+               columns={columns} totalValue={totalValue} totalGrossEarning={totalGrossEarning}
+               esimTotal={esimTotal} employeeType={employeeType} consultationTotal={consultationTotal} consultantionTdsTotal={consultantionTdsTotal} consultationPayableTotal={consultationPayableTotal}/>
+              <View style={{ position: "absolute", bottom: 20, width: "100%" }}>
+                <Text style={{ textAlign: "center", fontSize: 8, fontFamily: "Times-Bold" }}>
+                  Page {index + 1} of {data.length}
+                </Text>
+              </View>
+            </Page>
+          ))}
+          {salaryType == "summary" && employeeType == "regular" &&  <Page
               key={new Date()}
               size="A4"
               style={{ ...styles.pageLayout }}
             >
               <SummaryComponent  attendanceColumns={attendanceColumns} attendanceRows={attendanceRows}
-              particularsColumns={particularsColumns} earningRows={earningRows} deductionRows={deductionRows}
+              particularsColumns={particularsColumns} earningRows={earningRows} deductionRows={deductionRows} employeeType={employeeType}
               />
             </Page>}
         </Document>
