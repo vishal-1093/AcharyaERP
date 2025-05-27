@@ -226,7 +226,7 @@ const EmployeeDetails = ({ feedbackReportDetails, employeeImage, feedbackCount, 
                     {/* <TabelCell>Feedback Counts : {sectionList?.length < 2 ? feedbackCount : ""}</TabelCell> */}
                     <TabelCell>Year/Sem : {`${feedbackReportDetails?.employeeDetails?.current_year}/${feedbackReportDetails?.employeeDetails?.current_sem}`}</TabelCell>
                     <TabelCell>Course Name : {feedbackReportDetails?.employeeDetails?.course_name}</TabelCell>
-                    <TabelCell>Subject Code : {feedbackReportDetails?.employeeDetails?.course_code}</TabelCell>
+                    <TabelCell>Course Code : {feedbackReportDetails?.employeeDetails?.course_code}</TabelCell>
                 </TableRow>
             </tbody>
         </Table>
