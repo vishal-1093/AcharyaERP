@@ -65,7 +65,7 @@ function HostelBedForm() {
   const [hostelBlocks, setHostelBlocks] = useState([]);
   const [bedDetails, setBedDetails] = useState({});
   const { id } = useParams();
-  const { pathname } = useLocation();
+  const { pathname, state } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const checks = {
@@ -77,7 +77,16 @@ function HostelBedForm() {
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/hostelbedviewmaster/hostelbedview/new") {
+    if (state) {
+      setIsNew(false);
+      setCrumbs([
+        {
+          name: "Hostel Block View",
+          link: "/HostelBlockView",
+        }
+      ]);
+      getBedDetialForBlock()
+    } else if (pathname.toLowerCase() === "/hostelbedviewmaster/hostelbedview/new") {
       setIsNew(true);
       setCrumbs([
         {
@@ -121,8 +130,7 @@ function HostelBedForm() {
   const getBedDetials = async () => {
     await axios
       .get(
-        `/api/hostel/hostelBedsByHostelBlockId?hostelBlockId=${
-          values.blockName
+        `/api/hostel/hostelBedsByHostelBlockId?hostelBlockId=${values.blockName
         }${values?.occupancyType ? `&roomTypeId=${values?.occupancyType}` : ""}`
       )
       .then((res) => {
@@ -158,7 +166,23 @@ function HostelBedForm() {
       })
       .catch((err) => console.error(err));
   };
-
+  const getBedDetialForBlock = async () => {
+    await axios
+      .get(
+        `/api/hostel/hostelBedsByHostelBlockId?hostelBlockId=${state}`
+      )
+      .then((res) => {
+        if (Object.keys(res.data.data).length === 0) {
+          setAlertMessage({
+            severity: "error",
+            message: "No Data Found",
+          });
+          setAlertOpen(true);
+        }
+        setBedDetails(res?.data?.data);
+      })
+      .catch((err) => console.error(err));
+  };
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -221,7 +245,7 @@ function HostelBedForm() {
           />
         </>
       ) : (
-        <Box component="form" onSubmit={(e) => handleSubmit(e)} noValidate>
+        !state && <Box component="form" onSubmit={(e) => handleSubmit(e)} noValidate>
           <FormWrapper>
             <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
               <Grid item xs={12} md={4}>
@@ -255,7 +279,7 @@ function HostelBedForm() {
               variant="contained"
               color="primary"
               disabled={loading}
-              // navigate("/payreportPdf", { state: { rowdata, values, empId } });
+            // navigate("/payreportPdf", { state: { rowdata, values, empId } });
             >
               {loading ? (
                 <CircularProgress size={24} />

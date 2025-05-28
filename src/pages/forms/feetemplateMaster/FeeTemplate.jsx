@@ -5,6 +5,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
+import { type } from "@testing-library/user-event/dist/cjs/utility/type.js";
 
 const CustomMultipleAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomMultipleAutocomplete")
@@ -36,6 +37,7 @@ const initialValues = {
   yearsemId: "",
   uniformStatus: "Yes",
   laptopStatus: "No",
+  remarks: "",
 
   feeTemplateName: "",
   feeYearOne: "",
@@ -392,6 +394,10 @@ function FeeTemplate() {
     await axios
       .get(`/api/finance/getFeeTemplateDetailsData/${id}`)
       .then(async (res) => {
+        const speIds = res?.data?.data?.program_specialization_id
+          ?.split(",")
+          ?.map((obj) => Number(obj));
+
         setValues((prev) => ({
           ...prev,
           acYearId: res.data.data.ac_year_id,
@@ -405,9 +411,9 @@ function FeeTemplate() {
           currencyTypeId: res.data.data.currency_type_id,
           schoolId: res.data.data.school_id,
           programId: res.data.data.program_id,
-          programSpeId: res.data.data.program_specialization_id,
+          programSpeId: speIds,
+          remarks: res.data.data.remarks,
           feeTemplateName: res.data.data.fee_template_name,
-          programSpecialization: res.data.data.program_specialization,
           yearsemId: res.data.data.lat_year_sem,
           uniformStatus: res.data.data.uniform_status ? "Yes" : "No",
           laptopStatus: res.data.data.laptop_status ? "Yes" : "No",
@@ -596,7 +602,7 @@ function FeeTemplate() {
       temp.school_id = values.schoolId;
       temp.program_id = values.programId;
       temp.program_specialization_id = values.programSpeId.toString();
-      temp.program_specialization = values.programSpecialization;
+      // temp.program_specialization = values.programSpecialization;
       temp.laptop_status = values.laptopStatus === "Yes" ? true : false;
       temp.uniform_status = values.uniformStatus === "Yes" ? true : false;
       temp.remarks = values.remarks;
