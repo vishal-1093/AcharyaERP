@@ -40,7 +40,7 @@ const JournalVoucherPdf = () => {
     getPaymentVoucherData();
     if (fromPath) {
       setCrumbs([{ name: "Po Payment History", link: fromPath }]);
-    }else if (grnIndexStatus) {
+    } else if (grnIndexStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/journalmaster/grn" }]);
     } else if (indexStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/VoucherMaster" }]);
@@ -466,7 +466,7 @@ const JournalVoucherPdf = () => {
             <Typography variant="body1" textAlign="left" sx={bookmanFont}>
               Created By
               <br />
-              {voucherData?.[0]?.draftCreatedName}
+              {voucherData?.[0]?.draftCreatedName?.toUpperCase()}
             </Typography>
           </Grid>
           <Grid item xs={6} textAlign="right">

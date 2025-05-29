@@ -26,11 +26,15 @@ const EmployeeFeedbackReport = () => {
     }, [])
 
     const getImage = async (employeeImage) => {
+        try{
         const userImage = await axios.get(
             `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${employeeImage}`,
             { responseType: "blob" }
         );
         setUserImage(URL.createObjectURL(userImage.data))
+    }catch(err){
+        console.log("err", err)
+    }
     }
 
     const getReport = () => {

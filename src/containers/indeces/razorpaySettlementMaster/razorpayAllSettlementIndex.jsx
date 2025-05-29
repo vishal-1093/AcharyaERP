@@ -45,6 +45,11 @@ const RazorPaySettlementIndex = () => {
             .catch(err => {
                 console.log(err)
                 setLoading(false)
+                 setAlertMessage({
+                        severity: "error",
+                        message: "Failed to Fetch, Please try after sometime",
+                    });
+                    setAlertOpen(true);
             })
     }
 

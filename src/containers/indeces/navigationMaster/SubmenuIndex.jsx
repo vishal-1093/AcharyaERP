@@ -86,7 +86,10 @@ function SubmenuIndex() {
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
-
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    created_Date: false,
+    created_username: false,
+  });
   const columns = [
     {
       field: "submenu_name",
@@ -107,14 +110,14 @@ function SubmenuIndex() {
       headerName: "Url",
       width: 150,
       hideable: false,
-      renderCell: (params) =>
-        params.row.submenu_url.length > 19 ? (
-          <HtmlTooltip title={params.row.submenu_url}>
-            <span>{params.row.submenu_url.substr(0, 15) + " ...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.submenu_url
-        ),
+      // renderCell: (params) =>
+      //   params.row.submenu_url.length > 19 ? (
+      //     <HtmlTooltip title={params.row.submenu_url}>
+      //       <span>{params.row.submenu_url.substr(0, 15) + " ...."}</span>
+      //     </HtmlTooltip>
+      //   ) : (
+      //     params.row.submenu_url
+      //   ),
     },
     {
       field: "menu_name",
@@ -162,13 +165,11 @@ function SubmenuIndex() {
       field: "created_username",
       headerName: "Created By",
       width: 160,
-      hideable: false,
     },
     {
       field: "created_Date",
       headerName: "Created Date",
       width: 100,
-      hideable: false,
       valueFormatter: (value) => moment(value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
@@ -385,21 +386,21 @@ function SubmenuIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
+        title: "Deactivate",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      })
       : setModalContent({
-          title: "Activate",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
+        title: "Activate",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleToggle },
+          { name: "No", color: "primary", func: () => { } },
+        ],
+      });
     setConfirmModal(true);
   };
 
@@ -560,7 +561,10 @@ function SubmenuIndex() {
           Create
         </Button>
 
-        <GridIndex rows={rows} columns={columns} />
+        <GridIndex rows={rows} columns={columns}
+          columnVisibilityModel={columnVisibilityModel}
+          setColumnVisibilityModel={setColumnVisibilityModel}
+        />
       </Box>
     </>
   );
