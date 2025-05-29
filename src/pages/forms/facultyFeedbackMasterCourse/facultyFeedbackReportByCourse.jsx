@@ -41,7 +41,7 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
         textAlign: "center",
         padding: 3,
         border: "1px solid rgba(224, 224, 224, 1)",
-        backgroundColor: '#F5F5F5', 
+        backgroundColor: '#F5F5F5',
     },
 }));
 
@@ -76,8 +76,8 @@ function FacultyFeedbackReportByCourse() {
     const pathname = location.pathname;
 
     useEffect(() => {
-       const masterPathlink = pathname.includes("-inst") ? "/FacultyFeedbackMaster-course-inst" : pathname.includes("-dept") ? "/FacultyFeedbackMaster-course-dept" : "/FacultyFeedbackMaster-course"
-        
+        const masterPathlink = pathname.includes("-inst") ? "/FacultyFeedbackMaster-course-inst" : pathname.includes("-dept") ? "/FacultyFeedbackMaster-course-dept" : "/FacultyFeedbackMaster-course"
+
         setCrumbs([{ name: "Faculty Feedback Master-course", link: masterPathlink }, { name: "Faculty Feedback Report- Course" }]);
         getAllFacultySubject()
     }, []);
@@ -88,7 +88,7 @@ function FacultyFeedbackReportByCourse() {
     }, [tab])
 
     const getAllFacultySubject = () => {
-        setLoading(true)
+        // setLoading(true)
         const { year, sem, employee_id, acYear, ...query } = queryParams
         const yearAndSem = query?.yearSem && query?.yearSem?.split("/")
         const selectedYear = yearAndSem?.length > 0 ? yearAndSem[0] : ""
@@ -98,26 +98,14 @@ function FacultyFeedbackReportByCourse() {
         const baseUrl = "api/academic/getCourseAssignmentBasedOnProgramSpecialization"
         axios.get(baseUrl, { params })
             .then(res => {
-                setLoading(false)
                 const { data } = res.data
                 const columnData = data?.length > 0 && data?.map((col, index) => {
                     return {
                         field: col?.course_code,
-                        headerName: col?.course_code,
+                        headerName: `${col?.course_name},${col?.course_code}`,
                         flex: 1,
                         align: 'center',
                         headerAlign: 'center',
-                        renderCell: () => (
-                            <Tooltip title={col?.course_name || ''} arrow>
-                                <Typography
-                                    variant="body2"
-                                    noWrap
-                                    sx={{ overflow: 'hidden', textOverflow: 'ellipsis', cursor: 'default' }}
-                                >
-                                    {col?.course_code}
-                                </Typography>
-                            </Tooltip>
-                        )
                     }
                 })
                 if (columnData?.length > 0) {
@@ -125,7 +113,6 @@ function FacultyFeedbackReportByCourse() {
                 }
             })
             .catch(err => {
-                setLoading(false);
                 setAlertMessage({
                     severity: "error",
                     message: "Failed to create, Please try after sometime",
@@ -140,7 +127,6 @@ function FacultyFeedbackReportByCourse() {
         const baseUrl = tab === 'course' ? "/api/student/getFeedbackRatingReportCourseWise" : "api/student/getFeedbackRatingReportSectionWiseReport"
         axios.get(baseUrl, { params })
             .then(res => {
-                setLoading(false)
                 const { data } = res.data
                 if (tab === 'course') {
                     const grouped = {};
@@ -163,7 +149,7 @@ function FacultyFeedbackReportByCourse() {
                     const courseSection = {};
                     data?.forEach((item) => {
                         const empKey = item.empId;
-                        const course = item.course_code;
+                        const course = `${item.course_name},${item.course_code}`;
                         const section = item.section_name;
                         const value = item.avg_ratings_percentage;
 
@@ -200,6 +186,7 @@ function FacultyFeedbackReportByCourse() {
                     setAllCourses(allCourse);
                     setCourseSectionMap(courseSection);
                 }
+                setLoading(false)
             }).catch(err => {
                 setLoading(false);
                 setAlertMessage({
@@ -210,10 +197,30 @@ function FacultyFeedbackReportByCourse() {
             })
     }
 
-    function courseTableHead() {
-        return column?.map((obj, i) => {
-            return <StyledTableCell key={i}>{obj.headerName}</StyledTableCell>;
-        });
+    function courseTableHead(percentageType) {
+        if (percentageType === 'course') {
+            return column?.map((item, index) => {
+                const courseName = item?.headerName ? item?.headerName?.split(",")[0] : ""
+                const courseCode = item?.headerName ? item?.headerName?.split(",")[1] : ""
+                return <StyledTableCell key={index} sx={{ textAlign: 'center' }}>
+                    <Tooltip title={courseName} arrow>
+                        <span>{courseCode}</span>
+                    </Tooltip>
+                </StyledTableCell>
+
+            });
+        } else {
+            return allCourses?.map((item, index) => {
+                const courseName = item ? item?.split(",")[0] : ""
+                const courseCode = item ? item?.split(",")[1] : ""
+                return <StyledTableCell key={courseCode} colSpan={courseSectionMap[item]?.size || 1}>
+                    <Tooltip title={courseName} arrow>
+                        <span>{courseCode}</span>
+                    </Tooltip>
+                </StyledTableCell>
+
+            });
+        }
     }
 
     const handlePageChange = (event, newPage) => {
@@ -235,6 +242,12 @@ function FacultyFeedbackReportByCourse() {
         setPage(0);
     };
 
+    function getOrdinal(n) {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
     const tableData = useMemo(
         () => (
             <TableContainer component={Paper} elevation={3}>
@@ -249,13 +262,17 @@ function FacultyFeedbackReportByCourse() {
                                     textAlign: "center",
                                 }}
                             >
-                                {`Faculty Feedback Report for the Academic Year ${queryParams?.acYear}, ${queryParams?.sem || 0} Sem`}
+
+                                {`Faculty Feedback Report for the Academic Year - ${queryParams?.acYear}, ${queryParams?.sem
+                                        ? `${getOrdinal(queryParams.sem)} Sem`
+                                        : `${getOrdinal(queryParams?.year)} Year`
+                                    }`}
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <StyledTableCell sx={{maxWidth:50}}>Sl No</StyledTableCell>
+                            <StyledTableCell sx={{ maxWidth: 50 }}>Sl No</StyledTableCell>
                             <StyledTableCell sx={{ alignItems: "center", textAlign: "center !important" }}>Employee Name</StyledTableCell>
-                            {courseTableHead()}
+                            {courseTableHead("course")}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -292,7 +309,7 @@ function FacultyFeedbackReportByCourse() {
                                             return <StyledTableCellBody
                                                 key={j}
                                                 sx={{
-                                                    backgroundColor: sectionPercentage ? '#E0F7FA !important' : '#F5F5F5', 
+                                                    backgroundColor: sectionPercentage ? '#E0F7FA !important' : '#F5F5F5',
                                                     fontWeight: sectionPercentage ? 'bold' : 'normal',
                                                     color: sectionPercentage ? '#006064' : '#9e9e9e',
                                                     textAlign: 'center',
@@ -330,75 +347,79 @@ function FacultyFeedbackReportByCourse() {
     );
 
     const sectionTableData = useMemo(() => (
-          <Paper elevation={3}>
-        <Box sx={{ overflowX: 'auto', width: '100%' }}>
-            <Table size="small" sx={{ minWidth: 1200 }}>
-                <TableHead>
-                    <TableRow>
-                        <TableCell
-                            colSpan={4 + sectionKeys?.length}
-                            sx={{
-                                backgroundColor: "primary.main",
-                                color: "headerWhite.main",
-                                textAlign: "center",
-                            }}
-                        >
-                            {`Faculty Feedback Report for the Academic Year ${queryParams?.acYear}, ${queryParams?.sem || 0} Sem`}
-                        </TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <StyledTableCell rowSpan={2}>Sl No</StyledTableCell>
-                        <StyledTableCell rowSpan={2} sx={{ textAlign: "Center !important" }}>Employee Name</StyledTableCell>
-                        {allCourses.map(course => (
-                            <StyledTableCell key={course} colSpan={courseSectionMap[course]?.size || 1}>
-                                {course}
-                            </StyledTableCell>
-                        ))}
-                        <StyledTableCell rowSpan={2}>Total Student</StyledTableCell>
-                        <StyledTableCell rowSpan={2}>Feedback Count</StyledTableCell>
-                    </TableRow>
-                    <TableRow>
-                        {sectionKeys.map(({ section, field }) => (
-                            <StyledTableCell key={field}>Section {section}</StyledTableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {rows.length > 0 ? (
-                        rows
-                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((row, index) => (
-                                <TableRow key={row.empId}>
-                                    <StyledTableCellBody>{page * rowsPerPage + index + 1}</StyledTableCellBody>
-                                    <StyledTableCellBody sx={{ textAlign: "left !important" }}>{row.employee_name}</StyledTableCellBody>
-                                    {sectionKeys.map(({ field }) => {
-                                        const sectionPercentage =  row.feedback[field] ? row?.feedback[field] : ""
-                                      return  <StyledTableCellBody
-                                       key={field}
-                                      align="center"
-                                       sx={{
-                                                    backgroundColor: sectionPercentage ? '#E0F7FA !important' : '#F5F5F5', 
+        <Paper elevation={3}>
+            <Box sx={{ overflowX: 'auto', width: '100%' }}>
+                <Table size="small" sx={{ minWidth: 1200 }}>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell
+                                colSpan={4 + sectionKeys?.length}
+                                sx={{
+                                    backgroundColor: "primary.main",
+                                    color: "headerWhite.main",
+                                    textAlign: "center",
+                                }}
+                            >
+                                 {`Faculty Feedback Report for the Academic Year - ${queryParams?.acYear}, ${queryParams?.sem
+                                        ? `${getOrdinal(queryParams.sem)} Sem`
+                                        : `${getOrdinal(queryParams?.year)} Year`
+                                    }`}
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <StyledTableCell rowSpan={2}>Sl No</StyledTableCell>
+                            <StyledTableCell rowSpan={2} sx={{ textAlign: "Center !important" }}>Employee Name</StyledTableCell>
+                            {/* {allCourses.map(course => (
+                                <StyledTableCell key={course} colSpan={courseSectionMap[course]?.size || 1}>
+                                    {course}
+                                </StyledTableCell>
+                            ))} */}
+                            {courseTableHead("courseAndSection")}
+                            <StyledTableCell rowSpan={2}>Total Student</StyledTableCell>
+                            <StyledTableCell rowSpan={2}>Feedback Count</StyledTableCell>
+                        </TableRow>
+                        <TableRow>
+                            {sectionKeys.map(({ section, field }) => (
+                                <StyledTableCell key={field}>Section {section}</StyledTableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {rows.length > 0 ? (
+                            rows
+                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .map((row, index) => (
+                                    <TableRow key={row.empId}>
+                                        <StyledTableCellBody>{page * rowsPerPage + index + 1}</StyledTableCellBody>
+                                        <StyledTableCellBody sx={{ textAlign: "left !important" }}>{row.employee_name}</StyledTableCellBody>
+                                        {sectionKeys.map(({ field }) => {
+                                            const sectionPercentage = row.feedback[field] ? row?.feedback[field] : ""
+                                            return <StyledTableCellBody
+                                                key={field}
+                                                align="center"
+                                                sx={{
+                                                    backgroundColor: sectionPercentage ? '#E0F7FA !important' : '#F5F5F5',
                                                     fontWeight: sectionPercentage ? 'bold' : 'normal',
                                                     color: sectionPercentage ? '#006064' : '#9e9e9e',
                                                     textAlign: 'center',
                                                 }}
-                                      >
-                                            {sectionPercentage}
-                                        </StyledTableCellBody>
-})}
-                                    <StyledTableCellBody>{row.total_student}</StyledTableCellBody>
-                                    <StyledTableCellBody>{row.feedback_count}</StyledTableCellBody>
-                                </TableRow>
-                            ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={sectionKeys.length + 2} align="center">
-                                <Typography variant="subtitle2">No Records Found</Typography>
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+                                            >
+                                                {sectionPercentage}
+                                            </StyledTableCellBody>
+                                        })}
+                                        <StyledTableCellBody>{row.total_student}</StyledTableCellBody>
+                                        <StyledTableCellBody>{row.feedback_count}</StyledTableCellBody>
+                                    </TableRow>
+                                ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={sectionKeys.length + 2} align="center">
+                                    <Typography variant="subtitle2">No Records Found</Typography>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
             </Box>
             <TablePagination
                 rowsPerPageOptions={[50, 100, 200]}
@@ -414,15 +435,15 @@ function FacultyFeedbackReportByCourse() {
             />
         </Paper>
     ), [rows, sectionKeys, allCourses, page, rowsPerPage]);
-
+  
     return (
         <>
             <Box>
                 <Tabs value={tab} onChange={handleChangeTab}>
                     <Tab value="course" label="Course" />
                     {pathname === "/facultyFeedbackMasterCourseIndex" ? (
-                      <Tab value="course-and-section" label="Course And Section" />
-                    ): <></>}
+                        <Tab value="course-and-section" label="Course And Section" />
+                    ) : <></>}
                 </Tabs>
 
                 <Grid container mt={2}>
