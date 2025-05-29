@@ -122,7 +122,7 @@ const StudentDueReport = () => {
                     return
                 }
                 const { newAddmissionDueReports, totalEligibleStudent, totalReceivableAmount, totalStudent } = data
-                const academicYear = newAddmissionDueReports?.length > 0 && newAddmissionDueReports[0]?.acYear || "2025-2026"
+                const academicYear = newAddmissionDueReports?.length > 0 && newAddmissionDueReports[0]?.acYear
                 const NEWFALLBACKCRUMB = [
                     {
                         text: `Due Amount For ${academicYear}`,
