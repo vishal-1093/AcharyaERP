@@ -738,7 +738,7 @@ function StudentDetailsIndex() {
     },
     {
       field: "feeTemplateRemaks",
-      headerName: "Fee Template Remaks",
+      headerName: "Fee Note",
       flex: 1,
     },
     {
@@ -1005,7 +1005,7 @@ function StudentDetailsIndex() {
     getData();
   };
 
-  const YearSemComponent = ({rowData}) => (
+   const YearSemComponent = ({rowData}) => (
     <Box>
       <Grid container sx={{ display: "flex",justifyContent:"center", marginTop: "10px" }}>
         <Grid item xs={12}>

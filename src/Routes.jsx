@@ -83,6 +83,10 @@ const PoPaymentList = lazy(() =>
   import("./containers/indeces/inventoryMaster/PoPaymentList.jsx")
 );
 // Student Feedback Master Forms
+const StudentDetailsSearch = lazy(() =>
+  import("./pages/indeces/StudentDetailsSearch")
+);
+
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
 );
@@ -2196,6 +2200,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentDueReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/student-search"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsSearch />
               </Suspense>
             }
           />
