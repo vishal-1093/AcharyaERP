@@ -143,7 +143,7 @@ function CancelHostelReceipt() {
       if (values.receiptType === "general") {
         apiUrl = `/api/finance/getHostelFeeReceiptVoucherHeadWiseDetails?financial_year_id=${values.financialYearId}&fee_receipt=${values.receiptNo}&receipt_type=HOS`;
       } else {
-        apiUrl = `api/finance/feeReceiptDetailForHostel?financialYearId=${values.financialYearId}&feeReceipt=${values.receiptNo}&feeReceiptId=7848&receiptType=HOSB`;
+        apiUrl = `api/finance/feeReceiptDetailForHostel?financialYearId=${values.financialYearId}&feeReceipt=${values.receiptNo}&receiptType=HOSB`;
       }
 
       const response = await axios.get(`${apiUrl}`);
@@ -189,12 +189,18 @@ function CancelHostelReceipt() {
         active: true,
       };
 
+      const hosFeeRcptVoucHeadIds = voucherHeads?.map(
+        (obj) => obj?.hostel_fee_receipt_voucher_head_wise_id
+      );
+
       let deleteApiUrl;
 
       if (values.receiptType === "general") {
         deleteApiUrl = `/api/finance/inActivateFeeReceiptNumber?financial_year_id=${values.financialYearId}&fee_receipt=${values.receiptNo}&receipt_type=HOS`;
       } else {
-        // deleteApiUrl = `api/finance/deactivateFeeReceiptOfHostel?feeReceiptId=712&hosFeeRcptVoucHeadIds=1,2,3`;
+        deleteApiUrl = `/api/finance/deactivateFeeReceiptOfHostel?feeReceiptId=${
+          studentData?.fee_receipt_id
+        }&hosFeeRcptVoucHeadIds=${hosFeeRcptVoucHeadIds?.toString()}`;
       }
 
       try {

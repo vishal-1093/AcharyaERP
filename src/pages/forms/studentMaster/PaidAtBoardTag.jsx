@@ -6,8 +6,8 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import moment from "moment";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 
 const initialValues = {
   amount: "",
@@ -20,19 +20,30 @@ const initialValues = {
   neftNo: "",
   bulkNo: "",
   remarks: "",
+  receivedDate: null,
 };
 
 const requiredFields = [];
+
+const years = [
+  { label: 1, value: 1 },
+  { label: 2, value: 2 },
+  { label: 3, value: 3 },
+  { label: 4, value: 4 },
+  { label: 5, value: 5 },
+  { label: 6, value: 6 },
+  { label: 7, value: 7 },
+  { label: 8, value: 8 },
+];
 
 function PaidAtBoardTag() {
   const [values, setValues] = useState(initialValues);
   const [acYearOptions, setAcYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
-  const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
+  const [feetemplateOptions, setFeetemplateOptions] = useState([]);
   const [boardOptions, setBoardOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [programId, setProgramId] = useState(null);
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -51,22 +62,15 @@ function PaidAtBoardTag() {
   };
 
   useEffect(() => {
-    getBoardData();
     getAcademicYearData();
     getSchoolData();
     setCrumbs([{ name: "Paid At Board" }]);
   }, [pathname]);
 
   useEffect(() => {
-    getProgramSpeData();
-  }, [
-    values.acYearId,
-    values.schoolId,
-    programId,
-    values.programSpeId,
-    values.yearsemId,
-    values.courseId,
-  ]);
+    getFeetemplateData();
+    getBoardData();
+  }, [values.acYearId, values.schoolId, values.feeTemplateId]);
 
   const getAcademicYearData = async () => {
     await axios
@@ -97,62 +101,57 @@ function PaidAtBoardTag() {
   };
 
   const getBoardData = async () => {
-    await axios
-      .get(`/api/student/Board`)
-      .then((res) => {
-        setBoardOptions(
-          res.data.data.map((obj) => ({
-            value: obj.board_unique_id,
-            label: obj.board_unique_name,
-          }))
+    if (values.feeTemplateId)
+      try {
+        const getBoardResponse = await axios.get(
+          `/api/finance/boardAssignedToFeeTemplate/${values.feeTemplateId}`
         );
-      })
-      .catch((err) => console.error(err));
+
+        console.log(getBoardResponse);
+
+        const data = [];
+
+        getBoardResponse.data.data.forEach((ele) => {
+          data.push({
+            label: ele.board_unique_name,
+            value: ele.board_unique_id,
+          });
+        });
+
+        setBoardOptions(data);
+      } catch (error) {
+        setAlertMessage({
+          severity: "error",
+          message: error.response.data.message,
+        });
+        setAlertOpen(true);
+      }
   };
 
-  const getProgramSpeData = async () => {
+  const getFeetemplateData = async () => {
     if (values.acYearId && values.schoolId)
-      await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
-          setProgramSpeOptions(
-            res.data.data.map((obj) => ({
-              value: obj.program_specialization_id,
-              label: obj.specialization_with_program,
-            }))
-          );
+      try {
+        const getTemplateResponse = await axios.get(
+          `/api/finance/feeTemplateByAcYearAndSchool/${values.acYearId}/${values.schoolId}`
+        );
 
-          const yearsem = [];
-          res.data.data.forEach((obj) => {
-            if (obj.program_specialization_id === values.programSpeId) {
-              yearsem.push(obj);
-            }
+        const data = [];
+
+        getTemplateResponse.data.data.forEach((ele) => {
+          data.push({
+            label: ele.fee_template_name,
+            value: ele.fee_template_id,
           });
+        });
 
-          const newYear = [];
-          yearsem.forEach((obj) => {
-            if (obj.program_type_name.toLowerCase() === "yearly") {
-              for (let i = 1; i <= obj.number_of_years; i++) {
-                newYear.push({ value: i, label: "Year" + "-" + i });
-              }
-            }
-            if (obj.program_type_name.toLowerCase() === "semester") {
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                newYear.push({ value: i, label: "Sem" + "-" + i });
-              }
-            }
-          });
-
-          setYearSemOptions(
-            newYear.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
+        setFeetemplateOptions(data);
+      } catch (error) {
+        setAlertMessage({
+          severity: "error",
+          message: error.response.data.message,
+        });
+        setAlertOpen(true);
+      }
   };
 
   const handleChangeAdvance = async (name, newValue) => {
@@ -185,7 +184,45 @@ function PaidAtBoardTag() {
       });
       setAlertOpen(true);
     } else {
-      navigate(`/paid-at-board-index`);
+      const payload = {
+        receivedYear: values.receivedYear,
+        acYearId: values.acYearId,
+        boardId: values.boardId,
+        yearSem: values.receivedYear,
+        neftNo: values.neftNo,
+        amount: values.amount,
+        bulkReceiptNo: values.bulkNo,
+        remarks: values.remarks,
+        paidByStudent: true,
+        receivedDate: values.receivedDate,
+        schoolId: values.schoolId,
+        taggedAmount: values.amount,
+        lockStatus: false,
+        feeTemplateId: values.feeTemplateId,
+        active: true,
+      };
+
+      try {
+        const [response] = await Promise.all([
+          axios.post(`/api/finance/boardReceivedAmount`, payload),
+        ]);
+        if (!response.data.success) {
+          throw new Error();
+        }
+
+        setAlertMessage({
+          severity: "success",
+          message: "Created Successfully",
+        });
+        setAlertOpen(true);
+        navigate(`/paid-at-board-index`);
+      } catch (error) {
+        setAlertMessage({
+          severity: "error",
+          message: error.response.data.message,
+        });
+        setAlertOpen(true);
+      }
     }
   };
 
@@ -223,6 +260,17 @@ function PaidAtBoardTag() {
 
           <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
+              name="feeTemplateId"
+              label="Fee template"
+              value={values.feeTemplateId}
+              options={feetemplateOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
               name="boardId"
               label="Board"
               value={values.boardId}
@@ -234,23 +282,27 @@ function PaidAtBoardTag() {
 
           <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
-              name="feeTemplateId"
-              label="Fee template"
-              value={values.feeTemplateId}
-              options={programSpeOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={2.4}>
-            <CustomAutocomplete
               name="receivedYear"
               label="Received Year"
               value={values.receivedYear}
-              options={acYearOptions}
+              options={years}
               handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>
+
+          <Grid item xs={12} md={2.4} mt={2}>
+            <CustomDatePicker
+              name="receivedDate"
+              label="Receipt Date"
+              value={values.receivedDate}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.receivedDate}
+              errors={errorMessages.receivedDate}
+              required
+              maxDate={values.completeDate}
+            />
+          </Grid>
+
           <Grid item xs={12} md={2.4}>
             <CustomTextField
               name="neftNo"
