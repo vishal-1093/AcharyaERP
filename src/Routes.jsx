@@ -1961,6 +1961,11 @@ const DDDetailReport = lazy(() =>
   import("./pages/indeces/DDDetailsReport.jsx")
 );
 const SalaryMisIndex = lazy(() => import("./pages/indeces/SalaryMisIndex.jsx"));
+
+const ServiceIndentReport = lazy(() => import("./pages/indeces/ServiceIndentReport.jsx"));
+
+const ServiceIndentTransportReport = lazy(() => import("./pages/indeces/ServiceIndentTransportReport.jsx"));
+
 const LaptopIssueIndex = lazy(() =>
   import("./containers/indeces/laptopIssue/Index.jsx")
 );
@@ -8761,6 +8766,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryMisIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/serviceindent-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceIndentReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/serviceindenttransport-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceIndentTransportReport />
               </Suspense>
             }
           />
