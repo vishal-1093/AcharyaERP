@@ -46,6 +46,7 @@ import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
 import RazorPayPendingSettlementDetail from "./containers/indeces/razorpaySettlementMaster/razorpayPendingSettlement.jsx";
+import NewAdmissionsDueReport from "./pages/forms/studentDueReport/newAdmissionsDueReport.jsx";
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
@@ -2196,6 +2197,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentDueReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/new-admissions-due-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NewAdmissionsDueReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/new-admissions-due-report-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NewAdmissionsDueReport />
               </Suspense>
             }
           />
