@@ -61,7 +61,7 @@ const ServiceIndentTransportReport = () => {
     },
     {
       field: "type_of_vehicle",
-      headerName: "Type of Vehicle",
+      headerName: "Type",
       flex: 1,
       hideable: false
     },
@@ -73,7 +73,7 @@ const ServiceIndentTransportReport = () => {
     },
     {
       field: "requesting_from_datetime",
-      headerName: "PickUp Date&Time",
+      headerName: "PickUp Date & Time",
       flex: 1,
       valueGetter: (value, row) =>
         row.requesting_from_datetime ? convertToDateandTime(row.requesting_from_datetime) : "",
@@ -81,7 +81,7 @@ const ServiceIndentTransportReport = () => {
     },
     {
       field: "requesting_to_datetime",
-      headerName: "Droping Date&Time",
+      headerName: "Droping Date & Time",
       flex: 1,
       valueGetter: (value, row) =>
         row.requesting_to_datetime ? convertToDateandTime(row.requesting_to_datetime) : "",

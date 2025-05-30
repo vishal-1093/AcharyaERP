@@ -35,7 +35,7 @@ const initialState = {
   blockList: [],
   dept_id: null,
   serviceDeptList: [],
-  complaint_status: complaint_statusList[1].value,
+  complaint_status: complaint_statusList[0].value,
   date_range: dateFilterList[1].value,
   startDate: null,
   endDate: null,
@@ -46,7 +46,11 @@ const ServiceIndentReport = () => {
   const [{ rows, school_id, loading, schoolList, block_id, blockList, dept_id, serviceDeptList, complaint_status, date_range, startDate, endDate }, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({
+    block_short_name:false,
+    floorAndExtension:false,
+    complaintStatus:false
+  });
 
   useEffect(() => {
     setCrumbs([]);
@@ -120,9 +124,9 @@ const ServiceIndentReport = () => {
       field: "dateOfClosed",
       headerName: "Attended On",
       flex: 1,
+      valueGetter: (value, row) =>
+        row.dateOfClosed ? moment(row.dateOfClosed).format("DD-MM-YYYY") : "",
     },
-
-
     {
       field: "complaintStatus",
       headerName: "Status",
@@ -243,7 +247,7 @@ const ServiceIndentReport = () => {
         position: "relative"
       }}
     >
-      <Grid container rowSpacing={{ xs: 1, md: 0 }} columnSpacing={{ xs: 3 }} sx={{ marginTop: { xs: 2, md: 0 }, justifyContent: "flex-end" }}>
+      <Grid container rowSpacing={{ xs: 1, md: 0 }} columnSpacing={{ xs: 3 }} sx={{ marginTop: { xs: 2, md: 0 }, justifyContent: "flex-start" }}>
         <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="school_id"
