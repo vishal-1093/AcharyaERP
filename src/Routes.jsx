@@ -46,6 +46,7 @@ import PaymentGatewayTransaction from "./components/Gatewaygateway.jsx";
 import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/ProctorStudentAssignmentFormInst.jsx";
 import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
 import RazorPayPendingSettlementDetail from "./containers/indeces/razorpaySettlementMaster/razorpayPendingSettlement.jsx";
+import NewAdmissionsDueReport from "./pages/forms/studentDueReport/newAdmissionsDueReport.jsx";
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
@@ -65,13 +66,13 @@ const FacultyFeedbackReportBySection = lazy(() =>
   )
 );
 
-const FacultyFeedbackReportCourseForm = lazy(()=>
+const FacultyFeedbackReportCourseForm = lazy(() =>
   import(
     "./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportCourseForm.jsx"
   )
 );
 
-const FacultyFeedbackReportByCourse = lazy(()=>
+const FacultyFeedbackReportByCourse = lazy(() =>
   import("./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportByCourse.jsx")
 )
 
@@ -83,6 +84,10 @@ const PoPaymentList = lazy(() =>
   import("./containers/indeces/inventoryMaster/PoPaymentList.jsx")
 );
 // Student Feedback Master Forms
+const StudentDetailsSearch = lazy(() =>
+  import("./pages/indeces/StudentDetailsSearch")
+);
+
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
 );
@@ -2205,10 +2210,37 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/new-admissions-due-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NewAdmissionsDueReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/new-admissions-due-report-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NewAdmissionsDueReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/ChangePassword"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ChangePassword />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/student-search"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsSearch />
               </Suspense>
             }
           />
@@ -9566,7 +9598,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
-             <Route
+            <Route
               exact
               path="/FacultyFeedbackMaster-course-inst"
               element={
@@ -9593,7 +9625,7 @@ function RouteConfig() {
                 </Suspense>
               }
             />
-            
+
             <Route
               exact
               path="/facultyFeedbackMasterCourseIndex-inst"

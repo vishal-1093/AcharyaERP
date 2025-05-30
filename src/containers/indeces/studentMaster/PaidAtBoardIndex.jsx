@@ -19,6 +19,7 @@ import axios from "../../../services/Api";
 import moment from "moment";
 import useAlert from "../../../hooks/useAlert";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -63,9 +64,11 @@ function PaidAtBoardIndex() {
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getAcademicyear();
+    setCrumbs([]);
   }, []);
 
   useEffect(() => {
@@ -105,15 +108,15 @@ function PaidAtBoardIndex() {
   };
 
   const getDataBasedOnAcYear = async () => {
-    if (!values.acYearId) return;
-
     let url;
 
-    url = `/api/academic/getLessonPlan/${values.yearId}`;
+    url = `/api/finance/allBoardReceivedAmountDetails?page=${0}&pageSize=${100000000}&sort=createdDate`;
 
     try {
       const response = await axios.get(url);
-      setRows(response.data.data);
+      console.log(response);
+
+      setRows(response.data.data.Paginated_data.content);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -135,33 +138,43 @@ function PaidAtBoardIndex() {
 
   const columns = [
     {
-      field: "ac_year",
+      field: "acYear",
       headerName: "Ac Year",
       flex: 1,
+      align: "center",
     },
     {
-      field: "school_name",
+      field: "schoolNameShort",
       headerName: "School",
       flex: 1,
+      align: "center",
     },
     {
-      field: "board_name",
+      field: "boardUniqueShortName",
       headerName: "Board",
       flex: 1,
+      align: "center",
     },
     {
-      field: "feetemplate_name",
+      field: "feeTemplateName",
       headerName: "Template",
       flex: 1,
+      align: "center",
     },
     {
-      field: "neft_no",
+      field: "neftNo",
       headerName: "Neft No.",
       flex: 1,
+      align: "center",
     },
-    { field: "receipt_no", headerName: "Receipt No.", flex: 1 },
-    { field: "amount", headerName: "Amount", flex: 1 },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
+    {
+      field: "bulkReceiptNo",
+      headerName: "Receipt No.",
+      flex: 1,
+      align: "center",
+    },
+    { field: "amount", headerName: "Amount", flex: 1, align: "right" },
+    { field: "remarks", headerName: "Remarks", flex: 1, align: "center" },
 
     {
       field: "tag",
@@ -189,19 +202,17 @@ function PaidAtBoardIndex() {
       ],
     },
     {
-      field: "created_username",
+      field: "createdUsername",
       headerName: "Created By",
       flex: 1,
-      hide: true,
+      align: "center",
     },
     {
-      field: "created_date",
+      field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      //type: "date",
-       valueGetter: (value, row) =>
-        moment(row.created_date).format("DD-MM-YYYY"),
-      hide: true,
+      valueGetter: (value, row) => moment(row.createdDate).format("DD-MM-YYYY"),
+      align: "center",
     },
     {
       field: "active",
@@ -289,7 +300,7 @@ function PaidAtBoardIndex() {
         columnSpacing={2}
         alignItems="center"
       >
-        <Grid item xs={12} md={2}>
+        {/* <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="acYearId"
             label="Ac Year"
@@ -297,8 +308,8 @@ function PaidAtBoardIndex() {
             handleChangeAdvance={handleChangeAdvance}
             options={academicYearOptions}
           />
-        </Grid>
-        <Grid item xs={12} md={10} align="right">
+        </Grid> */}
+        <Grid item xs={12} md={12} align="right">
           <Button
             sx={{ borderRadius: 2 }}
             variant="contained"
@@ -309,7 +320,7 @@ function PaidAtBoardIndex() {
           </Button>
         </Grid>
         <Grid item xs={12}>
-          <GridIndex rows={row} columns={columns} />
+          <GridIndex rows={rows} columns={columns} />
         </Grid>
       </Grid>
     </>

@@ -156,7 +156,7 @@ function FeeTransfer() {
 
       const studentData = inactiveStudentRes.data.data;
 
-      if (studentData.length > 0 && rowData ) {
+      if (studentData.length > 0 && rowData) {
         setOldStudentId(rowData?.old_student_id);
         setFeetemplateId(studentData[0].fee_template_id);
         setStudentId(rowData?.id);
@@ -398,7 +398,7 @@ function FeeTransfer() {
       });
       setAlertOpen(true);
     } else if (Number(values.receivedAmount) === total) {
-      setLoading(true);
+      // setLoading(true);
 
       const newTemp = [];
 
@@ -410,6 +410,8 @@ function FeeTransfer() {
               data.postData[obj1.key][obj2.id] > 0
             ) {
               newTemp?.push({
+                bankImportTransactionId: obj.bank_import_transaction_id,
+                bank_transaction_history_id: obj.bank_transaction_history_id,
                 isChecked: obj.isChecked,
                 active: true,
                 fee_receipt: obj.fee_receipt,
@@ -430,6 +432,7 @@ function FeeTransfer() {
                 total: total,
                 total_som: total,
                 paid_amount: Number(data.postData[obj1.key][obj2.id]),
+                inr_value: Number(data.postData[obj1.key][obj2.id]),
                 paid_amount_som: data.postData[obj1.key][obj2.id],
                 to_pay: Number(
                   display.fee_template_sub_amount_format[obj1.key][obj2.id]
@@ -438,7 +441,8 @@ function FeeTransfer() {
                   display.fee_template_sub_amount_format[obj1.key][obj2.id],
                 voucher_head_new_id: obj2.id,
                 student_id: studentId,
-                fee_template_id: feetemplateId,
+                school_id: studentData?.school_id,
+                fee_template_id: rowData?.fee_template_id,
               });
             }
           });
@@ -502,9 +506,11 @@ function FeeTransfer() {
         >
           <Grid item xs={12}>
             {/* Student Details */}
-            {studentId && <Grid item xs={12}>
-              <StudentDetails id={studentId} />
-            </Grid>}
+            {studentId && (
+              <Grid item xs={12}>
+                <StudentDetails id={studentId} />
+              </Grid>
+            )}
             {open ? (
               <Grid container mt={3}>
                 <Grid item xs={12}>
