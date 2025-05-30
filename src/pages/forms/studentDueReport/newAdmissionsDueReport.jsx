@@ -15,7 +15,7 @@ const FALLBACKCRUMB = [
     }
 ]
 
-const StudentDueReport = () => {
+const NewAdmissionsDueReport = () => {
     const [rows, setRows] = useState([])
     const [columns, setColumns] = useState([])
     const [breadCrumbs, setBreadCrumbs] = useState(FALLBACKCRUMB)
@@ -31,106 +31,25 @@ const StudentDueReport = () => {
 
     useEffect(() => {
           setCrumbs([])
-        getInstituteData()
+      //  getInstituteData()
+          getNewAdmissionDues()
     }, [])
 
-    const getInstituteData = () => {
-        setLoading(true)
-        const baseUrl = (roleShortName === "SAA" || pathname === "/student-due-report") ? "/api/student/allSchoolWiseDueReport" : "/api/student/schoolWiseDueReport"
-        axios.get(baseUrl)
-            .then(res => {
-                setShowButton(true)
-                setBreadCrumbs(FALLBACKCRUMB)
-                const data = res.data.data
-                if (!data && data.schoolWiseDueReportLists.length <= 0) {
-                    setLoading(false)
-                    setColumns([])
-                    setRows([])
-                    return
-                }
-                const { schoolWiseDueReportLists, grantDueTotal, grantAddOnTotal, grantHostelFeeTotal, grantTotal } = data
-                const columns = [
-                    {
-                        field: "inst", headerName: "School Name", flex: 1, minWidth: 400, headerAlign: 'center', headerClassName: "header-bg",
-                        renderCell: (params) => {
-                            if (!params.row.isClickable)
-                                return <Typography fontWeight="bold">{params.row.inst}</Typography>
-
-                            return <Button onClick={() => getBranchData(params.row)} sx={{ padding: 0, fontWeight: "bold" }}>
-                                {params.row.inst}
-                            </Button>
-                        }
-                    },
-                    { field: "collegeDue", headerName: "College Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "addOn", headerName: "Add On", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
-                    { field: "hostelFee", headerName: "Hostel Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },                  
-                    {
-                        field: "total", headerName: "Total", flex: 1, align: 'right', headerAlign: 'right', headerClassName: "header-bg",
-                        renderCell: (params) => {
-                            const total = new Intl.NumberFormat('en-IN').format(params?.row?.total) || 0
-                            if (!params.row.isClickable)
-                                return <Typography fontWeight="bold">{total}</Typography>
-
-                            return <Button onClick={() => getBranchData(params.row)} sx={{ padding: 0, fontWeight: "bold" }}>
-                                {total}
-                            </Button>
-                        }
-                    },
-                ]
-
-                const dataRows = schoolWiseDueReportLists?.map(obj => {
-                    const { schoolId, schoolName,schoolShortName, collegeDue, addOn, hostelFee, uniformAmount, total } = obj
-                     if (total > 0)
-                        return {
-                            id: schoolId, inst: schoolName, collegeDue, addOn, isLastRow: false, uniformAmount,
-                            hostelFee: hostelFee ? hostelFee : 0, total, isClickable: total > 0 ? true : false
-                        }
-                     else return {}
-                })
-                dataRows.push({
-                    id: Date.now(),
-                    inst: "",
-                    collegeDue: grantDueTotal ? grantDueTotal : 0,
-                    addOn: grantAddOnTotal ? grantAddOnTotal : 0,
-                    hostelFee: grantHostelFeeTotal ? grantHostelFeeTotal : 0,
-                    total: grantTotal ? grantTotal : 0, isClickable: false,
-                    isLastRow: true
-                })
-
-                setColumns(columns)
-                setRows(dataRows?.filter(obj => Object.keys(obj).length > 0))
-                setLoading(false)
-            })
-            .catch(err => {
-                console.log(err)
-                setLoading(false)
-            })
-    }
-
-    // const getNewAdmissionDues = () => {
+    // const getInstituteData = () => {
     //     setLoading(true)
-    //     const baseUrl = (roleShortName === "SAA" || pathname === "/student-due-report") ? "/api/student/newAddmissionsDueReport" : "api/student/schoolWiseNewAddmissionsDueReport"
-       
+    //     const baseUrl = (roleShortName === "SAA" || pathname === "/student-due-report") ? "/api/student/allSchoolWiseDueReport" : "/api/student/schoolWiseDueReport"
     //     axios.get(baseUrl)
     //         .then(res => {
-    //             setShowButton(false)
+    //             setShowButton(true)
+    //             setBreadCrumbs(FALLBACKCRUMB)
     //             const data = res.data.data
-    //             if (!data && data.newAddmissionDueReports.length <= 0) {
+    //             if (!data && data.schoolWiseDueReportLists.length <= 0) {
     //                 setLoading(false)
     //                 setColumns([])
     //                 setRows([])
     //                 return
     //             }
-    //             const { newAddmissionDueReports, totalEligibleStudent, totalReceivableAmount, totalStudent } = data
-    //             const academicYear = newAddmissionDueReports?.length > 0 && newAddmissionDueReports[0]?.acYear
-    //             const NEWFALLBACKCRUMB = [
-    //                 {
-    //                     text: `Due Amount For ${academicYear}`,
-    //                     action: () => { },
-    //                     isParent: false
-    //                 }
-    //             ]
-    //             setBreadCrumbs(NEWFALLBACKCRUMB)
+    //             const { schoolWiseDueReportLists, grantDueTotal, grantAddOnTotal, grantHostelFeeTotal, grantTotal } = data
     //             const columns = [
     //                 {
     //                     field: "inst", headerName: "School Name", flex: 1, minWidth: 400, headerAlign: 'center', headerClassName: "header-bg",
@@ -138,44 +57,49 @@ const StudentDueReport = () => {
     //                         if (!params.row.isClickable)
     //                             return <Typography fontWeight="bold">{params.row.inst}</Typography>
 
-    //                         return <Button onClick={() => getBranchData(params.row, params?.row?.acYearId)} sx={{ padding: 0, fontWeight: "bold" }}>
+    //                         return <Button onClick={() => getBranchData(params.row)} sx={{ padding: 0, fontWeight: "bold" }}>
     //                             {params.row.inst}
     //                         </Button>
     //                     }
     //                 },
-    //                 { field: "studentDueCount", headerName: "Student Count", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+    //                 { field: "collegeDue", headerName: "College Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+    //                 { field: "addOn", headerName: "Add On", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+    //                 { field: "hostelFee", headerName: "Hostel Due", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },                  
     //                 {
     //                     field: "total", headerName: "Total", flex: 1, align: 'right', headerAlign: 'right', headerClassName: "header-bg",
     //                     renderCell: (params) => {
     //                         const total = new Intl.NumberFormat('en-IN').format(params?.row?.total) || 0
-    //                         return <Typography fontWeight="bold">{total}</Typography>
+    //                         if (!params.row.isClickable)
+    //                             return <Typography fontWeight="bold">{total}</Typography>
+
+    //                         return <Button onClick={() => getBranchData(params.row)} sx={{ padding: 0, fontWeight: "bold" }}>
+    //                             {total}
+    //                         </Button>
     //                     }
     //                 },
     //             ]
 
-    //             const dataRows = newAddmissionDueReports.map(obj => {
-    //                 const { schoolNameShort, schoolName, studentDueCount, feeReceivable, schoolId, acYearId } = obj
-    //                 if (feeReceivable > 0){
+    //             const dataRows = schoolWiseDueReportLists?.map(obj => {
+    //                 const { schoolId, schoolName,schoolShortName, collegeDue, addOn, hostelFee, uniformAmount, total } = obj
+    //                  if (total > 0)
     //                     return {
-    //                         id: schoolId, inst: schoolName, studentDueCount, isLastRow: false,
-    //                          total: feeReceivable, isClickable: feeReceivable > 0 ? true : false, acYearId
+    //                         id: schoolId, inst: schoolName, collegeDue, addOn, isLastRow: false, uniformAmount,
+    //                         hostelFee: hostelFee ? hostelFee : 0, total, isClickable: total > 0 ? true : false
     //                     }
-    //                 }
     //                  else return {}
     //             })
     //             dataRows.push({
     //                 id: Date.now(),
     //                 inst: "",
-    //                 acYearId: "",
-    //                 studentDueCount: totalStudent ? totalStudent : 0,
-    //                 // eligible: totalEligibleStudent ? totalEligibleStudent : 0,
-    //                 total: totalReceivableAmount ? totalReceivableAmount : 0,
-    //                 isClickable: false,
+    //                 collegeDue: grantDueTotal ? grantDueTotal : 0,
+    //                 addOn: grantAddOnTotal ? grantAddOnTotal : 0,
+    //                 hostelFee: grantHostelFeeTotal ? grantHostelFeeTotal : 0,
+    //                 total: grantTotal ? grantTotal : 0, isClickable: false,
     //                 isLastRow: true
     //             })
 
     //             setColumns(columns)
-    //             setRows(dataRows.filter(obj => Object.keys(obj).length > 0))
+    //             setRows(dataRows?.filter(obj => Object.keys(obj).length > 0))
     //             setLoading(false)
     //         })
     //         .catch(err => {
@@ -184,17 +108,93 @@ const StudentDueReport = () => {
     //         })
     // }
 
-    const getBranchData = (selectedInst) => {
+    const getNewAdmissionDues = () => {
+        setLoading(true)
+        const baseUrl =  pathname === "/new-admissions-due-report" ? "/api/student/newAddmissionsDueReport" : "api/student/schoolWiseNewAddmissionsDueReport"
+       
+        axios.get(baseUrl)
+            .then(res => {
+                setShowButton(false)
+                const data = res.data.data
+                if (!data && data.newAddmissionDueReports.length <= 0) {
+                    setLoading(false)
+                    setColumns([])
+                    setRows([])
+                    return
+                }
+                const { newAddmissionDueReports, totalEligibleStudent, totalReceivableAmount, totalStudent } = data
+                const academicYear = newAddmissionDueReports?.length > 0 && newAddmissionDueReports[0]?.acYear
+                const NEWFALLBACKCRUMB = [
+                    {
+                        text: `Due Amount For ${academicYear}`,
+                        action: () => { },
+                        isParent: false
+                    }
+                ]
+                setBreadCrumbs(NEWFALLBACKCRUMB)
+                const columns = [
+                    {
+                        field: "inst", headerName: "School Name", flex: 1, minWidth: 400, headerAlign: 'center', headerClassName: "header-bg",
+                        renderCell: (params) => {
+                            if (!params.row.isClickable)
+                                return <Typography fontWeight="bold">{params.row.inst}</Typography>
+
+                            return <Button onClick={() => getBranchData(params.row, params?.row?.acYearId)} sx={{ padding: 0, fontWeight: "bold" }}>
+                                {params.row.inst}
+                            </Button>
+                        }
+                    },
+                    { field: "studentDueCount", headerName: "Student Count", flex: 1, type: "number", align: 'right', headerAlign: 'right', headerClassName: "header-bg" },
+                    {
+                        field: "total", headerName: "Total", flex: 1, align: 'right', headerAlign: 'right', headerClassName: "header-bg",
+                        renderCell: (params) => {
+                            const total = new Intl.NumberFormat('en-IN').format(params?.row?.total) || 0
+                            return <Typography fontWeight="bold">{total}</Typography>
+                        }
+                    },
+                ]
+
+                const dataRows = newAddmissionDueReports.map(obj => {
+                    const { schoolNameShort, schoolName, studentDueCount, feeReceivable, schoolId, acYearId } = obj
+                    if (feeReceivable > 0){
+                        return {
+                            id: schoolId, inst: schoolName, studentDueCount, isLastRow: false,
+                             total: feeReceivable, isClickable: feeReceivable > 0 ? true : false, acYearId
+                        }
+                    }
+                     else return {}
+                })
+                dataRows.push({
+                    id: Date.now(),
+                    inst: "",
+                    acYearId: "",
+                    studentDueCount: totalStudent ? totalStudent : 0,
+                    // eligible: totalEligibleStudent ? totalEligibleStudent : 0,
+                    total: totalReceivableAmount ? totalReceivableAmount : 0,
+                    isClickable: false,
+                    isLastRow: true
+                })
+
+                setColumns(columns)
+                setRows(dataRows.filter(obj => Object.keys(obj).length > 0))
+                setLoading(false)
+            })
+            .catch(err => {
+                console.log(err)
+                setLoading(false)
+            })
+    }
+
+    const getBranchData = (selectedInst, acYear="") => {
         setShowButton(false)
         setLoading(true)
-        // const url = acYear ? `/api/student/branchWiseDueReport?schoolId=${selectedInst.id}&acYearId=${acYear}` : `/api/student/branchWiseDueReport?schoolId=${selectedInst.id}`
-                const url = `/api/student/branchWiseDueReport?schoolId=${selectedInst.id}`
+        const url = `/api/student/branchWiseDueReport?schoolId=${selectedInst.id}&acYearId=${acYear}`
         axios.get(url)
             .then(res => {
                 setBreadCrumbs([
                     {
                         text: selectedInst.inst,
-                        action: () => getInstituteData(selectedInst),
+                        action: () => getNewAdmissionDues(selectedInst),
                         isParent: true
                     },
                     {
@@ -231,7 +231,7 @@ const StudentDueReport = () => {
                             const value = params?.row[`sem${index}`];
                             const isClickable = isBranchWiseDueReport && params.row.isClickable && value > 0;
                             if (isClickable) {
-                                return (<Button onClick={() => getSemesterData(selectedInst, params.row, index)}>
+                                return (<Button onClick={() => getSemesterData(selectedInst, params.row, index, acYear)}>
                                     {params?.row[`sem${index}`]}
                                 </Button>)
                             }
@@ -291,21 +291,21 @@ const StudentDueReport = () => {
             })
     }
 
-    const getSemesterData = (selectedInst, selectedBranch, selectedSemester) => {
+    const getSemesterData = (selectedInst, selectedBranch, selectedSemester, acYear) => {
         setShowButton(false)
         setLoading(true)
-        axios.get(`/api/student/SemWiseStudentWiseDueReport?schoolId=${selectedInst?.id}&programId=${selectedBranch?.programId}&programSpecializationId=${selectedBranch?.programSpecializationId}&sem=${selectedSemester}&pageSize=100&pageNo=0`)
+        axios.get(`/api/student/SemWiseStudentWiseDueReport?schoolId=${selectedInst?.id}&programId=${selectedBranch?.programId}&programSpecializationId=${selectedBranch?.programSpecializationId}&sem=${selectedSemester}&&acYearId=${acYear}&pageSize=10000&pageNo=0`)
             .then(res => {
                 const currentSem = `Semester ${selectedSemester}`
                 setBreadCrumbs([
                     {
                         text: selectedInst.inst,
-                        action: () => getInstituteData(),
+                        action: () => getNewAdmissionDues(acYear),
                         isParent: true
                     },
                     {
                         text: currentSem,
-                        action: () => getBranchData(selectedInst),
+                        action: () => getBranchData(selectedInst, acYear),
                         isParent: true
                     },
                     {
@@ -395,22 +395,22 @@ const StudentDueReport = () => {
             })
     }
 
-    const getStudentData = (selectedInst, selectedBranch) => {
+    const getStudentData = (selectedInst, selectedBranch, acYear) => {
         setLoading(true)
         setIsBranchWiseDueReport(false)
-        axios.get(`/api/student/studentWiseDueReport?schoolId=${selectedInst?.id}&programId=${selectedBranch?.programId}&programSpecializationId=${selectedBranch?.programSpecializationId}&pageSize=100&pageNo=0`)
+        axios.get(`/api/student/studentWiseDueReport?schoolId=${selectedInst?.id}&programId=${selectedBranch?.programId}&programSpecializationId=${selectedBranch?.programSpecializationId}&acYearId=${acYear}&pageSize=10000&pageNo=0`)
             .then(res => {
                 setColumns([])
                 setShowButton(false)
                 setBreadCrumbs([
                     {
                         text: selectedInst.inst,
-                        action: () => getInstituteData(),
+                        action: () => getNewAdmissionDues(acYear),
                         isParent: true
                     },
                     {
                         text: selectedBranch.program,
-                        action: () => getBranchData(selectedInst),
+                        action: () => getBranchData(selectedInst, acYear),
                         isParent: true
                     },
                     {
@@ -494,8 +494,7 @@ const StudentDueReport = () => {
             }}
                 className="children-grid"
             >
-                <CustomBreadCrumbs arr={breadCrumbs} />
-                {/* <Box sx={{ display: "flex", justifyContent: 'space-between', marginBottom: '10px' }}>
+                <Box sx={{ display: "flex", justifyContent: 'space-between', marginBottom: '10px' }}>
                     <CustomBreadCrumbs arr={breadCrumbs} />
                     {showButton ? (
                         <Button
@@ -507,7 +506,7 @@ const StudentDueReport = () => {
                             New Admissions
                         </Button>
                     ) : <></>}
-                </Box> */}
+                </Box>
                 <GridIndex
                     initialState={{
                         pinnedColumns: { left: ['program'] },
@@ -526,7 +525,7 @@ const StudentDueReport = () => {
     </Box>)
 }
 
-export default StudentDueReport
+export default NewAdmissionsDueReport
 
 
 const CustomBreadCrumbs = ({ arr }) => {
