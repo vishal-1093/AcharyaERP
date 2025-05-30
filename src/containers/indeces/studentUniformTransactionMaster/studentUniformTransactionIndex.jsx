@@ -175,29 +175,19 @@ function StudentUniformTransactionIndex() {
     }
 
      const handleRefetch = async() =>{
-           await axios
-            .get(`/fetch-receipts-java&datee=2025-04-30`)
-            .then((res) => {
-                 console.log("res++++", res)
-            })
-            .catch((err) => {
-                console.log("err++++", err)
-            });
+        setIsRefetchModelOpen(true)
     }
 
       const handleRefetchSubmit = () =>{
-      //  refetchUniformTransactionData()
-       console.log("refetch")
+       const formatedDate = moment(refetchDate).format("YYYY-MM-DD")
+    window.open(`https://www.maruthiassociates.in/index.php?r=acerp-api/fetch-receipts-java&datee=${formatedDate}`, '_blank', 'noopener,noreferrer');
+      setRefetchDate("")
+       setIsRefetchModelOpen(false)
     }
 
      const handleRefetchInputChange = (name, newValue) => {
         setRefetchDate(newValue)
     };
-
-         const refetchUniformTransactionData = () => {
-            console.log("refetch transaction")
-       
-        }
 
     const columns = [
         {
@@ -420,7 +410,7 @@ function StudentUniformTransactionIndex() {
                     <Grid item xs={12} sm={10}>
                      <CustomDatePicker
                         name="refetchDate"
-                        label="Settlement Date"
+                        label="Transaction Date"
                         value={refetchDate || ""}
                         handleChangeAdvance={handleRefetchInputChange}
                         maxDate={new Date()}
@@ -434,18 +424,10 @@ function StudentUniformTransactionIndex() {
                       variant="contained"
                       color="primary"
                       sx={{ borderRadius: 1, px: 2 }}
-                      disabled={!refetchDate || loading}
+                      disabled={!refetchDate}
                       onClick={handleRefetchSubmit}
                     >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>{"Save"}</strong>
-                      )}
+                      Submit
                     </Button>
                   </Box>
                 </Grid>
@@ -528,7 +510,7 @@ function StudentUniformTransactionIndex() {
                             required={true}
                         />
                     </Grid>
-                    {/* <Grid item xs={8} md={0.8}>
+                    <Grid item xs={8} md={0.8}>
                          <Button
                                 style={{ borderRadius: 7 }}
                                 variant="contained"
@@ -538,7 +520,7 @@ function StudentUniformTransactionIndex() {
                             >
                               Refetch
                             </Button>
-                    </Grid> */}
+                    </Grid>
                 </Grid>
             </Box>
             <Box mt={2}>

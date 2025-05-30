@@ -82,18 +82,7 @@ function StudentRefundIndex() {
           <Typography variant="subtitle2">Pending</Typography>
         ) : params.row.approver_status === "1" ? (
           <IconButton color="primary">
-            <CheckCircleIcon
-              fontSize="small"
-              // onClick={() =>
-              //   navigate(`/StudentRefundPdf`, {
-              //     state: {
-              //       id: params.row.refund_reference_no,
-              //       schoolId: params.row.school_id,
-              //       fcYearId: params.row.financial_year_id,
-              //     },
-              //   })
-              // }
-            />
+            <CheckCircleIcon fontSize="small" />
           </IconButton>
         ) : params.row.created_by === userId ? (
           <Typography variant="subtitle2">Pending</Typography>
@@ -181,7 +170,7 @@ function StudentRefundIndex() {
     setApproveOpen(true);
     await axios
       .get(
-        `/api/finance/getRefundRequestDataDetails/${data.refund_reference_no}`
+        `/api/finance/getRefundRequestData/${data.refund_reference_no}/${data.school_id}/${data.financial_year_id}`
       )
       .then((response) => {
         setReceiptData(response.data.data);
