@@ -17,6 +17,7 @@ const GridIndex = lazy(() => import("../../components/GridIndex.jsx"));
 
 const complaint_statusList = [
   { value: "PENDING", label: "Pending" },
+  { value: "UNDERPROCESS", label: "Under Process"},
   { value: "COMPLETED", label: "Completed" },
 ];
 
