@@ -285,7 +285,7 @@ const PermissionIndex = () => {
       if (params.row.active === true) {
         try {
           const res = await axios.delete(
-            `/api/student/deleteStudentPermission?auid=${params.row?.auid}&currentSem=${params.row?.currentSem}&permissionType=${params.row?.permissionType}`
+            `/api/student/deleteStudentPermission?auid=${params.row?.auid}&currentSem=${params.row?.currentSem}&currentYear=${params.row?.currentYear}&permissionType=${params.row?.permissionType}`
           );
           if (res.status === 200) {
             setLoadingAndGetData();
@@ -296,7 +296,7 @@ const PermissionIndex = () => {
       } else {
         try {
           const res = await axios.delete(
-            `/api/student/activateStudentPermission?auid=${params.row?.auid}&currentSem=${params.row?.currentSem}&permissionType=${params.row?.permissionType}`
+            `/api/student/activateStudentPermission?auid=${params.row?.auid}&currentSem=${params.row?.currentSem}&currentYear=${params.row?.currentYear}&permissionType=${params.row?.permissionType}`
           );
           if (res.status === 200) {
             setLoadingAndGetData();
