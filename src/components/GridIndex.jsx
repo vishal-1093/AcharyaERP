@@ -59,6 +59,7 @@ function GridIndex({
   handleOnFilterChange,
   columnVisibilityModel={},
   setColumnVisibilityModel=()=>{},
+  onRowClick=()=>{},
   ...props
 }) {
   const [updatePageSize, setUpdatePageSize] = useState(pageSize);
@@ -112,7 +113,10 @@ function GridIndex({
           quickFilterProps: { debounceMs: 500 },
         },
       }}
-      sx={gridStyle}
+      sx={{
+        ...gridStyle,
+          ...props.sx, 
+      }}
       // pageSize={updatePageSize ? updatePageSize : 100}
       // rowsPerPageOptions={[50, 100]}
       pageSizeOptions={[50, 100]} 
@@ -121,6 +125,7 @@ function GridIndex({
       density="compact"
       loading={loading}
       getRowClassName={getRowClassName}
+       onRowClick={onRowClick} 
       {...props}
     />
   );
