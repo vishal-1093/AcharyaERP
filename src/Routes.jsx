@@ -1946,6 +1946,10 @@ const AddonReport = lazy(() => import("./pages/indeces/AddonReportAll.jsx"));
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
+const StudentDueReportDetail = lazy(() => import("./containers/indeces/studentDueReportDetail/studentDueReportDetailIndex.jsx"));
+
+const StudentDueReportForProgramme = lazy(()=>import("./containers/indeces/studentDueReportDetail/studentDueReportDetail-programme.jsx"));
+
 const DirectDemandIndex = lazy(() =>
   import("./pages/indeces/DirectDemandIndex.jsx")
 );
@@ -2205,6 +2209,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentDueReport />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/student-due-report-detail"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDueReportDetail />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/student-due-report-detail/programme"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDueReportForProgramme />
               </Suspense>
             }
           />
