@@ -302,7 +302,7 @@ function StudentDueReportDetail() {
                                     programSpecializationId: params?.row?.program_specialization_id,
                                     course: params?.row?.course
                                 }
-                                navigate('/student-due-report-details/programme', { state: queryValues })
+                                navigate('/student-due-report-detail/programme', { state: queryValues })
                             }}
                             sx={{
                                 "& .MuiDataGrid-row:hover": {
