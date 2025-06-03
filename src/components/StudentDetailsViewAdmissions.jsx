@@ -170,23 +170,26 @@ const StudentDetailsViewDocuments = ({
   useEffect(() => {
     getCountry();
     getNationality();
+    if (!applicantData?.candidate_name || !applicantData?.auid) return;
+    const nameWithAuid = `${applicantData.candidate_name || "Unknown Candidate"}-${applicantData.auid || "Unknown AUID"}`;
     if (state) {
       setCrumbs([
         {
           name: "Student Master",
           link: "/student-master",
         },
-        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+        { name: nameWithAuid },
       ]);
     } else {
       setCrumbs([
         {
           name: "Student Master",
         },
-        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+        { name: nameWithAuid },
       ]);
     }
-  }, []);
+  }, [applicantData, state]);
+
 
   useEffect(() => {
     getState();
@@ -973,15 +976,15 @@ const StudentDetailsViewDocuments = ({
                             <TableCell>
                               {row.submitted_date
                                 ? moment(row.submitted_date).format(
-                                    "DD-MM-YYYY"
-                                  )
+                                  "DD-MM-YYYY"
+                                )
                                 : "-"}
                             </TableCell>
                             <TableCell>
                               {row.will_submit_by
                                 ? moment(row.will_submit_by).format(
-                                    "DD-MM-YYYY"
-                                  )
+                                  "DD-MM-YYYY"
+                                )
                                 : "-"}
                             </TableCell>
                             <TableCell>
