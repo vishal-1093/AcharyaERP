@@ -195,6 +195,13 @@ const ChangeBed = ({ rowDetails, getData }) => {
     temp.bedStatus = "Occupied";
 
     try {
+      const deleteResponse = await axios.delete(
+        `/api/hostel/deactiveHostelBedAssignment/${rowDetails?.id}`
+      );
+
+      if (deleteResponse.status === 200 || deleteResponse.status === 204) {
+        console.log("Previous bed assignment deactivated successfully");
+      }
       const res = await axios.post(`/api/hostel/hostelBedAssignment`, temp);
       if (res.status === 200 || res.status === 201) {
         setAlertMessage({
@@ -202,16 +209,16 @@ const ChangeBed = ({ rowDetails, getData }) => {
           message: "Bed Changed",
         });
 
-        // Call the DELETE API
-        const deleteResponse = await axios.delete(
-          `/api/hostel/deactiveHostelBedAssignment/${rowDetails?.id}`
-        );
+        // // Call the DELETE API
+        // const deleteResponse = await axios.delete(
+        //   `/api/hostel/deactiveHostelBedAssignment/${rowDetails?.id}`
+        // );
 
-        if (deleteResponse.status === 200 || deleteResponse.status === 204) {
-          console.log("Hostel bed assignment deactivated successfully");
-        } else {
-          console.log("Error deactivating hostel bed assignment");
-        }
+        // if (deleteResponse.status === 200 || deleteResponse.status === 204) {
+        //   console.log("Hostel bed assignment deactivated successfully");
+        // } else {
+        //   console.log("Error deactivating hostel bed assignment");
+        // }
       } else {
         setAlertMessage({
           severity: "error",

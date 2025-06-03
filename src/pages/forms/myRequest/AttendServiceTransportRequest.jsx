@@ -59,6 +59,7 @@ function AttendServiceRequest() {
   const statusData = [
     { label: "Trip Cancelled By Transport Dept", value: "Trip Cancelled By Transport Dept" },
     { label: "Trip Cancelled By End User", value: "Trip Cancelled By End User" },
+    { label: "Under Process", value: "UNDERPROCESS"},
     { label: "Trip Completed", value: "Trip Completed" }
   ];
 
