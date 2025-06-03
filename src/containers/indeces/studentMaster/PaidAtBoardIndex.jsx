@@ -38,19 +38,6 @@ const initialValues = {
   acYearId: null,
 };
 
-const row = [
-  {
-    id: 1,
-    ac_year: "2024-2025",
-    school_name: "AIT",
-    board_name: "KEA",
-    feetemplate_name: "TEST1234",
-    neft_no: "Test@1234",
-    receipt_no: 12,
-    amount: 5000000,
-  },
-];
-
 function PaidAtBoardIndex() {
   const [rows, setRows] = useState([]);
   const [values, setValues] = useState(initialValues);
@@ -181,9 +168,13 @@ function PaidAtBoardIndex() {
       type: "actions",
       flex: 1,
       headerName: "Tag",
-      getActions: () => [
+      getActions: (params) => [
         <IconButton
-          onClick={() => navigate(`/paid-at-board-std-list`)}
+          onClick={() =>
+            navigate(`/paid-at-board-std-list`, {
+              state: { rowData: params.row },
+            })
+          }
           color="primary"
         >
           <AddCircleRoundedIcon fontSize="small" />

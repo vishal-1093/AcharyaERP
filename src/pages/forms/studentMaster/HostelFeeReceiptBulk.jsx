@@ -579,7 +579,6 @@ function HostelFeeReceiptBulk() {
         hostel_status: 1,
         bank_id: bankImportedDataById?.deposited_bank_id,
         inr_value:
-          studentData.currency_type_name === "USD" ||
           values.receivedIn === "USD"
             ? Math.round(Number(values.receivedAmount * inrValue.inr))
             : Math.round(Number(values.receivedAmount)),
@@ -638,8 +637,6 @@ function HostelFeeReceiptBulk() {
         school_id: values.schoolId,
         student_id: studentData.student_id,
       };
-
-      
 
       if (!requiredFieldsValid()) {
         setAlertMessage({

@@ -253,7 +253,7 @@ const NewAdmissionsDueReport = () => {
                             if (!params.row.isClickable)
                                 return <Typography fontWeight="bold">{total}</Typography>
 
-                            return (<Button onClick={() => getStudentData(selectedInst, params.row)}>
+                            return (<Button onClick={() => getStudentData(selectedInst, params.row, acYear)}>
                                 {total}
                             </Button>)
                         }
