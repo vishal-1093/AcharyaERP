@@ -196,9 +196,10 @@ function PaidAtBoardTag() {
         paidByStudent: true,
         receivedDate: values.receivedDate,
         schoolId: values.schoolId,
-        taggedAmount: values.amount,
+        taggedAmount: 0,
         lockStatus: false,
         feeTemplateId: values.feeTemplateId,
+        remainingBalance: values.amount,
         active: true,
       };
 

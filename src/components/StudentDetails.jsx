@@ -11,10 +11,14 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Tooltip,
+  tooltipClasses,
+  styled,
 } from "@mui/material";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import reportingStatus from "../utils/ReportingStatus";
+import { Cancel } from "@mui/icons-material";
 
 const bookmanFont = {
   fontFamily: "Roboto",
@@ -33,6 +37,21 @@ const bookmanFontPrint = {
   fontSize: "20px !important",
 };
 
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: "100%",
+    padding: "10px",
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    // padding: theme.spacing(1),
+    // textAlign: "justify",
+  },
+}));
+
 function StudentDetails({
   id,
   isStudentdataAvailable = () => {},
@@ -40,12 +59,14 @@ function StudentDetails({
   isPrintClick = false,
 }) {
   const [studentData, setStudentData] = useState(null);
+  const [cancel, setCancel] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     getData();
+    getCancelData();
   }, [id]);
 
   const getData = async () => {
@@ -58,8 +79,33 @@ function StudentDetails({
       }=${id}`;
 
       const response = await axios.get(url);
+      // const cancelresponse = await axios.get(
+      //   `/api/finance/dueAmountCalculationOnVocherHeadWiseAndYearWiseForFeeReceipt/${id}`
+      // );
+      // setCancel(cancelresponse?.data?.data?.cancelAdmissions?.[0]);
+
       setStudentData(response.data.data[0]);
       isStudentdataAvailable(response.data.data[0]);
+    } catch (err) {
+      console.error("Error fetching student data:", err);
+      setError("Failed to fetch student details. Please try again later.");
+      isStudentdataAvailable({});
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCancelData = async () => {
+    try {
+      setLoading(true);
+      const containsAlphabetic = /[a-zA-Z]/.test(id);
+
+      if (!containsAlphabetic) {
+        const cancelresponse = await axios.get(
+          `/api/finance/dueAmountCalculationOnVocherHeadWiseAndYearWiseForFeeReceipt/${id}`
+        );
+        setCancel(cancelresponse?.data?.data?.cancelAdmissions?.[0]);
+      }
     } catch (err) {
       console.error("Error fetching student data:", err);
       setError("Failed to fetch student details. Please try again later.");
@@ -125,13 +171,33 @@ function StudentDetails({
 
   if (!studentData) {
     return (
-      <Typography
-        variant="subtitle2"
-        color="error"
-        sx={{ textAlign: "center", marginBottom: 2 }}
+      <HtmlTooltip
+        title={
+          <>
+            <Typography color="inherit">
+              <strong>Requested By :</strong> {cancel?.created_username}
+            </Typography>
+            <Typography color="inherit">
+              <strong>Cancelled Date :</strong>{" "}
+              {moment(cancel?.approved_date).format("DD-MM-YYYY")}
+            </Typography>
+            <Typography color="inherit">
+              <strong>Requested By Remarks :</strong> {cancel?.remarks}
+            </Typography>
+            <Typography color="inherit">
+              <strong>Approved By Remarks :</strong> {cancel?.approved_remarks}
+            </Typography>
+          </>
+        }
       >
-        Admission is cancelled !!!
-      </Typography>
+        <Typography
+          variant="subtitle2"
+          color="error"
+          sx={{ textAlign: "center", marginBottom: 2, cursor: "pointer" }}
+        >
+          Admission is cancelled !!!
+        </Typography>
+      </HtmlTooltip>
     );
   }
 
