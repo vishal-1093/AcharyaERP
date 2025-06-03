@@ -157,7 +157,7 @@ function ExamFeeReceipt() {
       if (studentDataResponse.data.data.length > 0) {
         try {
           const studentExamDueResponse = await axios.get(
-            `/api/finance/feePaymentDetailsForExamFeeByStudentId/${studentDataResponse?.data?.data?.[0]?.student_id}`
+            `/api/finance/getFeePaymentDetailsForExamFeeByStudentId/${studentDataResponse?.data?.data?.[0]?.student_id}`
           );
 
           if (
@@ -470,7 +470,6 @@ function ExamFeeReceipt() {
         paid_year: newArr?.toString(),
         school_id: studentData.school_id,
         inr_value:
-          studentData.currency_type_name === "USD" ||
           values.receivedIn === "USD"
             ? Math.round(Number(values.receivedAmount * inrValue.inr))
             : Math.round(Number(values.receivedAmount)),
@@ -480,7 +479,10 @@ function ExamFeeReceipt() {
         const vouchers = dueData?.[obj]
           ?.filter((voucher) => voucher.amountPaying > 0)
           ?.map((voucher) => ({
-            amount: voucher.amountPaying,
+            amount:
+              values.receivedIn === "USD"
+                ? Math.round(Number(voucher.amountPaying * inrValue.inr))
+                : voucher.amountPaying,
             voucherHeadNewId: voucher.voucher_head_new_id,
           }));
 
@@ -1006,19 +1008,18 @@ function ExamFeeReceipt() {
                   )}
                   {/*Saved Data Open Ends */}
 
-                  {studentData.currency_type_name === "USD" &&
-                    values.receivedIn === "INR" && (
-                      <Grid item xs={12} align="center">
-                        <Typography variant="subtitle2" color="error">
-                          Amount of{" "}
-                          {Math.round(
-                            Number(values.receivedAmount || values.ddAmount) *
-                              inrValue.inr
-                          )}{" "}
-                          is being collected in INR
-                        </Typography>
-                      </Grid>
-                    )}
+                  {values.receivedIn === "USD" && (
+                    <Grid item xs={12} align="center">
+                      <Typography variant="subtitle2" color="error">
+                        Amount of{" "}
+                        {Math.round(
+                          Number(values.receivedAmount || values.ddAmount) *
+                            inrValue.inr
+                        )}{" "}
+                        is being collected in INR
+                      </Typography>
+                    </Grid>
+                  )}
 
                   {/* Accordian Start */}
                   <Grid item xs={12} align="center">

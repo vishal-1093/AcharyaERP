@@ -567,7 +567,7 @@ function HostelFeeReceipt() {
           school_id: schoolIdHostel?.[0]?.school_id,
           student_id: studentData.student_id,
           to_pay: obj.total_amount,
-          total_amount: total,
+          total_amount: obj.total_amount,
           transcation_type: values.transactionType,
           voucher_head_new_id: obj.voucher_head_new_id,
           receipt_type: "HOS",
@@ -628,7 +628,6 @@ function HostelFeeReceipt() {
         hostel_status: 1,
         bank_id: bankImportedDataById?.deposited_bank_id,
         inr_value:
-          studentData.currency_type_name === "USD" ||
           values.receivedIn === "USD"
             ? Math.round(Number(values.receivedAmount * inrValue.inr))
             : Math.round(Number(values.receivedAmount)),

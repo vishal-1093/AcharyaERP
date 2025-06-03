@@ -484,7 +484,6 @@ function BulkFeeReceipt() {
       data.forEach((obj) => {
         if (obj.voucherId !== null) {
           temp[obj.voucherId] =
-            studentData.currency_type_name === "USD" ||
             values.receivedIn === "USD"
               ? Math.round(Number(obj.payingAmount * inrValue.inr))
               : obj.payingAmount;
@@ -498,13 +497,13 @@ function BulkFeeReceipt() {
       tempOne.received_type = "Bulk";
       tempOne.remarks = values.narration;
       tempOne.total_amount =
-        studentData.currency_type_name === "USD" || values.receivedIn === "USD"
+        values.receivedIn === "USD"
           ? Math.round(Number(values.receivedAmount * inrValue.inr))
           : Math.round(Number(values.receivedAmount));
       tempOne.total_amount_som = total;
       tempOne.total_som = total;
       tempOne.total =
-        studentData.currency_type_name === "USD" || values.receivedIn === "USD"
+        values.receivedIn === "USD"
           ? Math.round(Number(values.receivedAmount * inrValue.inr))
           : Math.round(Number(values.receivedAmount));
       tempOne.transaction_date = bankImportedDataById?.transaction_date;
@@ -525,7 +524,7 @@ function BulkFeeReceipt() {
       tempTwo.hostel_fee_payment_id = null;
       tempTwo.hostel_status = 0;
       tempTwo.inr_value =
-        studentData.currency_type_name === "USD" || values.receivedIn === "USD"
+        values.receivedIn === "USD"
           ? Math.round(Number(values.receivedAmount * inrValue.inr))
           : Math.round(Number(values.receivedAmount));
       tempTwo.student_id = studentData.student_id;
