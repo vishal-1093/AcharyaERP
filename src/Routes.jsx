@@ -87,7 +87,9 @@ const PoPaymentList = lazy(() =>
 const StudentDetailsSearch = lazy(() =>
   import("./pages/indeces/StudentDetailsSearch")
 );
-
+const StudentDetailsViewAttendance = lazy(() =>
+  import("./components/StudentDetailsViewAttendance.jsx")
+);
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
 );
@@ -5260,6 +5262,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ImportBioTrans />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentDetailsViewAttendance/:studentId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsViewAttendance />
               </Suspense>
             }
           />

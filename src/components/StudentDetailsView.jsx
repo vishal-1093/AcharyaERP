@@ -451,6 +451,10 @@ function StudentDetailsView() {
   );
 
   useEffect(() => {
+    const studentName = applicantData?.student_name || "Unknown Student";
+    const auid = applicantData?.auid || "Unknown AUID";
+
+    const nameWithAuid = `${studentName} - ${auid}`;
     if (
       [
         "/student-master-inst",
@@ -465,9 +469,7 @@ function StudentDetailsView() {
           link: pathFrom || "",
         },
         {
-          name: `${applicantData?.student_name || "Unknown Student"}-${
-            applicantData?.auid || "Unknown AUID"
-          }`,
+          name: nameWithAuid,
         },
       ]);
     } else if (state) {
@@ -477,7 +479,7 @@ function StudentDetailsView() {
           link: `/student-master`,
         },
         {
-          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+          name: nameWithAuid,
         },
       ]);
     } else if (pathname?.toLowerCase() === `/studentdetailsview/${Id}`) {
@@ -487,7 +489,7 @@ function StudentDetailsView() {
           link: "/ProctorStudentMaster/Proctor",
         },
         {
-          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+          name: nameWithAuid,
         },
       ]);
     } else {
@@ -497,7 +499,7 @@ function StudentDetailsView() {
           link: "/ProctorMaster/Proctor",
         },
         {
-          name: `${applicantData?.student_name}-${applicantData?.auid}`,
+          name: nameWithAuid,
         },
       ]);
     }
@@ -625,29 +627,29 @@ function StudentDetailsView() {
   };
   useEffect(() => {
     const hasFullAccess = checkFullAccess();
-    if (
-      [
-        "/student-master-inst",
-        "/student-master-user",
-        "/student-master-dept",
-        "/student-master-intl",
-      ].includes((pathFrom || "").toLowerCase())
-    ) {
+
+    const nameWithAuid = `${applicantData?.candidate_name || "Unknown Candidate"} - ${applicantData?.auid || "Unknown AUID"}`;
+
+    const pathList = [
+      "/student-master-inst",
+      "/student-master-user",
+      "/student-master-dept",
+      "/student-master-intl",
+    ];
+
+    if (pathList.includes((pathFrom || "").toLowerCase())) {
       setCrumbs([
         {
           name: "Student Master",
           link: pathFrom || "",
         },
         {
-          name: `${applicantData?.student_name || "Unknown Student"}-${
-            applicantData?.auid || "Unknown AUID"
-          }`,
+          name: nameWithAuid,
         },
       ]);
     } else if (
-      pathname.toLowerCase() ===
-        `/studentdetailsmaster/studentsdetailsview/${Id}` ||
-      `/studentdetailsmaster/studentsdetails/${Id}`
+      pathname.toLowerCase() === `/studentdetailsmaster/studentsdetailsview/${Id}` ||
+      pathname.toLowerCase() === `/studentdetailsmaster/studentsdetails/${Id}`
     ) {
       if (hasFullAccess && state) {
         setCrumbs([
@@ -655,16 +657,17 @@ function StudentDetailsView() {
             name: "Student Master",
             link: "/student-master",
           },
-          { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+          { name: nameWithAuid },
         ]);
       } else {
         setCrumbs([
           { name: "My Profile" },
-          { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+          { name: nameWithAuid },
         ]);
       }
     }
   }, [applicantData]);
+
 
   const getRegistrationData = async (applicationNo, candidateId) => {
     await axios
@@ -1661,7 +1664,7 @@ function StudentDetailsView() {
               )}
 
               {subTab === "Follow up Notes" &&
-              userType.toLowerCase() !== "student" ? (
+                userType.toLowerCase() !== "student" ? (
                 <Card>
                   <CardHeader
                     title="Notes"
@@ -1771,7 +1774,7 @@ function StudentDetailsView() {
         )}
         {tab === "Proctorial" && (
           <>
-            <StudentDetailsViewProctorial state={state} />
+            <StudentDetailsViewProctorial state={state} id={id} />
           </>
         )}
         {tab === "Accounts" && (

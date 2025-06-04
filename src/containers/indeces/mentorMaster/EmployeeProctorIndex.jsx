@@ -81,21 +81,6 @@ function EmployeeProctorIndex() {
     description: ["This field is required"],
   };
 
-  useEffect(() => {
-    // setCrumbs([{ name: "Proctor Master", link: "/ProctorMaster" }, { name: state?.concat_employee_name }]);
-    getData();
-    getSchoolDetails();
-  }, []);
-
-  useEffect(() => {
-    getDepartmentOptions();
-    getData();
-  }, [values.schoolId]);
-
-  useEffect(() => {
-    getData();
-  }, [values.deptId]);
-
   const getDepartmentOptions = async () => {
     try {
       const isPathValid =
@@ -180,8 +165,8 @@ function EmployeeProctorIndex() {
         .join("&");
       const url = `/api/employee/fetchAllEmployeeDetailsBasedOnProctor?${queryParams}`;
       const response = await axios.get(url);
-      const { content, totalElements } = response.data.data.Paginated_data;
-      setRows(content);
+      const { content, totalElements } = response?.data?.data?.Paginated_data;
+      setRows(content || []);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -592,6 +577,21 @@ function EmployeeProctorIndex() {
         setAlertOpen(true);
       });
   };
+  useEffect(() => {
+    getData();
+    getSchoolDetails();
+  }, []);
+
+  useEffect(() => {
+    if (values.schoolId !== null) {
+      getDepartmentOptions();
+      getData();
+    }
+  }, [values.schoolId]);
+
+  useEffect(() => {
+    getData();
+  }, [values.deptId]);
   return (
     <>
       <CustomModal
@@ -670,15 +670,17 @@ function EmployeeProctorIndex() {
         </Grid>
       </Box>
       <Box sx={{ position: "relative", mt: 2 }}>
-        {!loading && (
-          <GridIndex
-            rows={rows}
-            columns={columns}
-            checkboxSelection
-            getRowId={(row) => row?.emp_id}
-            onRowSelectionModelChange={onSelectionModelChange}
-          />
-        )}
+        {/* {!loading && ( */}
+        <GridIndex
+          rows={rows}
+          columns={columns}
+          loading={loading}
+          checkboxSelection
+          getRowId={(row) => row.emp_id}
+          onRowSelectionModelChange={onSelectionModelChange}
+        />
+
+        {/* )} */}
       </Box>
       {/* Proctor Head   */}
       <ModalWrapper
