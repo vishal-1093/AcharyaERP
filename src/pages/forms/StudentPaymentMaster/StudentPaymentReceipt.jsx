@@ -257,7 +257,7 @@ function StudentPaymentReceipt() {
                                   textAlign: "right",
                                 }}
                               >
-                                {obj.amount}
+                                {obj.inr_value ?? obj.amount}
                               </TableCell>
                               <StyledTableCell>
                                 {obj.year ? obj.year : obj.fcYear}
