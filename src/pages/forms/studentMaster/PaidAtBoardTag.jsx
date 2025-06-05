@@ -107,8 +107,6 @@ function PaidAtBoardTag() {
           `/api/finance/boardAssignedToFeeTemplate/${values.feeTemplateId}`
         );
 
-        console.log(getBoardResponse);
-
         const data = [];
 
         getBoardResponse.data.data.forEach((ele) => {
@@ -139,7 +137,7 @@ function PaidAtBoardTag() {
 
         getTemplateResponse.data.data.forEach((ele) => {
           data.push({
-            label: ele.fee_template_name,
+            label: `${ele.fee_template_name} - ${ele.fee_template_id}`,
             value: ele.fee_template_id,
           });
         });
