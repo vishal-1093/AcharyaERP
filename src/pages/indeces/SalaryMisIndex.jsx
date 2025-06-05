@@ -397,6 +397,7 @@ const SalaryMisIndex = () => {
       headerName: "Net Amount",
       flex: 1,
       type: "number",
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number((params.row?.netpay)) || 0)}</div>,
       hide: false
     },
   ];
@@ -448,10 +449,12 @@ const SalaryMisIndex = () => {
       field: "lic",
       headerName: "LIC Amount",
       type: "number",
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number((params.row?.lic)) || 0)}</div>,
       flex: 1,
       hide: false
     },
   ];
+
   const esiColumns = [
     { field: "empcode", headerName: "Emp Code", flex: 1, hide: false },
     { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1, hide: true },
@@ -476,9 +479,15 @@ const SalaryMisIndex = () => {
       hide: true
     },
     { field: "pay_days", headerName: "Pay Days", flex: 1, hide: false },
-    { field: "gross_pay", headerName: "ESI Earning", type: "number", flex: 1, hide: false },
-    { field: "esi", headerName: "ESIE", type: "number", flex: 1, hide: false },
-    { field: "esi_contribution_employee", headerName: "ESIM", type: "number", flex: 1, hide: false },
+    { field: "gross_pay", headerName: "ESI Earning", type: "number", flex: 1, hide: false,
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number((params.row?.gross_pay)) || 0)}</div> 
+     },
+    { field: "esi", headerName: "ESIE", type: "number", flex: 1, hide: false,
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number((params.row?.esi)) || 0)}</div> 
+     },
+    { field: "esi_contribution_employee", headerName: "ESIM", type: "number", flex: 1, hide: false,
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number((params.row?.esi_contribution_employee)) || 0)}</div> 
+     },
   ];
   const epfColumns = [
     { field: "uan_no", headerName: "UAN", flex: 1, hide: true},
@@ -537,8 +546,12 @@ const SalaryMisIndex = () => {
       flex: 1,
       hide: true
     },
-    { field: "total_earning", headerName: "Gross Amount", type: "number", flex: 1, hide: false },
-    { field: "pt", headerName: "Deduction Amount", type: "number", flex: 1, hide: false },
+    { field: "total_earning", headerName: "Gross Amount", type: "number", flex: 1, hide: false,
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number((params.row?.total_earning)) || 0)}</div> 
+     },
+    { field: "pt", headerName: "Deduction Amount", type: "number", flex: 1, hide: false,
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number((params.row?.pt)) || 0)}</div> 
+     },
   ];
 
   const advanceColumns = [
@@ -564,7 +577,10 @@ const SalaryMisIndex = () => {
       flex: 1,
       hide: true
     },
-    { field: "advance", headerName: "Advance Amount", type: "number", flex: 1, hide: false }
+    { field: "advance", headerName: "Advance Amount", type: "number", flex: 1, hide: false,
+      type: "number",
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number((params.row?.advance)) || 0)}</div>,
+     }
   ];
 
   const tdsColumns = [
@@ -590,8 +606,11 @@ const SalaryMisIndex = () => {
       flex: 1,
       hide: true
     },
-    { field: "gross_pay", headerName: "Gross Earning", type: "number", flex: 1, hide: false },
-    { field: "tds", headerName: "TDS", type: "number", flex: 1, hide: false }
+    { field: "gross_pay", headerName: "Gross Earning", type: "number", flex: 1, hide: false,
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number((params.row?.gross_pay)) || 0)}</div> },
+    { field: "tds", headerName: "TDS", type: "number", flex: 1, hide: false,
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number((params.row?.tds)) || 0)}</div> 
+     }
   ];
 
   const schoolColumns = [
@@ -795,7 +814,7 @@ const SalaryMisIndex = () => {
                             {obj.name == "Total Gross Salary" ? <b>{obj.name}</b> : obj.name}
                           </StyledTableCell>
                           <StyledTableCell sx={{ textAlign: "right" }}>
-                            {obj.name == "Total Gross Salary" ? <b>{new Intl.NumberFormat().format(obj.value)}</b> : new Intl.NumberFormat().format(obj.value)}
+                            {obj.name == "Total Gross Salary" ? <b>{obj.value}</b> : obj.value}
                           </StyledTableCell>
                         </StyledTableRow>
                       );
@@ -807,7 +826,7 @@ const SalaryMisIndex = () => {
                             {obj.name == "Net Salary Payable" ? <b>{obj.name}</b> : obj.name}
                           </StyledTableCell>
                           <StyledTableCell sx={{ textAlign: "right" }}>
-                            {obj.name == "Net Salary Payable" ? <b>{new Intl.NumberFormat().format(obj.value)}</b> : new Intl.NumberFormat().format(obj.value)}
+                            {obj.name == "Net Salary Payable" ? <b>{obj.value}</b> : obj.value}
                           </StyledTableCell>
                         </StyledTableRow>
                       );
@@ -852,7 +871,7 @@ const SalaryMisIndex = () => {
                             {obj.schoolNameShort}
                           </StyledTableCell>
                           <StyledTableCell sx={{ textAlign: "right" }}>
-                            {new Intl.NumberFormat().format(obj.totalNetPay)}
+                            {obj.totalNetPay}
                           </StyledTableCell>
                         </StyledOddTableRow>
                       );
@@ -865,7 +884,7 @@ const SalaryMisIndex = () => {
                       <b>TOTAL</b>
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "right" }}>
-                      <b>{new Intl.NumberFormat().format(schoolRows.reduce((sum, acc) => sum + acc[`totalNetPay`], 0))}</b>
+                      <b>{schoolRows.reduce((sum, acc) => sum + acc[`totalNetPay`], 0)}</b>
                     </StyledTableCell>
                   </StyledTableRow>}
                 </Table>
@@ -907,13 +926,13 @@ const SalaryMisIndex = () => {
                             {obj.school}
                           </StyledTableCell>
                           <StyledTableCell sx={{ textAlign: "right" }}>
-                            {new Intl.NumberFormat().format(obj.s715)}
+                            {obj.s715}
                           </StyledTableCell>
                           <StyledTableCell sx={{ textAlign: "right" }}>
-                           {new Intl.NumberFormat().format(obj.s742)}
+                           {obj.s742}
                           </StyledTableCell>
                           <StyledTableCell sx={{ textAlign: "right" }}>
-                           {new Intl.NumberFormat().format(obj.s725)}
+                           {obj.s725}
                           </StyledTableCell>
                         </StyledOddTableRow>
                       );
@@ -924,13 +943,13 @@ const SalaryMisIndex = () => {
                        <b>TOTAL</b>
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "right" }}>
-                     <b>{new Intl.NumberFormat().format(consultantEpfRows.reduce((sum, acc) => sum + acc[`s715`], 0))}</b>
+                     <b>{consultantEpfRows.reduce((sum, acc) => sum + acc[`s715`], 0)}</b>
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "right" }}>
-                      <b>{new Intl.NumberFormat().format(consultantEpfRows.reduce((sum, acc) => sum + acc[`s742`], 0))}</b>
+                      <b>{consultantEpfRows.reduce((sum, acc) => sum + acc[`s742`], 0)}</b>
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "right" }}>
-                      <b>{new Intl.NumberFormat().format(consultantEpfRows.reduce((sum, acc) => sum + acc[`s725`], 0))}</b>
+                      <b>{consultantEpfRows.reduce((sum, acc) => sum + acc[`s725`], 0)}</b>
                     </StyledTableCell>
                   </StyledTableRow>}
                 </Table>
