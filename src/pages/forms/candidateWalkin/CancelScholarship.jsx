@@ -43,6 +43,8 @@ function CancelScholarship({
       updateData.cancel_remarks = values.cancelRemarks;
       updateData.cancel_date = moment();
       updateData.cancelBy = userId;
+      updateData.active = false;
+      updateData.is_approved = "No";
 
       const [schHistory, updateResponse] = await Promise.all([
         axios.post("api/student/scholarshipApprovalStatusHistory", {

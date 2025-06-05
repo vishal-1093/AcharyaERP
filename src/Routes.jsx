@@ -87,7 +87,9 @@ const PoPaymentList = lazy(() =>
 const StudentDetailsSearch = lazy(() =>
   import("./pages/indeces/StudentDetailsSearch")
 );
-
+const StudentDetailsViewAttendance = lazy(() =>
+  import("./components/StudentDetailsViewAttendance.jsx")
+);
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
 );
@@ -1946,6 +1948,10 @@ const AddonReport = lazy(() => import("./pages/indeces/AddonReportAll.jsx"));
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
+const StudentDueReportDetail = lazy(() => import("./containers/indeces/studentDueReportDetail/studentDueReportDetailIndex.jsx"));
+
+const StudentDueReportForProgramme = lazy(()=>import("./containers/indeces/studentDueReportDetail/studentDueReportDetail-programme.jsx"));
+
 const DirectDemandIndex = lazy(() =>
   import("./pages/indeces/DirectDemandIndex.jsx")
 );
@@ -2205,6 +2211,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StudentDueReport />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/student-due-report-detail"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDueReportDetail />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/student-due-report-detail/programme"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDueReportForProgramme />
               </Suspense>
             }
           />
@@ -5238,6 +5262,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ImportBioTrans />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentDetailsViewAttendance/:studentId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsViewAttendance />
               </Suspense>
             }
           />
