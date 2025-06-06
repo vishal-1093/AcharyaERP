@@ -391,7 +391,10 @@ const HostelFeeReceiptPdfNew = () => {
                       ...bookmanFont,
                     }}
                   >
-                    {data?.[0]?.totalAmount}
+                    {data?.reduce(
+                      (total, sum) => Number(total) + Number(sum.payingAmount),
+                      0
+                    )}
                   </td>
                 </tr>
               </tbody>

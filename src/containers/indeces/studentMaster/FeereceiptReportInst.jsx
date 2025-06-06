@@ -67,12 +67,13 @@ const filterLists = [
   { label: "Today", value: "today" },
   { label: "1 Week", value: "week" },
   { label: "1 Month", value: "month" },
+  { label: "6 Months", value: "6month" },
   { label: "Custom Date", value: "custom" },
 ];
 
 const initialValues = {
   filterList: filterLists,
-  filter: filterLists[0].value,
+  filter: filterLists[3].value,
   startDate: "",
   endDate: "",
   schoolList: [],
@@ -97,6 +98,7 @@ function FeereceiptReportInst() {
     remarks: false,
     transaction_date: false,
     cheque_dd_no: false,
+    bank_name: false,
   });
 
   const navigate = useNavigate();
@@ -105,7 +107,7 @@ function FeereceiptReportInst() {
 
   useEffect(() => {
     getSchoolDetails();
-    getData(values.filterList[0].value);
+    getData(values.filterList[3].value);
     getEmployeeDetails();
   }, []);
 
@@ -162,57 +164,17 @@ function FeereceiptReportInst() {
   const getData = async (filterKey, value) => {
     setLoading(true);
     let params = null;
-    if (
-      filterKey == "custom" &&
-      !!value &&
-      !!values.startDate &&
-      !values.schoolId
-    ) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(
-        values.startDate
-      ).format("YYYY-MM-DD")}&end_date=${moment(value).format("YYYY-MM-DD")}`;
-    } else if (
-      filterKey == "custom" &&
-      !!value &&
-      !!values.startDate &&
-      !!values.schoolId
-    ) {
+
+    if (filterKey === "custom") {
       params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${
         values.schoolId
       }&date_range=custom&start_date=${moment(values.startDate).format(
         "YYYY-MM-DD"
       )}&end_date=${moment(value).format("YYYY-MM-DD")}`;
-    } else if (
-      filterKey == "schoolId" &&
-      !!values.endDate &&
-      !!values.startDate
-    ) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=custom&start_date=${moment(
-        values.startDate
-      ).format("YYYY-MM-DD")}&end_date=${moment(values.endDate).format(
-        "YYYY-MM-DD"
-      )}`;
-    } else if (
-      filterKey == "schoolId" &&
-      !!values.filter &&
-      !values.endDate &&
-      !values.startDate
-    ) {
-      if (value === null) {
-        params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${
-          values.filter
-        }`;
-      } else {
-        params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=${
-          values.filter
-        }`;
-      }
-    } else if (filterKey !== "custom" && !!values.schoolId) {
+    } else {
       params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}&school_id=${
         values.schoolId
       }`;
-    } else {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`;
     }
 
     if (params) {
@@ -220,7 +182,10 @@ function FeereceiptReportInst() {
         .get(`/api/finance/fetchAllFeeReceipt?${params}`)
         .then((res) => {
           const filterRowData = res.data.data.filter(
-            (ele) => ele.receipt_type === "General"
+            (ele) =>
+              ele.receipt_type === "General" &&
+              ele.paid_year === "1" &&
+              ele.active
           );
 
           const cashLists = filterRowData.filter(
@@ -561,7 +526,7 @@ function FeereceiptReportInst() {
                   transactionType: params.row.transaction_type,
                   feeReceiptId: params.row.id,
                   financialYearId: params.row.financial_year_id,
-                  linkStatus: true,
+                  reportStatus: true,
                 },
               })
             }

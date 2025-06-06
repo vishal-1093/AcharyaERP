@@ -540,7 +540,9 @@ function HostelFeeReceipt() {
       data.hostelFeeTemplate.forEach((obj) => {
         hostelFeeReceiptVocherHead.push({
           active: true,
-          balanceAmount: (obj.total_amount - obj.payingAmount).toFixed(2),
+          balanceAmount:
+            data?.voucherheadwiseDueAmount[obj.voucher_head_new_id] -
+            obj.payingAmount,
           paid_year: obj.key,
           acYearId: studentData.ac_year_id,
           fee_template_id: obj.hostel_fee_template_id,

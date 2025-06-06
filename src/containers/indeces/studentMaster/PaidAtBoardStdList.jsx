@@ -258,17 +258,18 @@ function PaidAtBoardStdList() {
       align: "right",
     },
     {
-      field: "BalanceAmount",
-      headerName: "Remaining Balance",
-      flex: 1,
-      align: "right",
-    },
-    {
       field: "paid",
       headerName: "Paid",
       flex: 1,
       align: "right",
     },
+    {
+      field: "BalanceAmount",
+      headerName: "Balance",
+      flex: 1,
+      align: "right",
+    },
+
     {
       field: "eachPay",
       headerName: "Paying now",
@@ -391,7 +392,7 @@ function PaidAtBoardStdList() {
               disabled={disable}
               onClick={handleCreate}
             >
-              SUBMIT
+              INSERT
             </Button>
           </Grid>
           <Grid item xs={12}>
