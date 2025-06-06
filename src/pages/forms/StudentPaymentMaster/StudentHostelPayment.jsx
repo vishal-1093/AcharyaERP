@@ -136,9 +136,12 @@ function StudentHostelPayment() {
   );
 
   const handleChangeTotalPay = (e) => {
-    if (date1WithoutTime <= date2WithoutTime) {
+    const checked = hostelDueData?.filter((obj) => obj.checked);
+
+    // if (date1WithoutTime <= date2WithoutTime) {
+    if (checked?.[0]?.due > checked?.[0]?.minimum_amount)
       setTotalPay(e.target.value);
-    }
+    // }
   };
 
   const handleCheckboxChange = (index) => {
@@ -181,7 +184,8 @@ function StudentHostelPayment() {
         });
         setAlertOpen(true);
       } else {
-        if (totalPay < hostelDueData?.[0]?.minimum_amount) {
+        const checked = hostelDueData?.filter((obj) => obj.checked);
+        if (totalPay < checked?.[0]?.minimum_amount) {
           setAlertMessage({
             severity: "error",
             message: `Total paying is less than minimum amount ${hostelDueData?.[0]?.minimum_amount}`,

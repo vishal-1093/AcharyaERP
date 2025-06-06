@@ -38,6 +38,7 @@ const FeeReceiptDetailsPDFNew = () => {
     linkStatus,
     studentStatus,
     receiptStatus,
+    reportStatus,
   } = location?.state;
 
   useEffect(() => {
@@ -53,6 +54,10 @@ const FeeReceiptDetailsPDFNew = () => {
       setCrumbs([{ name: "Payments", link: "/Feepayment/Receipt" }]);
     } else if (receiptStatus) {
       setCrumbs([{ name: "Fee Receipt", link: "/FeeReceipt" }]);
+    } else if (reportStatus) {
+      setCrumbs([
+        { name: "Fee Receipt", link: "/feereceipt-daybook-index-inst" },
+      ]);
     } else {
       setCrumbs([]);
     }

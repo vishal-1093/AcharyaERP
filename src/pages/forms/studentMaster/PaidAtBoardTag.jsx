@@ -188,7 +188,7 @@ function PaidAtBoardTag() {
         boardId: values.boardId,
         yearSem: values.receivedYear,
         neftNo: values.neftNo,
-        amount: values.amount,
+        amount: Number(values.amount),
         bulkReceiptNo: values.bulkNo,
         remarks: values.remarks,
         paidByStudent: true,
@@ -197,7 +197,7 @@ function PaidAtBoardTag() {
         taggedAmount: 0,
         lockStatus: false,
         feeTemplateId: values.feeTemplateId,
-        remainingBalance: values.amount,
+        remainingBalance: Number(values.amount),
         active: true,
       };
 
