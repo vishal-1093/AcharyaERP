@@ -250,32 +250,7 @@ function PaidAtBoardStdList() {
       flex: 1,
       align: "center",
     },
-    {
-      field: "reporting_date",
-      headerName: "Reported Date",
-      flex: 1,
-      valueGetter: (value, row) =>
-        row.reporting_date
-          ? moment(row.reporting_date).format("DD-MM-YYYY")
-          : "",
-      align: "center",
-    },
-    {
-      field: "current",
-      headerName: "Year/Sem",
-      flex: 1,
-      valueGetter: (value, row) => row.current_year + "/" + row.current_sem,
-      align: "center",
-    },
-    {
-      field: "eligible_reported_status",
-      headerName: "Reported",
-      flex: 1,
-      valueGetter: (value, row) =>
-        row.eligible_reported_status
-          ? ELIGIBLE_REPORTED_STATUS[row.eligible_reported_status]
-          : "",
-    },
+
     {
       field: "fixBoardAmount",
       headerName: "Fixed",
@@ -288,6 +263,13 @@ function PaidAtBoardStdList() {
       flex: 1,
       align: "right",
     },
+    {
+      field: "BalanceAmount",
+      headerName: "Balance",
+      flex: 1,
+      align: "right",
+    },
+
     {
       field: "eachPay",
       headerName: "Paying now",
@@ -410,7 +392,7 @@ function PaidAtBoardStdList() {
               disabled={disable}
               onClick={handleCreate}
             >
-              SUBMIT
+              INSERT
             </Button>
           </Grid>
           <Grid item xs={12}>

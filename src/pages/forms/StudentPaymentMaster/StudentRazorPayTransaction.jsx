@@ -89,15 +89,15 @@ function StudentRazorPayTransaction() {
           `/api/student/registrationFeeDetailsForStudent?studentId=${studentDataResponse.data.data[0].student_id}`
         );
 
-        console.log(registrationTransactionDetails);
-
         const response = await axios.get(
           `/api/student/getTransactionDetails?studentId=${studentDataResponse.data.data[0].student_id}`
         );
 
         // const bulkResponse = await axios.get(
-        //   `/api/student/getBulkTransactionDetails${studentDataResponse.data.data[0].student_id}`
+        //   `/api/student/getBulkTransactionDetails?studentId=${studentDataResponse.data.data[0].student_id}`
         // );
+
+        // console.log(bulkResponse);
 
         const uniformResposne = await axios.get(
           `/api/student/getUniformTransactionDetails?studentId=${studentDataResponse.data.data[0].student_id}`

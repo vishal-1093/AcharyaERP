@@ -804,9 +804,21 @@ function StudentReceipt() {
       };
 
       if (bankImportedDataById.balance === null) {
-        bit.balance = bankImportedDataById.amount - values.receivedAmount;
+        bit.balance =
+          studentData.currency_type_name === "USD"
+            ? (
+                bankImportedDataById.amount -
+                Number(values.receivedAmount) * inrValue.inr
+              ).toFixed(2)
+            : bankImportedDataById.amount - values.receivedAmount;
       } else {
-        bit.balance = bankImportedDataById.balance - values.receivedAmount;
+        bit.balance =
+          studentData.currency_type_name === "USD"
+            ? (
+                bankImportedDataById.balance -
+                Number(values.receivedAmount) * inrValue.inr
+              ).toFixed(2)
+            : bankImportedDataById.balance - values.receivedAmount;
       }
 
       if (values.transactionType.toLowerCase() === "rtgs") {

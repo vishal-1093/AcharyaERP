@@ -120,8 +120,28 @@ function StudentHostelPayment() {
     setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const date = new Date(hostelDueData?.[0]?.till_date);
+  const currentDate = new Date();
+  const partFeeDate = new Date(date);
+
+  const date1WithoutTime = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    currentDate.getDate()
+  );
+  const date2WithoutTime = new Date(
+    partFeeDate.getFullYear(),
+    partFeeDate.getMonth(),
+    partFeeDate.getDate()
+  );
+
   const handleChangeTotalPay = (e) => {
-    setTotalPay(e.target.value);
+    const checked = hostelDueData?.filter((obj) => obj.checked);
+
+    // if (date1WithoutTime <= date2WithoutTime) {
+    if (checked?.[0]?.due > checked?.[0]?.minimum_amount)
+      setTotalPay(e.target.value);
+    // }
   };
 
   const handleCheckboxChange = (index) => {
@@ -164,6 +184,16 @@ function StudentHostelPayment() {
         });
         setAlertOpen(true);
       } else {
+        const checked = hostelDueData?.filter((obj) => obj.checked);
+        if (totalPay < checked?.[0]?.minimum_amount) {
+          setAlertMessage({
+            severity: "error",
+            message: `Total paying is less than minimum amount ${hostelDueData?.[0]?.minimum_amount}`,
+          });
+          setAlertOpen(true);
+          return;
+        }
+
         const allSems = [];
 
         const hostelPay = [];
@@ -347,7 +377,7 @@ function StudentHostelPayment() {
                           name="totalPaying"
                           label="Total Paying"
                           value={totalPay}
-                          // handleChange={handleChangeTotalPay}
+                          handleChange={handleChangeTotalPay}
                         />
                       </Grid>
                       <Grid item xs={12} mt={2}>
