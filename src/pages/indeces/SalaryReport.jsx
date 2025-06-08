@@ -1,15 +1,34 @@
 import { useState, useEffect, lazy } from "react";
 import {
-  Box, Grid
+  Box, Grid,
+  IconButton,
+  Tooltip,
+  styled,
+  tooltipClasses,
 } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs.js";
 import useAlert from "../../hooks/useAlert.js";
 import axios from "../../services/Api.js";
 import CustomToggle from "../../components/Inputs/CustomToggle";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 const GridIndex = lazy(() => import("../../components/GridIndex.jsx"));
 const CustomAutocomplete = lazy(() =>
   import("../../components/Inputs/CustomAutocomplete.jsx")
 );
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const reportTypeList = [
   { value: "earnedSalary", label: "Earned Salary" },
@@ -31,11 +50,15 @@ const initialState = {
   salaryColumns: [],
   countColumns: [],
   employeeType: employeeTypeList[0].value,
+  schoolRows: []
 };
 
 const SalaryReport = () => {
-  const [{ loading, rows, fcYearId, fcYearList, reportType, countColumns, salaryColumns,employeeType }, setState] = useState(initialState);
+  const [{ loading, rows, fcYearId, fcYearList, reportType, countColumns, salaryColumns, employeeType, schoolRows }, setState] = useState(initialState);
   const [showCount, setShowCount] = useState(false);
+  const [isSchoolCount, setIsSchoolCount] = useState(false);
+  const [isSchool, setIsSchool] = useState(false);
+  const [rowDetailData, setRowDetailData] = useState(null);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
@@ -47,9 +70,22 @@ const SalaryReport = () => {
 
   useEffect(() => {
     (fcYearId && reportType == "earnedSalary" && employeeType == "regular") && getData(fcYearId);
-    (fcYearId && reportType == "masterSalary" && employeeType == "regular") && getMasterData(fcYearId);
     (fcYearId && reportType == "earnedSalary" && employeeType == "consultant") && getConsultantEarnedSalaryData(fcYearId);
-  }, [reportType, fcYearId, showCount]);
+    (fcYearId && reportType == "masterSalary") && getMasterData(fcYearId);
+    (fcYearId && reportType == "earnedCTC") && getEarnedCtcData(fcYearId);
+  }, [reportType, fcYearId, showCount, employeeType]);
+
+  useEffect(() => {
+    (rowDetailData && isSchool) && getSchoolWiseData(rowDetailData)
+  }, [isSchoolCount]);
+
+  useEffect(() => {
+    (isSchool && rowDetailData) ? setCrumbs([{ name: "Earned CTC", link: () => setIsSchool(false) },
+    { name: rowDetailData?.month },
+    { name: `Gross: ${rowDetailData?.grossAmount}` },
+    { name: `Net: ${rowDetailData?.netAmount}` }
+    ]) : setCrumbs([]);
+  }, [isSchool]);
 
   const countColumn = [
     {
@@ -240,13 +276,150 @@ const SalaryReport = () => {
     },
   ];
 
+  const ctcColumn = [
+    {
+      field: "month",
+      headerName: "Month",
+      flex: 1,
+      headerClassName: 'row-header',
+    },
+    {
+      field: "grossAmount",
+      headerName: "Gross",
+      flex: 1,
+      type: "number",
+      headerClassName: 'row-header',
+    },
+    {
+      field: "netAmount",
+      headerName: "Net",
+      flex: 1,
+      type: "number",
+      headerClassName: 'row-header',
+    },
+    {
+      field: "detail",
+      headerName: "Detail",
+      flex: 1,
+      headerClassName: 'row-header',
+      type: "actions",
+      getActions: (params) => {
+        if (params.id === rows[rows.length - 1].id) {
+          return [];
+        }
+        return [
+          <HtmlTooltip title="View School Wise Data">
+            <IconButton
+              onClick={() => getSchoolWiseData(params.row)}
+            >
+              <OpenInNewIcon color="primary" />
+            </IconButton>
+          </HtmlTooltip>
+        ]
+      }
+    },
+  ];
+
+  const ctcCountColumn = [
+    {
+      field: "month",
+      headerName: "Month",
+      flex: 1,
+      headerClassName: 'row-header',
+    },
+    {
+      field: "grossCount",
+      headerName: "Gross",
+      flex: 1,
+      type: "number",
+      headerClassName: 'row-header',
+    },
+    {
+      field: "netCount",
+      headerName: "Net",
+      flex: 1,
+      type: "number",
+      headerClassName: 'row-header',
+    },
+    {
+      field: "detail",
+      headerName: "Detail",
+      flex: 1,
+      headerClassName: 'row-header',
+      type: "actions",
+      getActions: (params) => {
+        if (params.id === rows[rows.length - 1].id) {
+          return [];
+        }
+        return [
+          <HtmlTooltip title="View School Wise Data">
+            <IconButton
+              onClick={() => getSchoolWiseData(params.row)}
+            >
+              <OpenInNewIcon color="primary" />
+            </IconButton>
+          </HtmlTooltip>
+        ]
+      }
+    },
+  ];
+
+  const schoolColumn = [
+    {
+      field: "school",
+      headerName: "Inst",
+      flex: 1,
+      headerClassName: 'row-header',
+    },
+    {
+      field: "grossAmount",
+      headerName: "Gross",
+      flex: 1,
+      type: "number",
+      headerClassName: 'row-header',
+    },
+    {
+      field: "netPay",
+      headerName: "Net",
+      flex: 1,
+      type: "number",
+      headerClassName: 'row-header',
+    },
+  ];
+
+  const schoolCountColumn = [
+    {
+      field: "school",
+      headerName: "Inst",
+      flex: 1,
+      headerClassName: 'row-header',
+    },
+    {
+      field: "grossCount",
+      headerName: "Gross",
+      flex: 1,
+      type: "number",
+      headerClassName: 'row-header',
+    },
+    {
+      field: "netCount",
+      headerName: "Net",
+      flex: 1,
+      type: "number",
+      headerClassName: 'row-header',
+    }
+  ];
+
   const getFcYear = async () => {
     try {
       const res = await axios.get(`/api/FinancialYear`);
       if (res.status == 200 || res.status == 201) {
+        const list = res.data.data.map((ele) => ({ value: ele.financial_year_id, label: ele.financial_year }));
+        const fcYearLists = list.filter((val) => (val.label).slice(0, 4) > "2024");
         setState((prevState) => ({
           ...prevState,
-          fcYearList: res.data.data.map((ele) => ({ value: ele.financial_year_id, label: ele.financial_year })),
+          fcYearId: fcYearLists[0].value,
+          fcYearList: fcYearLists,
         }));
       }
     } catch (error) {
@@ -265,7 +438,6 @@ const SalaryReport = () => {
       ...prevState,
       [name]: newValue
     }));
-    (name == "fcYearId") && getData(newValue)
   };
 
   const getData = async (fcyearId = null) => {
@@ -382,7 +554,7 @@ const SalaryReport = () => {
     }
   };
 
-    const getConsultantEarnedSalaryData = async (fcyearId = null) => {
+  const getConsultantEarnedSalaryData = async (fcyearId = null) => {
     try {
       setLoading(true);
       const res = await axios.get(`/api/consoliation/consultantEarnedSummary?fcYearID=${fcyearId}`);
@@ -439,6 +611,76 @@ const SalaryReport = () => {
     }
   };
 
+  const getEarnedCtcData = async (fcyearId = null) => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`/api/consoliation/earnedCTC?fcYearID=${fcyearId}`);
+      if (res.status == 200 || res.status == 201) {
+        const list = res.data.data.map((li) => ({ ...li, grossCount: li.count, netCount: li.count }));
+        const totalSalaryRows = {
+          "month": "Total",
+          "grossAmount": "" + list.reduce((acc, curr) => (acc + (curr.grossAmount ? Number(curr.grossAmount) : 0)), 0),
+          "netAmount": "" + list.reduce((acc, curr) => (acc + (curr.netAmount ? Number(curr.netAmount) : 0)), 0),
+        };
+        const totalCountRows = {
+          "month": "Total",
+          "grossCount": "" + list.reduce((acc, curr) => (acc + (curr.grossCount ? Number(curr.grossCount) : 0)), 0),
+          "netCount": "" + list.reduce((acc, curr) => (acc + (curr.netCount ? Number(curr.netCount) : 0)), 0),
+        };
+        showCount ? list.push(totalCountRows) : list.push(totalSalaryRows);
+        setState((prevState) => ({
+          ...prevState,
+          rows: list.map((ele, index) => ({ ...ele, id: index + 1 })),
+          loading: false
+        }));
+      }
+    } catch (error) {
+      setLoading(false)
+      setAlertMessage({
+        severity: "error",
+        message: "An error occured",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getSchoolWiseData = async (rowData) => {
+    try {
+      setRowDetailData(rowData);
+      setIsSchool(true);
+      setLoading(true);
+      const monthNo = rowData.month == "APRIL" ? 4 : rowData.month == "MAY" ? 5 : rowData.month == "JUNE" ? 6 : rowData.month == "JULY" ? 7 :
+        rowData.month == "AUGUST" ? 8 : rowData.month == "SEPTEMBER" ? 9 : rowData.month == "OCTOBER" ? 10 : rowData.month == "NOVEMBER" ? 11 :
+          rowData.month == "DECEMBER" ? 12 : rowData.month == "JANUARY" ? 1 : rowData.month == "FEBRUARY" ? 2 : rowData.month == "MARCH" ? 3 : "";
+      const res = await axios.get(`/api/consoliation/getMonthWiseEarnedCTC?month=${monthNo}&year=${rowData.year}`);
+      const list = res.data.data.map((li) => ({ ...li, grossCount: li.count, netCount: li.count }));
+      const totalSalaryRows = {
+        "school": "Total",
+        "grossAmount": "" + list.reduce((acc, curr) => (acc + (curr.grossAmount ? Number(curr.grossAmount) : 0)), 0),
+        "netPay": "" + list.reduce((acc, curr) => (acc + (curr.netPay ? Number(curr.netPay) : 0)), 0),
+      };
+      const totalCountRows = {
+        "school": "Total",
+        "grossCount": "" + list.reduce((acc, curr) => (acc + (curr.grossCount ? Number(curr.grossCount) : 0)), 0),
+        "netCount": "" + list.reduce((acc, curr) => (acc + (curr.netCount ? Number(curr.netCount) : 0)), 0),
+      };
+      isSchoolCount ? list.push(totalCountRows) : list.push(totalSalaryRows);
+      if (res.status == 200 || res.status == 201) {
+        setLoading(false);
+        setState((prevState) => ({
+          ...prevState,
+          schoolRows: list.map((li, index) => ({ ...li, id: index + 1 }))
+        }))
+      }
+    } catch (error) {
+      setLoading(false)
+      setAlertMessage({
+        severity: "error",
+        message: "An error occured",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   return (
     <Box
@@ -446,7 +688,7 @@ const SalaryReport = () => {
         position: "relative"
       }}
     >
-      <Grid container rowSpacing={{ xs: 1, md: 0 }} columnSpacing={{ xs: 3 }} sx={{ marginTop: { xs: 2, md: 0 }, justifyContent: "flex-end" }}>
+      {!isSchool && <Grid container rowSpacing={{ xs: 1, md: 0 }} columnSpacing={{ xs: 3 }} sx={{ marginTop: { xs: 2, md: 0 }, justifyContent: "flex-start" }}>
         <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="reportType"
@@ -467,7 +709,7 @@ const SalaryReport = () => {
             required
           />
         </Grid>}
-        
+
         <Grid item xs={12} md={2} align="center">
           <CustomToggle
             isVisible={showCount}
@@ -482,38 +724,68 @@ const SalaryReport = () => {
             label="FC Year"
             handleChangeAdvance={handleChangeAdvance}
             options={fcYearList || []}
+            required
           />
         </Grid>
-      </Grid>
-      <Box mt={1} sx={{
+      </Grid>}
+      {isSchool && <Grid container sx={{ marginTop: { xs: 1, md: -6 }, justifyContent: "flex-end" }}>
+        <Grid item xs={12} md={2} align="center">
+          <CustomToggle
+            isVisible={isSchoolCount}
+            onToggle={() => setIsSchoolCount(!isSchoolCount)}
+            label="Count"
+          />
+        </Grid>
+      </Grid>}
+      <Box mt={2} sx={{
         position: "absolute",
         width: "100%",
-        maxHeight: "80vh",
+        display: "flex",
+        justifyContent: "center",
         '& .row-header': {
           backgroundColor: '#376a7d',
           color: '#ffff'
         },
         '& .last-row': {
           backgroundColor: '#376a7d !important',
-          color: '#ffff !important'
+          color: '#ffff !important',
+          cursor: 'none !important'
         },
       }}>
-        <GridIndex
-          rows={rows}
-          columns={showCount ? countColumns : salaryColumns}
-          loading={loading}
-          columnVisibilityModel={columnVisibilityModel}
-          setColumnVisibilityModel={setColumnVisibilityModel}
-          getRowClassName={(params) =>
-            params.id === rows[rows.length - 1].id ? 'last-row' : ''
-          }
-          getRowId={row => row.id}
-          isRowSelectable={(params) => params.id != rows[rows.length - 1].id}
-        />
+        <Box sx={{
+          width: (countColumns.length < 6 || salaryColumns.length < 6 || ctcColumn.length < 6 || ctcCountColumn.length < 6 ||
+            schoolColumn.length < 6 || schoolCountColumn.length < 6) ? '50%' : '100%'
+        }}>
+          {!isSchool && <GridIndex
+            rows={rows}
+            columns={reportType !== "earnedCTC" ? (showCount ? countColumns : salaryColumns) :
+              (reportType == "earnedCTC") ? (showCount ? ctcCountColumn : ctcColumn) : []
+            }
+            loading={loading}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}
+            getRowClassName={(params) =>
+              params.id === rows[rows.length - 1].id ? 'last-row' : ''
+            }
+            getRowId={row => row.id}
+            isRowSelectable={(params) => params.id != rows[rows.length - 1].id}
+          />}
+          {isSchool && <GridIndex
+            rows={schoolRows}
+            columns={isSchoolCount ? schoolCountColumn : schoolColumn}
+            loading={loading}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel}
+            getRowClassName={(params) =>
+              params.id === schoolRows[schoolRows.length - 1].id ? 'last-row' : ''
+            }
+            getRowId={row => row.id}
+            isRowSelectable={(params) => params.id != schoolRows[schoolRows.length - 1].id}
+          />}
+        </Box>
       </Box>
     </Box>
   )
-
 };
 
 export default SalaryReport;

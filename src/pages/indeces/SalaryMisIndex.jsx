@@ -728,6 +728,7 @@ const SalaryMisIndex = () => {
             helperText="mm/yyyy"
             value={date}
             handleChangeAdvance={handleChangeAdvance}
+            minDate="01-01-2025"
             required
           />
         </Grid>
