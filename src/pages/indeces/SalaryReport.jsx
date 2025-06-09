@@ -72,7 +72,8 @@ const SalaryReport = () => {
     (fcYearId && reportType == "earnedSalary" && employeeType == "regular") && getData(fcYearId);
     (fcYearId && reportType == "earnedSalary" && employeeType == "consultant") && getConsultantEarnedSalaryData(fcYearId);
     (fcYearId && reportType == "masterSalary") && getMasterData(fcYearId);
-    (fcYearId && reportType == "earnedCTC") && getEarnedCtcData(fcYearId);
+    (fcYearId && reportType == "earnedCTC" && employeeType == "regular") && getEarnedCtcData(fcYearId);
+    (fcYearId && reportType == "earnedCTC" && employeeType == "consultant") && getEarnedCtcConsultantData(fcYearId);
   }, [reportType, fcYearId, showCount, employeeType]);
 
   useEffect(() => {
@@ -82,8 +83,8 @@ const SalaryReport = () => {
   useEffect(() => {
     (isSchool && rowDetailData) ? setCrumbs([{ name: "Earned CTC", link: () => setIsSchool(false) },
     { name: rowDetailData?.month },
-    { name: `Gross: ${rowDetailData?.grossAmount}` },
-    { name: `Net: ${rowDetailData?.netAmount}` }
+    { name: `${rowDetailData?.grossAmount}`},
+    { name: `${rowDetailData?.netAmount}`}
     ]) : setCrumbs([]);
   }, [isSchool]);
 
@@ -308,7 +309,7 @@ const SalaryReport = () => {
           return [];
         }
         return [
-          <HtmlTooltip title="View School Wise Data">
+          <HtmlTooltip title="View Schools Detail">
             <IconButton
               onClick={() => getSchoolWiseData(params.row)}
             >
@@ -433,7 +434,16 @@ const SalaryReport = () => {
       loading: val
     }))
   };
+
+  const employeeTypeReset = () => {
+    setState((prevState) => ({
+      ...prevState,
+      employeeType: employeeTypeList[0].value
+    }));
+  };
+
   const handleChangeAdvance = (name, newValue) => {
+    if (name == "reportType") employeeTypeReset()
     setState((prevState) => ({
       ...prevState,
       [name]: newValue
@@ -644,6 +654,39 @@ const SalaryReport = () => {
     }
   };
 
+  const getEarnedCtcConsultantData = async (fcyearId = null) => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`api/consoliation/consultantCTC?fcYearID=${fcyearId}`);
+      if (res.status == 200 || res.status == 201) {
+        const list = res.data.data.map((li) => ({ ...li, grossCount: li.count, netCount: li.count }));
+        const totalSalaryRows = {
+          "month": "Total",
+          "grossAmount": "" + list.reduce((acc, curr) => (acc + (curr.grossAmount ? Number(curr.grossAmount) : 0)), 0),
+          "netAmount": "" + list.reduce((acc, curr) => (acc + (curr.netAmount ? Number(curr.netAmount) : 0)), 0),
+        };
+        const totalCountRows = {
+          "month": "Total",
+          "grossCount": "" + list.reduce((acc, curr) => (acc + (curr.grossCount ? Number(curr.grossCount) : 0)), 0),
+          "netCount": "" + list.reduce((acc, curr) => (acc + (curr.netCount ? Number(curr.netCount) : 0)), 0),
+        };
+        showCount ? list.push(totalCountRows) : list.push(totalSalaryRows);
+        setState((prevState) => ({
+          ...prevState,
+          rows: list.map((ele, index) => ({ ...ele, id: index + 1 })),
+          loading: false
+        }));
+      }
+    } catch (error) {
+      setLoading(false)
+      setAlertMessage({
+        severity: "error",
+        message: "An error occured",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const getSchoolWiseData = async (rowData) => {
     try {
       setRowDetailData(rowData);
@@ -652,7 +695,8 @@ const SalaryReport = () => {
       const monthNo = rowData.month == "APRIL" ? 4 : rowData.month == "MAY" ? 5 : rowData.month == "JUNE" ? 6 : rowData.month == "JULY" ? 7 :
         rowData.month == "AUGUST" ? 8 : rowData.month == "SEPTEMBER" ? 9 : rowData.month == "OCTOBER" ? 10 : rowData.month == "NOVEMBER" ? 11 :
           rowData.month == "DECEMBER" ? 12 : rowData.month == "JANUARY" ? 1 : rowData.month == "FEBRUARY" ? 2 : rowData.month == "MARCH" ? 3 : "";
-      const res = await axios.get(`/api/consoliation/getMonthWiseEarnedCTC?month=${monthNo}&year=${rowData.year}`);
+      const url = employeeType == "regular" ? `/api/consoliation/getMonthWiseEarnedCTC` : `/api/consoliation/getMonthWiseConsultantCTC`
+      const res = await axios.get(`${url}?month=${monthNo}&year=${rowData.year}`);
       const list = res.data.data.map((li) => ({ ...li, grossCount: li.count, netCount: li.count }));
       const totalSalaryRows = {
         "school": "Total",
@@ -699,7 +743,7 @@ const SalaryReport = () => {
             required
           />
         </Grid>
-        {reportType == "earnedSalary" && <Grid item xs={12} md={2}>
+        {reportType !== "masterSalary" && <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="employeeType"
             value={employeeType}
