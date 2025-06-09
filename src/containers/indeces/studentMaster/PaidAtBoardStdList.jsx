@@ -6,6 +6,7 @@ import {
   Checkbox,
   Grid,
   IconButton,
+  CircularProgress,
   styled,
   Tooltip,
   tooltipClasses,
@@ -60,10 +61,10 @@ function PaidAtBoardStdList() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-  const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [checkedLength, setCheckedLength] = useState(0);
   const [disable, setDisable] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -167,7 +168,7 @@ function PaidAtBoardStdList() {
           board_receivable_id: rowData?.id,
           to_pay_from_board: obj.eachPay,
           received_from_board: rowData?.amount,
-          paid: obj.eachPay,
+          paid: Number(obj.eachPay),
           remaining_balance: obj.fixBoardAmount - obj.eachPay,
           remarks: values.remarks,
           active: true,
@@ -177,6 +178,7 @@ function PaidAtBoardStdList() {
     });
 
     payload.boardTagAmountDtoList = boardTagAmountDtoList;
+    setLoading(true);
 
     try {
       if (values.amountPerHead * checkedLength > rowData.remainingBalance) {
@@ -198,8 +200,12 @@ function PaidAtBoardStdList() {
           message: "Tagged Successfully",
         });
         setAlertOpen(true);
+        navigate(`/paid-at-board-index`);
+        getStudentsList();
+        setLoading(false);
       }
     } catch (error) {
+      setLoading(false);
       setAlertMessage({
         severity: "error",
         message: error.response.data.message,
@@ -389,10 +395,18 @@ function PaidAtBoardStdList() {
           <Grid item xs={12} md={2}>
             <Button
               variant="contained"
-              disabled={disable}
+              disabled={disable || loading}
               onClick={handleCreate}
             >
-              INSERT
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{"INSERT"}</strong>
+              )}
             </Button>
           </Grid>
           <Grid item xs={12}>

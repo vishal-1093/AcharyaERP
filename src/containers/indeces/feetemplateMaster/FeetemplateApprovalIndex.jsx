@@ -279,8 +279,8 @@ function FeetemplateApprovalIndex() {
       getActions: (params) => [
         (params.row.approved_status === null ||
           params.row.approved_status === false) &&
-          roleShortName === "SAA" &&
-          params.row.active === true ? (
+        roleShortName === "SAA" &&
+        params.row.active === true ? (
           <IconButton
             onClick={() =>
               navigate(
@@ -293,7 +293,7 @@ function FeetemplateApprovalIndex() {
             <EditIcon fontSize="small" />
           </IconButton>
         ) : (params.row.approved_status === null ||
-          params.row.approved_status === false) &&
+            params.row.approved_status === false) &&
           roleShortName !== "SAA" &&
           params.row.countOfStudent === 0 &&
           params.row.active === true ? (
@@ -328,8 +328,8 @@ function FeetemplateApprovalIndex() {
       getActions: (params) => [
         (params.row.approved_status === null ||
           params.row.approved_status === false) &&
-          roleShortName === "SAA" &&
-          params.row.active === true ? (
+        roleShortName === "SAA" &&
+        params.row.active === true ? (
           <IconButton
             onClick={() =>
               navigate(
@@ -341,7 +341,7 @@ function FeetemplateApprovalIndex() {
             <EditIcon fontSize="small" />
           </IconButton>
         ) : (params.row.approved_status === null ||
-          params.row.approved_status === false) &&
+            params.row.approved_status === false) &&
           roleShortName !== "SAA" &&
           params.row.countOfStudent === 0 &&
           params.row.active === true ? (
@@ -539,14 +539,16 @@ function FeetemplateApprovalIndex() {
       } else if (data.acYearId !== null) {
         API_URL = `&ac_year_id=${data.acYearId}`;
       }
-      const res = await axios.get(`/api/finance/fetchFeeTemplateDetailByAcYearId?page=${0}&page_size=${10000}&sort=created_date${API_URL}`);
+      const res = await axios.get(
+        `/api/finance/fetchFeeTemplateDetailByAcYearId?page=${0}&page_size=${10000}&sort=created_date${API_URL}`
+      );
       if (res.status == 200 || res.status == 201) {
         setRows(res.data.data.Paginated_data.content);
-        setGridLoading(false)
+        setGridLoading(false);
       }
     } catch (error) {
-      setGridLoading(false)
-      console.log(error)
+      setGridLoading(false);
+      console.log(error);
     }
   };
 
@@ -606,7 +608,7 @@ function FeetemplateApprovalIndex() {
         message: "Give permission to Edit?",
         buttons: [
           { name: "Yes", color: "primary", func: handleTogg },
-          { name: "No", color: "primary", func: () => { } },
+          { name: "No", color: "primary", func: () => {} },
         ],
       });
     }
@@ -640,21 +642,21 @@ function FeetemplateApprovalIndex() {
     };
     params.row.active === true
       ? setModalContent({
-        title: "Deactivate",
-        message: "Do you want to make it Inactive?",
-        buttons: [
-          { name: "No", color: "primary", func: () => { } },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ],
-      })
+          title: "Deactivate",
+          message: "Do you want to make it Inactive?",
+          buttons: [
+            { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
+          ],
+        })
       : setModalContent({
-        title: "Activate",
-        message: "Do you want to make it Active?",
-        buttons: [
-          { name: "No", color: "primary", func: () => { } },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ],
-      });
+          title: "Activate",
+          message: "Do you want to make it Active?",
+          buttons: [
+            { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
+          ],
+        });
     setConfirmModal(true);
   };
 
@@ -805,7 +807,7 @@ function FeetemplateApprovalIndex() {
         </Grid>
         {remark?.map((obj, i) => {
           return (
-            <Box key={i+1}>
+            <Box key={i + 1}>
               <Grid
                 container
                 rowSpacing={2}
@@ -929,6 +931,9 @@ function FeetemplateApprovalIndex() {
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Name
                     </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Status
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -949,6 +954,9 @@ function FeetemplateApprovalIndex() {
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.student_name}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.active ? "Active" : "Inactive"}
                         </TableCell>
                       </TableRow>
                     );
@@ -1017,7 +1025,7 @@ function FeetemplateApprovalIndex() {
           </Grid>
 
           <Grid item xs={12} md={12}>
-            <Box sx={{position:"absolute",width:"100%"}}>
+            <Box sx={{ position: "absolute", width: "100%" }}>
               <GridIndex
                 rows={rows}
                 columns={columns}
