@@ -54,73 +54,25 @@ function PaidAtBoardIndex() {
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
-    getAcademicyear();
     setCrumbs([]);
   }, []);
 
   useEffect(() => {
-    getDataBasedOnAcYear();
+    getData();
   }, [values.acYearId]);
 
-  const getAcademicyear = async () => {
-    try {
-      const response = await axios.get("/api/academic/academic_year");
-      const optionData = [];
-      const ids = [];
-      response.data.data
-        .filter((val) => {
-          return val.current_year >= 2023;
-        })
-        .forEach((obj) => {
-          optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
-          ids.push(obj.current_year);
-        });
-
-      const latestYear = Math.max(...ids);
-      const latestYearId = response.data.data.filter(
-        (obj) => obj.current_year === 2024
-      );
-      setAcademicYearOptions(optionData);
-      setValues((prev) => ({
-        ...prev,
-        yearId: latestYearId[0].ac_year_id,
-      }));
-    } catch (err) {
-      setAlertMessage({
-        severity: "error",
-        message: "Failed to fetch the academic years !!",
-      });
-      setAlertOpen(true);
-    }
-  };
-
-  const getDataBasedOnAcYear = async () => {
+  const getData = async () => {
     let url;
 
     url = `/api/finance/allBoardReceivedAmountDetails?page=${0}&pageSize=${100000000}&sort=createdDate`;
 
     try {
       const response = await axios.get(url);
-      console.log(response);
 
-      setRows(response.data.data.Paginated_data.content);
+      setRows(response.data.data.content);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
-
-  const handleChangeAdvance = async (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
   };
 
   const columns = [
@@ -161,6 +113,20 @@ function PaidAtBoardIndex() {
       align: "center",
     },
     { field: "amount", headerName: "Amount", flex: 1, align: "right" },
+    {
+      field: "remainingBalance",
+      headerName: "Balance",
+      flex: 1,
+      align: "right",
+    },
+
+    {
+      field: "taggedAmount",
+      headerName: "Tagged Amount",
+      flex: 1,
+      align: "right",
+    },
+
     { field: "remarks", headerName: "Remarks", flex: 1, align: "center" },
 
     {
@@ -239,7 +205,7 @@ function PaidAtBoardIndex() {
           .delete(`/api/academic/LessonPlan/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getDataBasedOnAcYear();
+              getData();
               setModalOpen(false);
             }
           })
@@ -249,7 +215,7 @@ function PaidAtBoardIndex() {
           .delete(`/api/academic/activateLessonPlan/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getDataBasedOnAcYear();
+              getData();
               setModalOpen(false);
             }
           })
