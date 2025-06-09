@@ -186,9 +186,9 @@ const AdmissionPage = () => {
 	const [isGroupColumnTable, setIsGroupColumntable] = useState(false);
 	const [data, setData] = useState([]);
 	const [detailsRows, setDetailsRows] = useState([]);
-	const [detailsColumns, setDetailsColumns] = useState([]);
 	const [isDetails, setIsDetails] = useState(false);
 	const { setAlertMessage, setAlertOpen } = useAlert();
+	const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
 
 	useEffect(() => {
 		setCrumbs([{ name: "Charts Dashboard", link: "/charts-dashboard/" },
@@ -442,6 +442,64 @@ const AdmissionPage = () => {
 		});
 	};
 
+	const detailsColumns = [
+		{
+			field: "student_name",
+			headerName: "Student Name",
+			headerClassName: "header-bg",
+			flex: 1,
+			valueGetter: (value, row) => (row.student_name.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())).join(" ")
+		},
+		{
+			field: "auid",
+			headerName: "Auid",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+		{
+			field: "concatProgram",
+			headerName: "Program & Specilization",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+		{
+			field: "fee_admission_category_short_name",
+			headerName: "Category",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+		{
+			field: "fee_admission_sub_category_short_name",
+			headerName: "Sub Category",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+		{
+			field: "counselorName",
+			headerName: "Counselor",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+		{
+			field: "countryName",
+			headerName: "Country",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+		{
+			field: "stateName",
+			headerName: "State",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+		{
+			field: "cityName",
+			headerName: "City",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+	];
+
 	const handleApiCall = (path, callback) => {
 		setLoading(true);
 		setIsGroupColumntable(false)
@@ -569,46 +627,6 @@ const AdmissionPage = () => {
 			},
 		];
 
-		const schoolDetailsColumns = [
-			{
-				field: "student_name",
-				headerName: "Student Name",
-				headerClassName: "header-bg",
-				flex: 1,
-				valueGetter:(value,row)=>(row.student_name.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())).join(" ")
-			},
-			{
-				field: "auid",
-				headerName: "Auid",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "concatProgram",
-				headerName: "Program & Specilization",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "counselorName",
-				headerName: "Counselor",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "stateName",
-				headerName: "State",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "nationalityName",
-				headerName: "Nationality",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-		];
-
 		const getSchoolWiseData = async (rowData) => {
 			try {
 				setLoading(true);
@@ -618,7 +636,6 @@ const AdmissionPage = () => {
 					const list = res.data.map((ele, index) => ({ id: index + 1, ...ele }))
 					setLoading(false);
 					setDetailsRows(list);
-					setDetailsColumns(schoolDetailsColumns)
 				}
 			} catch (error) {
 				setLoading(false)
@@ -681,11 +698,11 @@ const AdmissionPage = () => {
 		let total_ = 0;
 		let id = 0;
 		for (const obj of data) {
-			const { year, Total,ac_year_id} = obj;
+			const { year, Total, ac_year_id } = obj;
 			rowsToShow.push({
 				id: id,
 				Year: year,
-				acYearId:ac_year_id,
+				acYearId: ac_year_id,
 				"Student Entry": obj["Student Entry"],
 				"Lateral Entry": obj["Lateral Entry"],
 				InActive: obj["InActive"],
@@ -774,46 +791,6 @@ const AdmissionPage = () => {
 		setTableColumns(columns);
 		setTableRows(rowsToShow);
 
-		const yearDetailsColumns = [
-			{
-				field: "student_name",
-				headerName: "Student Name",
-				headerClassName: "header-bg",
-				flex: 1,
-				valueGetter:(value,row)=>(row.student_name.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())).join(" ")
-			},
-			{
-				field: "auid",
-				headerName: "Auid",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "concatProgram",
-				headerName: "Program & Specilization",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "counselorName",
-				headerName: "Counselor",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "stateName",
-				headerName: "State",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "nationalityName",
-				headerName: "Nationality",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-		];
-		
 		const getYearWiseDetailData = async (rowData) => {
 			try {
 				setLoading(true);
@@ -823,7 +800,6 @@ const AdmissionPage = () => {
 					const list = res.data.map((ele, index) => ({ id: index + 1, ...ele }))
 					setLoading(false);
 					setDetailsRows(list);
-					setDetailsColumns(yearDetailsColumns)
 				}
 			} catch (error) {
 				setLoading(false)
@@ -945,46 +921,6 @@ const AdmissionPage = () => {
 			},
 		];
 
-		const dayDetailsColumns = [
-			{
-				field: "student_name",
-				headerName: "Student Name",
-				headerClassName: "header-bg",
-				flex: 1,
-				valueGetter:(value,row)=>(row.student_name.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())).join(" ")
-			},
-			{
-				field: "auid",
-				headerName: "Auid",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "concatProgram",
-				headerName: "Program & Specilization",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "counselorName",
-				headerName: "Counselor",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "stateName",
-				headerName: "State",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "nationalityName",
-				headerName: "Nationality",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-		];
-
 		const getDayWiseDetailData = async (rowData) => {
 			try {
 				setLoading(true);
@@ -994,7 +930,6 @@ const AdmissionPage = () => {
 					const list = res.data.map((ele, index) => ({ id: index + 1, ...ele }))
 					setLoading(false);
 					setDetailsRows(list);
-					setDetailsColumns(dayDetailsColumns)
 				}
 			} catch (error) {
 				setLoading(false)
@@ -1038,15 +973,15 @@ const AdmissionPage = () => {
 		let total = 0;
 		let id = 0;
 		for (const obj of data) {
-			const { course, Total,ac_year_id,school_id,program_id,program_specialization_id } = obj;
+			const { course, Total, ac_year_id, school_id, program_id, program_specialization_id } = obj;
 			rowsToShow.push({
 				id: id,
 				course: course,
-				acYearId:ac_year_id,
-				schoolId:school_id,
+				acYearId: ac_year_id,
+				schoolId: school_id,
 				Total: Total,
-				programId:program_id,
-				programSpecializationId:program_specialization_id
+				programId: program_id,
+				programSpecializationId: program_specialization_id
 			});
 			total += Total;
 			id += 1;
@@ -1091,46 +1026,6 @@ const AdmissionPage = () => {
 			},
 		];
 
-	    const programmeDetailsColumns = [
-			{
-				field: "student_name",
-				headerName: "Student Name",
-				headerClassName: "header-bg",
-				flex: 1,
-				valueGetter:(value,row)=>(row.student_name.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())).join(" ")
-			},
-			{
-				field: "auid",
-				headerName: "Auid",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "concatProgram",
-				headerName: "Program & Specilization",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "counselorName",
-				headerName: "Counselor",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "stateName",
-				headerName: "State",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "nationalityName",
-				headerName: "Nationality",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-		];
-
 		const getProgrammeWiseDetailData = async (rowData) => {
 			try {
 				setLoading(true);
@@ -1140,7 +1035,6 @@ const AdmissionPage = () => {
 					const list = res.data.map((ele, index) => ({ id: index + 1, ...ele }))
 					setLoading(false);
 					setDetailsRows(list);
-					setDetailsColumns(programmeDetailsColumns)
 				}
 			} catch (error) {
 				setLoading(false)
@@ -1154,8 +1048,6 @@ const AdmissionPage = () => {
 
 		setTableColumns(columns);
 		setTableRows(rowsToShow);
-
-
 
 		const datasets = [
 			{
@@ -1303,48 +1195,8 @@ const AdmissionPage = () => {
 				]
 			},
 		});
-				const yearDetailsColumns = [
-			{
-				field: "student_name",
-				headerName: "Student Name",
-				headerClassName: "header-bg",
-				flex: 1,
-				valueGetter:(value,row)=>(row.student_name.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())).join("")
-			},
-			{
-				field: "auid",
-				headerName: "Auid",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "concatProgram",
-				headerName: "Program & Specilization",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "counselorName",
-				headerName: "Counselor",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "stateName",
-				headerName: "State",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "nationalityName",
-				headerName: "Nationality",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-		];
-		
+
 		const getGeoLocationWiseDetailData = async (rowData) => {
-			console.log("rowData======",rowData)
 			try {
 				setLoading(true);
 				setIsDetails(true);
@@ -1353,7 +1205,6 @@ const AdmissionPage = () => {
 					const list = res.data.map((ele, index) => ({ id: index + 1, ...ele }))
 					setLoading(false);
 					setDetailsRows(list);
-					setDetailsColumns(yearDetailsColumns)
 				}
 			} catch (error) {
 				setLoading(false)
@@ -1498,8 +1349,6 @@ const AdmissionPage = () => {
 	};
 
 	const getAdmissionReports = (data, type) => {
-		console.log(data, type, "From handleAdmissionCategory");
-
 		if (
 			data?.id !== "last_row_of_table" &&
 			type === "Admission Category Report"
@@ -1547,7 +1396,6 @@ const AdmissionPage = () => {
 	};
 
 	const admissionReports = (data, type) => {
-		console.log(data, type, "hhhhhhhh");
 
 		if (data?.id !== "last_row_of_table" && type === "Institute Wise") {
 			handleApiCall(
@@ -1559,7 +1407,6 @@ const AdmissionPage = () => {
 				{
 					name: "Admission",
 					link: () => {
-						console.log("ttt");
 						handleApiCall(
 							`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`,
 							handleAdmissionCategory
@@ -1623,7 +1470,6 @@ const AdmissionPage = () => {
 				{
 					name: "Admission",
 					link: () => {
-						console.log("ttt");
 						handleApiCall(
 							`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`,
 							handleAdmissionCategory
@@ -2301,7 +2147,7 @@ const AdmissionPage = () => {
 
 		// Create the grouped structure
 		const result = schoolNames.map((school, i) => {
-			const row = { schoolName: school };
+			let row = { schoolName: school };
 
 			academicYears.forEach((year) => {
 				const entry = filteredData.find(
@@ -2310,7 +2156,7 @@ const AdmissionPage = () => {
 				row[year] = entry ? entry.studentCount : 0;
 			});
 			row.id = `${school}__${i}`;
-
+			row.schoolId = filteredData.find((ele) => ele.school_name_short == school)?.school_id;
 			return row;
 		});
 
@@ -2340,29 +2186,30 @@ const AdmissionPage = () => {
 						headerName: year,
 						flex: 1,
 						headerClassName: "header-bg",
-						type: "number",
-					// 	cellClassName: (params) => {
-					// 		if (params.row.id === "last_row_of_table") {
-					// 			return "";
-					// 		}
-					// 		return academicYears.length === i + 1 ? "latest-year" : "";
-					// 	},
-					// getActions: (params) => {
-					//  	if (params.row.id === "last_row_of_table") {
-					//  		return [
-					//  			<Typography color="#fff" variant="subtitle2">{params.row.year}</Typography>
-					//  		];
-					//  	}
-					//  	return [
-					//  		<HtmlTooltip title="View Students Detail">
-					//  			<IconButton
-					//  				onClick={() => getDateWiseDetailData(params.row)}
-					//  			>
-					//  				<Typography color="primary" variant="subtitle2">{params.row.year}</Typography>
-					//  			</IconButton>
-					//  		</HtmlTooltip>
-					//  	]
-					//  },
+						type: "actions",
+						cellClassName: (params) => {
+							if (params.row.id === "last_row_of_table") {
+								return "";
+							}
+							return academicYears.length === i + 1 ? "latest-year" : "";
+						},
+						getActions: (params) => {
+							if (params.row.id === "last_row_of_table") {
+								return [
+									<Typography color="#fff" variant="subtitle2">{params.row[`${year}`]}</Typography>
+								];
+							}
+							return [
+								<HtmlTooltip title="View Students Detail">
+									<IconButton
+										disabled={params.row[`${year}`] == 0}
+										onClick={() => getDateWiseDetailData(params.row, year, filteredData)}
+									>
+										<Typography color="primary" variant="subtitle2">{params.row[`${year}`]}</Typography>
+									</IconButton>
+								</HtmlTooltip>
+							]
+						},
 					};
 
 				return {
@@ -2370,19 +2217,26 @@ const AdmissionPage = () => {
 					headerName: year,
 					flex: 1,
 					headerClassName: "header-bg",
-					type: "number",
+					type: "actions",
+					cellClassName: (params) => {
+						if (params.row.id === "last_row_of_table") {
+							return "";
+						}
+						return academicYears.length === i + 1 ? "latest-year" : "";
+					},
 					getActions: (params) => {
 						if (params.row.id === "last_row_of_table") {
 							return [
-								<Typography color="#fff" variant="subtitle2">{params.row.year}</Typography>
+								<Typography color="#fff" variant="subtitle2">{params.row[`${year}`]}</Typography>
 							];
 						}
 						return [
 							<HtmlTooltip title="View Students Detail">
 								<IconButton
-									onClick={() => getDateWiseDetailData(params.row)}
+									disabled={params.row[`${year}`] == 0}
+									onClick={() => getDateWiseDetailData(params.row, year, filteredData)}
 								>
-									<Typography color="primary" variant="subtitle2">{params.row.year}</Typography>
+									<Typography color="primary" variant="subtitle2">{params.row[`${year}`]}</Typography>
 								</IconButton>
 							</HtmlTooltip>
 						]
@@ -2391,56 +2245,17 @@ const AdmissionPage = () => {
 			})
 		);
 
-		const dateDetailsColumns = [
-			{
-				field: "student_name",
-				headerName: "Student Name",
-				headerClassName: "header-bg",
-				flex: 1,
-				valueGetter:(value,row)=>(row.student_name.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())).join("")
-			},
-			{
-				field: "auid",
-				headerName: "Auid",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "concatProgram",
-				headerName: "Program & Specilization",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "counselorName",
-				headerName: "Counselor",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "stateName",
-				headerName: "State",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-			{
-				field: "nationalityName",
-				headerName: "Nationality",
-				flex: 1,
-				headerClassName: "header-bg",
-			},
-		];
-		
-		const getDateWiseDetailData = async (rowData) => {
+		const getDateWiseDetailData = async (rowData, year, filteredData) => {
 			try {
+				const date = selectedDate;
+				const acYearId = filteredData.find((ele) => ele?.ac_year == year && ele?.school_id == rowData?.schoolId)?.ac_year_id;
 				setLoading(true);
 				setIsDetails(true);
-				const res = await axios.get(`/api/student/getCountOfAdmissionDateStudentDetails?date_of_admission=2025-06-09&school_id=1&ac_year_id=7`);
+				const res = await axios.get(`/api/student/getCountOfAdmissionDateStudentDetails?date_of_admission=${year.slice(0, 5)}${moment(date).format("MM-DD")}&school_id=${rowData.schoolId}&ac_year_id=${acYearId}`);
 				if (res.status == 200 || res.status == 201) {
-					const list = res.data.map((ele, index) => ({ id: index + 1, ...ele }))
+					const list = res.data.data.map((ele, index) => ({ id: index + 1, ...ele }))
 					setLoading(false);
 					setDetailsRows(list);
-					setDetailsColumns(dateDetailsColumns)
 				}
 			} catch (error) {
 				setLoading(false)
@@ -2451,8 +2266,6 @@ const AdmissionPage = () => {
 				setAlertOpen(true);
 			}
 		};
-
-		console.log("result===========",result)
 
 		setTableColumns(columns);
 		setTableRows(result);
@@ -2894,6 +2707,7 @@ const AdmissionPage = () => {
 									lg={isGroupColumnTable ? [...new Set(data.map((item) => item.fee_admission_category_short_name))].length > 2 ? 12 : 8 : (tableColumns.length <= 4 && !isDetails) ? 8 : 12}
 									pt={1}
 									sx={{
+										position: "absolute", width: "100%",
 										"& .last-row": {
 											fontWeight: "bold",
 											backgroundColor: "#376a7d !important",
@@ -2929,6 +2743,8 @@ const AdmissionPage = () => {
 													: "";
 											}}
 											loading={loading}
+											columnVisibilityModel={columnVisibilityModel}
+											setColumnVisibilityModel={setColumnVisibilityModel}
 										/> :
 											<GridIndex
 												rows={detailsRows}
@@ -2943,6 +2759,8 @@ const AdmissionPage = () => {
 														: "";
 												}}
 												loading={loading}
+												columnVisibilityModel={columnVisibilityModel}
+												setColumnVisibilityModel={setColumnVisibilityModel}
 											/>
 									}
 								</Grid>
