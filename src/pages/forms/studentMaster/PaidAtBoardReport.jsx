@@ -448,8 +448,7 @@ function PaidAtBoardReport() {
           <Grid
             item
             xs={12}
-            md={12}
-            lg={10}
+            md={8}
             sx={{
               "& .last-row": {
                 fontWeight: 700,
