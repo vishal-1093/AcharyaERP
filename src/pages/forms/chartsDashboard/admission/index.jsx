@@ -464,6 +464,13 @@ const AdmissionPage = () => {
 			headerClassName: "header-bg",
 		},
 		{
+			field: "date_of_admission",
+			headerName: "DOA",
+			flex: 1,
+			headerClassName: "header-bg",
+			valueGetter: (value, row) => (row.date_of_admission ) ? `${moment(row.date_of_admission).format("DD-MM-YYYY")}` : ""
+		},
+		{
 			field: "fee_admission_category_short_name",
 			headerName: "Category",
 			flex: 1,
