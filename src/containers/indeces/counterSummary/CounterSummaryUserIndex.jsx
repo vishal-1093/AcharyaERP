@@ -1,14 +1,9 @@
 import { useState, useEffect, lazy } from "react";
-import GridIndex from "../../../components/TotalGridIndex.jsx";
+import GridIndex from "../../../components/GridIndex.jsx";
 import {
   Box,
   Button,
-  Grid,
-  Typography,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell
+  Grid
 } from "@mui/material";
 import axios from "../../../services/Api.js";
 import PrintIcon from "@mui/icons-material/Print";
@@ -24,13 +19,14 @@ const todayDate = new Date();
 const initialValues = {
   startDate: todayDate,
   endDate: todayDate,
-  loading:false,
+  loading: false,
   cashTotal: 0,
-  usdCashTotal:0,
+  usdCashTotal: 0,
   ddTotal: 0,
   onlineTotal: 0,
   paymentTotal: 0,
-  closingTotal: 0
+  closingTotal: 0,
+  pdfRow:[]
 };;
 
 function CounterSummaryUserIndex() {
@@ -41,7 +37,7 @@ function CounterSummaryUserIndex() {
 
   useEffect(() => {
     (values.startDate && values.endDate) && getData(values);
-  }, [values.startDate,values.endDate]);
+  }, [values.startDate, values.endDate]);
 
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
@@ -51,9 +47,9 @@ function CounterSummaryUserIndex() {
   };
 
   const setLoading = (val) => {
-    setValues((prevState)=>({
+    setValues((prevState) => ({
       ...prevState,
-      loading:val
+      loading: val
     }))
   };
 
@@ -65,15 +61,29 @@ function CounterSummaryUserIndex() {
         .get(`/api/finance/getCounterSummary?${params}`)
         .then((res) => {
           setLoading(false);
+
           const grandTotalCash = res.data.data?.reduce((sum, acc) => sum + acc.INRCASH, 0);
           const grandUSDTotalCash = res.data.data?.reduce((sum, acc) => sum + acc.USDCASH, 0);
           const grandTotalDD = res.data.data?.reduce((sum, acc) => sum + acc.INRDD, 0);
           const grandTotalOnline = res.data.data?.reduce((sum, acc) => sum + acc.INRONLINE, 0);
           const grandTotalPayment = res.data.data.reduce((sum, acc) => sum + acc.payment, 0);
           const grandTotalClosing = (grandTotalCash) - (grandTotalPayment);
-          setRows(res.data.data.map((li, index) => ({ ...li, id: index + 1 })));
+
+          const totalRow = {
+            "createdUsername": "Total",
+            "INRDD": grandTotalDD,
+            "INRONLINE": grandTotalOnline,
+            "INRCASH": grandTotalCash,
+            "USDCASH": grandUSDTotalCash,
+            "payment": grandTotalPayment,
+            "closing": grandTotalClosing,
+          };
+          const pdfRows = res.data.data;
+          const list = [...res.data.data, totalRow];
+          setRows(list.map((li, index) => ({ ...li, id: index + 1 })));
           setValues((prevState) => ({
             ...prevState,
+            pdfRow:pdfRows,
             cashTotal: grandTotalCash,
             usdCashTotal: grandUSDTotalCash,
             ddTotal: grandTotalDD,
@@ -82,7 +92,7 @@ function CounterSummaryUserIndex() {
             closingTotal: grandTotalClosing
           }))
         })
-        .catch((err) =>{ setLoading(false);console.error(err)});
+        .catch((err) => { setLoading(false); console.error(err) });
     }
   };
 
@@ -95,83 +105,57 @@ function CounterSummaryUserIndex() {
       field: "INRDD",
       headerName: "DD",
       flex: 1,
-      type: "number",
       hideable: false,
+      type: 'number',
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number(params.row?.INRDD % 1 !== 0 ? params.row?.INRDD?.toFixed(2) : params.row?.INRDD) || 0)}</div>,
       valueGetter: (value, row) => (Number(row?.INRDD % 1 !== 0 ? row?.INRDD?.toFixed(2) : row?.INRDD) || 0)
     },
     {
       field: "INRONLINE",
       headerName: "Online",
       flex: 1,
-      type: "number",
       hideable: false,
+        type: 'number',
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number(params.row?.INRONLINE % 1 !== 0 ? params.row?.INRONLINE?.toFixed(2) : params.row?.INRONLINE) || 0)}</div>,
       valueGetter: (value, row) => (Number(row?.INRONLINE % 1 !== 0 ? row?.INRONLINE?.toFixed(2) : row?.INRONLINE) || 0)
     },
     {
       field: "INRCASH",
       headerName: "INR",
       flex: 1,
-      type: "number",
       hideable: false,
+       type: 'number',
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number(params.row?.INRCASH % 1 !== 0 ? params.row?.INRCASH?.toFixed(2) : params.row?.INRCASH) || 0)}</div>,
       valueGetter: (value, row) => (Number(row?.INRCASH % 1 !== 0 ? row?.INRCASH?.toFixed(2) : row?.INRCASH) || 0)
     },
     {
       field: "USDCASH",
       headerName: "INR1",
       flex: 1,
-      type: "number",
       hideable: false,
+       type: 'number',
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number(params.row?.USDCASH % 1 !== 0 ? params.row?.USDCASH?.toFixed(2) : params.row?.USDCASH) || 0)}</div>,
       valueGetter: (value, row) => (Number(row?.USDCASH % 1 !== 0 ? row?.USDCASH?.toFixed(2) : row?.USDCASH) || 0)
     },
     {
       field: "payment",
       headerName: "Payment",
       flex: 1,
-      type: "number",
       hideable: false,
+       type: 'number',
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number(params.row?.payment % 1 !== 0 ? params.row?.payment?.toFixed(2) : params.row?.payment) || 0)}</div>,
       valueGetter: (value, row) => (Number(row?.payment % 1 !== 0 ? row?.payment?.toFixed(2) : row?.payment) || 0)
     },
     {
       field: "closing",
       headerName: "Closing",
       flex: 1,
-      type: "number",
       hideable: false,
+       type: 'number',
+      renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}>{(Number((params.row?.INRCASH - params.row?.payment) % 1 !== 0 ? (params.row?.INRCASH - params.row?.payment)?.toFixed(2) : (params.row?.INRCASH - params.row?.payment)) || 0)}</div>,
       valueGetter: (value, row) => (Number((row?.INRCASH - row?.payment) % 1 !== 0 ? (row?.INRCASH - row?.payment)?.toFixed(2) : (row?.INRCASH - row?.payment)) || 0)
     }
   ];
-
-  const cashBankTotalFooter = () => (
-    <Box>
-      <Table sx={{background:"rgba(74, 87, 169, 0.1)",width:"100%"}}>
-        <TableBody>
-          <TableRow>
-            <TableCell style={{borderBottom:"0px",padding:"5px",width:"26%"}}>
-            <b>TOTAL</b>
-            </TableCell>
-            <TableCell style={{borderBottom:"0px",padding:"5px",width:"12%"}}><Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {Number(values.ddTotal % 1 !== 0 ? values.ddTotal?.toFixed(2) : values.ddTotal) || 0}
-          </Typography></TableCell>
-            <TableCell style={{borderBottom:"0px",padding:"5px",width:"15%"}}> <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {Number(values.onlineTotal % 1 !== 0 ? values.onlineTotal?.toFixed(2) : values.onlineTotal) || 0}
-          </Typography></TableCell>
-            <TableCell style={{borderBottom:"0px",padding:"5px",width:"17%"}}><Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {Number(values.cashTotal % 1 !== 0 ? values.cashTotal?.toFixed(2) : values.cashTotal) || 0}
-          </Typography></TableCell>
-            <TableCell style={{borderBottom:"0px",padding:"5px",width:"15%"}}><Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {Number(values.usdCashTotal % 1 !== 0 ? values.usdCashTotal?.toFixed(2) : values.usdCashTotal) || 0}
-          </Typography></TableCell>
-            <TableCell style={{borderBottom:"0px",padding:"5px",width:"15%"}}><Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {Number(values.paymentTotal % 1 !== 0 ? values.paymentTotal?.toFixed(2) : values.paymentTotal) || 0}
-          </Typography></TableCell>
-            <TableCell style={{borderBottom:"0px",padding:"5px",width:"15%"}}> <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {Number(values.closingTotal % 1 !== 0 ? values.closingTotal?.toFixed(2) : values.closingTotal) || 0}
-          </Typography></TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </Box>
-  );
 
   const onClickPrint = async () => {
     const chunkArray = (array, chunkSize) =>
@@ -179,12 +163,12 @@ function CounterSummaryUserIndex() {
         array.slice(i * chunkSize, i * chunkSize + chunkSize)
       );
 
-    const rowChunks = chunkArray(rows, 35);
+    const rowChunks = chunkArray(values.pdfRow, 35);
     const pages = [];
     rowChunks.forEach((rowChunk) => {
       pages.push({ rows: rowChunk });
     });
-    const reportResponse = await GenerateUserCounterSummary(pages, values.startDate, values.endDate, values.cashTotal, values.ddTotal, values.onlineTotal, values.paymentTotal, values.closingTotal,values.usdCashTotal);
+    const reportResponse = await GenerateUserCounterSummary(pages, values.startDate, values.endDate, values.cashTotal, values.ddTotal, values.onlineTotal, values.paymentTotal, values.closingTotal, values.usdCashTotal);
     if (!!reportResponse) {
       setReportPath(URL.createObjectURL(reportResponse));
       setIsPrintModalOpen(!isPrintModalOpen);
@@ -228,9 +212,25 @@ function CounterSummaryUserIndex() {
           </Button>
         </Grid>
       </Grid>
-      <Box sx={{ position: "relative", marginTop: { xs: 8, md:1 } }}>
-        <Box sx={{ position: "absolute", width: "100%",}}>
-          <GridIndex rows={rows} columns={columns} TotalCustomFooter={cashBankTotalFooter} loading={values.loading}/>
+      <Box sx={{ position: "relative", marginTop: { xs: 8, md: 1 } }}>
+        <Box sx={{
+          position: "absolute",
+          width: "100%",
+          '& .last-row': {
+            backgroundColor: '#edeef6 !important',
+            color: '#000 !important',
+            fontWeight:"bold"
+          },
+        }}>
+          <GridIndex
+            rows={rows}
+            columns={columns}
+            loading={values.loading}
+            getRowClassName={(params) =>
+              params.id === rows[rows.length - 1].id ? 'last-row' : ''
+            }
+            getRowId={row => row.id}
+            isRowSelectable={(params) => params.id != rows[rows.length - 1].id} />
         </Box>
       </Box>
       <ModalWrapper
