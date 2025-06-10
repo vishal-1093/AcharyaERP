@@ -279,7 +279,6 @@ function FeetemplateApprovalIndex() {
       getActions: (params) => [
         (params.row.approved_status === null ||
           params.row.approved_status === false) &&
-        roleShortName === "SAA" &&
         params.row.active === true ? (
           <IconButton
             onClick={() =>
@@ -294,7 +293,6 @@ function FeetemplateApprovalIndex() {
           </IconButton>
         ) : (params.row.approved_status === null ||
             params.row.approved_status === false) &&
-          roleShortName !== "SAA" &&
           params.row.countOfStudent === 0 &&
           params.row.active === true ? (
           <IconButton
