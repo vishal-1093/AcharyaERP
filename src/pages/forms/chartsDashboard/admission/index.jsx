@@ -242,7 +242,7 @@ const AdmissionPage = () => {
 				handleApiCall(apiPath, handleGeoLocationWiseDataCountry);
 			} else {
 				setCityList([]);
-				setSlectedCity("");
+				setSlectedCity(null);
 			}
 		}
 	}, [selectedState]);
@@ -468,7 +468,7 @@ const AdmissionPage = () => {
 			headerName: "DOA",
 			flex: 1,
 			headerClassName: "header-bg",
-			valueGetter: (value, row) => (row.date_of_admission ) ? `${moment(row.date_of_admission).format("DD-MM-YYYY")}` : ""
+			valueGetter: (value, row) => (row.date_of_admission) ? `${moment(row.date_of_admission).format("DD-MM-YYYY")}` : ""
 		},
 		{
 			field: "fee_admission_category_short_name",
@@ -859,7 +859,7 @@ const AdmissionPage = () => {
 			const { created_day, Total } = obj;
 			rowsToShow.push({
 				id: id,
-				Date: moment(created_day).format("DD-MM-YYYY"),
+				Date: created_day,
 				"Student Entry": obj["Student Entry"],
 				"Lateral Entry": obj["Laternal Entry"],
 				Total: Total,
@@ -1202,14 +1202,16 @@ const AdmissionPage = () => {
 
 		const getGeoLocationWiseDetailData = async (rowData, details) => {
 			try {
-				const country_id = details.find((ele) => ele.name == rowData.country)?.id
+				const country_id = details.find((ele) => ele.name == rowData.country)?.id;
+				const state_id = details.find((ele) => ele.name == rowData.state)?.states_id;
+				const city_id = details.find((ele) => ele.name == rowData.city)?.cityId;
 				setLoading(true);
 				const params = new URLSearchParams();
 				const paramsObj = {
 					schoolId: selectedInstitute,
 					countryId: selectedCountry || country_id,
-					stateId: selectedState,
-					cityId: selectedCity
+					stateId: selectedState || state_id,
+					cityId: selectedCity || city_id
 				};
 				Object.entries(paramsObj).forEach(([key, value]) => {
 					if (value != null) {
@@ -1314,8 +1316,8 @@ const AdmissionPage = () => {
 			setCountryList(countriesToShow);
 			setstateList([]);
 			setCityList([]);
-			setSlectedState("");
-			setSlectedCity("");
+			setSlectedState(null);
+			setSlectedCity(null);
 		}
 	};
 
@@ -1335,8 +1337,8 @@ const AdmissionPage = () => {
 			}))
 		);
 		setCityList([]);
-		setSlectedState("");
-		setSlectedCity("");
+		setSlectedState(null);
+		setSlectedCity(null);
 	};
 
 	const handleGeoLocationWiseDataState = (data) => {
@@ -1354,7 +1356,7 @@ const AdmissionPage = () => {
 				label: obj.name,
 			}))
 		);
-		setSlectedCity("");
+		setSlectedCity(null);
 	};
 
 	const handleGeoLocationWiseDataCity = (data) => {
