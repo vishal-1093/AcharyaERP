@@ -86,20 +86,20 @@ function StudentLibraryDetailsView({ state }) {
 
   useEffect(() => {
     getLibraryBooks();
-    if (state) {
-      setCrumbs([
-        {
-          name: "Student Master",
-          link: "/student-master",
-        },
-      ]);
-    } else {
-      setCrumbs([
-        {
-          name: "Student Master",
-        },
-      ]);
-    }
+    // if (state) {
+    //   setCrumbs([
+    //     {
+    //       name: "Student Master",
+    //       link: "/student-master",
+    //     },
+    //   ]);
+    // } else {
+    //   setCrumbs([
+    //     {
+    //       name: "Student Master",
+    //     },
+    //   ]);
+    // }
   }, []);
 
   useEffect(() => {
