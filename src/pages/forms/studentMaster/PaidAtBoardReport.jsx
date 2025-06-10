@@ -1,139 +1,531 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Box, Breadcrumbs, Button, Grid, Typography } from "@mui/material";
+import GridIndex from "../../../components/GridIndex";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import axios from "../../../services/Api";
-import {
-  Grid,
-  Paper,
-  Typography,
-  TableContainer,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-  styled,
-  tableCellClasses,
-  TableHead,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import useAlert from "../../../hooks/useAlert";
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#edeff7",
-    color: "black",
-    border: "1px solid #DCDCDC",
-    textAlign: "center",
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-    border: "1px solid #DCDCDC",
-    textAlign: "center",
-    width: "33.33%",
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
+const Fallbackcrumb = [
+  { text: `Board Receivables`, action: () => {}, isParent: false },
+];
 
 function PaidAtBoardReport() {
-  const [boardWiseDue, setBoardWiseDue] = useState([]);
-  const navigate = useNavigate();
-  const { setAlertMessage, setAlertOpen } = useAlert();
+  const [rows, setRows] = useState([]);
+  const [columns, setColumns] = useState([]);
+  const [crumbs, setCrumbs] = useState(Fallbackcrumb);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getBoardWiseDue();
+    getReport();
   }, []);
 
-  const getBoardWiseDue = async () => {
-    try {
-      const boardWiseResponse = await axios.get(
-        `/api/finance/paidBoardReportBasedOnBoard`
-      );
-      setBoardWiseDue(boardWiseResponse.data.data);
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.response.data.message,
+  const getReport = async () => {
+    setLoading(true);
+
+    await axios
+      .get(`/api/finance/paidBoardReportBasedOnBoard`)
+      .then((response) => {
+        if (response.data.data.length > 0) {
+          const dataRows = [];
+          setCrumbs(Fallbackcrumb);
+
+          response.data.data.forEach((ele, i) => {
+            dataRows.push({
+              id: i + 1,
+              boardName: ele.board_unique_name,
+              balance: ele.balance,
+              isLastRow: false,
+              isClickable: true,
+              boardId: ele.board_unique_id,
+            });
+          });
+
+          const column = [
+            {
+              field: "id",
+              headerName: "Sl No.",
+              flex: 1,
+              headerClassName: "header-bg",
+            },
+            {
+              field: "boardName",
+              headerName: "Board",
+              flex: 1,
+              headerClassName: "header-bg",
+              renderCell: (params) => {
+                if (!params.row.isClickable)
+                  return (
+                    <Typography fontWeight="bold">
+                      {params.row.boardName}
+                    </Typography>
+                  );
+
+                return (
+                  <Button
+                    onClick={() => getSchoolData(params.row)}
+                    sx={{ padding: 0, fontWeight: "bold" }}
+                  >
+                    {params.row.boardName}
+                  </Button>
+                );
+              },
+
+              headerAlign: "center",
+              align: "center",
+            },
+            {
+              field: "balance",
+              headerName: "Total",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "right",
+            },
+          ];
+
+          setColumns(column);
+          setRows(dataRows);
+          setLoading(false);
+        } else {
+          setColumns([]);
+          setRows([]);
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error(error);
       });
-      setAlertOpen(true);
-    }
+  };
+
+  const getSchoolData = async (data) => {
+    setLoading(true);
+
+    await axios
+      .get(`/api/finance/paidBoardReportBasedOnSchoolByBoard/${data?.boardId}`)
+      .then((response) => {
+        if (response.data.data.length > 0) {
+          const dataRows = [];
+          setCrumbs([
+            { text: `Board Receivables`, action: () => {}, isParent: false },
+            {
+              text: `${data?.boardName}`,
+              action: () => getReport(),
+              isParent: true,
+            },
+          ]);
+
+          response.data.data.forEach((ele, i) => {
+            dataRows.push({
+              id: i + 1,
+              schoolName: ele.school_name,
+              balance: ele.balance ?? 0,
+              isLastRow: false,
+              isClickable: true,
+              boardId: ele.board_unique_id,
+              schoolId: ele.school_id,
+              boardName: data?.boardName,
+            });
+          });
+
+          const column = [
+            {
+              field: "id",
+              headerName: "Sl No.",
+              flex: 1,
+              headerClassName: "header-bg",
+            },
+            {
+              field: "schoolName",
+              headerName: "School",
+              flex: 1,
+              headerClassName: "header-bg",
+              renderCell: (params) => {
+                if (!params.row.isClickable)
+                  return (
+                    <Typography fontWeight="bold">
+                      {params.row.schoolName}
+                    </Typography>
+                  );
+
+                return (
+                  <Button
+                    onClick={() => getAcYearData(params.row)}
+                    sx={{ padding: 0, fontWeight: "bold" }}
+                  >
+                    {params.row.schoolName}
+                  </Button>
+                );
+              },
+
+              headerAlign: "center",
+              align: "center",
+            },
+            {
+              field: "balance",
+              headerName: "Due Total",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "right",
+            },
+          ];
+
+          setColumns(column);
+          setRows(dataRows);
+          setLoading(false);
+        } else {
+          setColumns([]);
+          setRows([]);
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error(error);
+      });
+  };
+
+  const getAcYearData = async (data) => {
+    setLoading(true);
+
+    await axios
+      .get(
+        `/api/finance/paidBoardReportBasedOnAcademicYearByBoardAndSchool/${data?.boardId}/${data?.schoolId}`
+      )
+      .then((response) => {
+        if (response.data.data.length > 0) {
+          const dataRows = [];
+          setCrumbs([
+            { text: `Board Receivables`, action: () => {}, isParent: false },
+            {
+              text: `${data?.boardName}`,
+              action: () => getReport(),
+              isParent: true,
+            },
+            {
+              text: `${data?.schoolName}`,
+              action: () => getSchoolData(data),
+              isParent: true,
+            },
+          ]);
+
+          response.data.data.forEach((ele, i) => {
+            dataRows.push({
+              id: i + 1,
+              acYear: ele.ac_year,
+              balance: ele.balance ?? 0,
+              isLastRow: false,
+              isClickable: true,
+              boardId: ele.board_unique_id,
+              schoolId: ele.school_id,
+              acYearId: ele.ac_year_id,
+              boardName: data?.boardName,
+              schoolName: data?.schoolName,
+            });
+          });
+
+          const column = [
+            {
+              field: "id",
+              headerName: "Sl No.",
+              flex: 1,
+              headerClassName: "header-bg",
+            },
+            {
+              field: "acYear",
+              headerName: "Ac Year",
+              flex: 1,
+              headerClassName: "header-bg",
+              renderCell: (params) => {
+                if (!params.row.isClickable)
+                  return (
+                    <Typography fontWeight="bold">
+                      {params.row.acYear}
+                    </Typography>
+                  );
+
+                return (
+                  <Button
+                    onClick={() => getStudentData(params.row)}
+                    sx={{ padding: 0, fontWeight: "bold" }}
+                  >
+                    {params.row.acYear}
+                  </Button>
+                );
+              },
+
+              headerAlign: "center",
+              align: "center",
+            },
+            {
+              field: "balance",
+              headerName: "Due Total",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "right",
+            },
+          ];
+
+          setColumns(column);
+          setRows(dataRows);
+          setLoading(false);
+        } else {
+          setColumns([]);
+          setRows([]);
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error(error);
+      });
+  };
+
+  const getStudentData = async (data) => {
+    setLoading(true);
+
+    await axios
+      .get(
+        `/api/finance/studentDetailsByBoardSchoolAcademicYear/${data?.boardId}/${data?.schoolId}/${data?.acYearId}`
+      )
+      .then((response) => {
+        if (response.data.data.length > 0) {
+          const dataRows = [];
+          setCrumbs([
+            { text: `Board Receivables`, action: () => {}, isParent: false },
+            {
+              text: `${data?.boardName}`,
+              action: () => getReport(),
+              isParent: true,
+            },
+            {
+              text: `${data?.schoolName}`,
+              action: () => getSchoolData(data),
+              isParent: true,
+            },
+            {
+              text: `${data?.acYear}`,
+              action: () => getAcYearData(data),
+              isParent: true,
+            },
+          ]);
+
+          response.data.data.forEach((ele, i) => {
+            dataRows.push({
+              id: i + 1,
+              auid: ele.auid,
+              studentName: ele.student_name,
+              fee_admission_category_short_name:
+                ele.fee_admission_category_short_name,
+              board_unique_short_name: ele.board_unique_short_name,
+              program_type_code: ele.program_type_code,
+              current_year: ele.current_year,
+              current_sem: ele.current_sem,
+              toPay: ele.toPay ?? 0,
+              received: ele.received ?? 0,
+              balance: ele.balance ?? 0,
+              isLastRow: false,
+              isClickable: true,
+              boardId: ele.board_unique_id,
+              schoolId: ele.school_id,
+              acYearId: ele.ac_year_id,
+            });
+          });
+
+          const column = [
+            {
+              field: "id",
+              headerName: "Sl No.",
+              flex: 1,
+              headerClassName: "header-bg",
+            },
+            {
+              field: "auid",
+              headerName: "Auid",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "center",
+            },
+            {
+              field: "studentName",
+              headerName: "Name",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "center",
+            },
+            {
+              field: "fee_admission_category_short_name",
+              headerName: "Category",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "center",
+            },
+            {
+              field: "board_unique_short_name",
+              headerName: "Board",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "center",
+            },
+            {
+              field: "program_type_code",
+              headerName: "Pattern",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "center",
+            },
+            {
+              field: "current_year",
+              headerName: "Year/Sem",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "center",
+              renderCell: (params) => {
+                return `${params.row.current_year}/${params.row.current_sem}`;
+              },
+            },
+
+            {
+              field: "toPay",
+              headerName: "To pay",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "right",
+            },
+            {
+              field: "received",
+              headerName: "Received",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "right",
+            },
+            {
+              field: "balance",
+              headerName: "Balance",
+              flex: 1,
+              headerClassName: "header-bg",
+              headerAlign: "center",
+              align: "right",
+            },
+          ];
+
+          setColumns(column);
+          setRows(dataRows);
+          setLoading(false);
+        } else {
+          setColumns([]);
+          setRows([]);
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error(error);
+      });
   };
 
   return (
     <>
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Grid container justifyContent="center" alignItems="center" mt={2}>
-          <Grid item xs={12} md={8}>
-            <Grid
-              container
-              justifyContent="flex-start"
-              rowSpacing={2}
-              alignItems="center"
-            >
-              <Grid item xs={12} md={12}>
-                <Typography
-                  sx={{
-                    backgroundColor: "tableBg.main",
-                    color: "tableBg.textColor",
-                    textAlign: "center",
-                    padding: 1,
-                    borderRadius: 4,
-                  }}
-                  variant="h6"
-                >
-                  Paid At Board
-                </Typography>
-              </Grid>
+      <Box>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="space-between"
+          pt={3}
+          rowGap={2}
+          className="main-grid"
+        >
+          <Grid item xs={12} md={12} lg={1}></Grid>
+          <Grid
+            item
+            xs={12}
+            md={8}
+            sx={{
+              "& .last-row": {
+                fontWeight: 700,
+                backgroundColor: "#376a7d !important",
+                color: "#fff",
+                fontSize: "13px",
+              },
+              "& .last-column": { fontWeight: "bold" },
+              "& .last-row:hover": {
+                fontWeight: 700,
+                backgroundColor: "#376a7d !important",
+                color: "#fff",
+                fontSize: "13px",
+              },
+              "& .header-bg": {
+                fontWeight: "bold",
+                backgroundColor: "#376a7d",
+                color: "#fff",
+                fontSize: "15px",
+              },
+            }}
+            className="children-grid"
+          >
+            <CustomBreadCrumbs arr={crumbs} />
 
-              <Grid item xs={12} md={12}>
-                <TableContainer component={Paper}>
-                  <Table size="small">
-                    <TableHead>
-                      <StyledTableRow>
-                        <StyledTableCell>SL No.</StyledTableCell>
-                        <StyledTableCell>Board Name</StyledTableCell>
-                        <StyledTableCell> Total</StyledTableCell>
-                      </StyledTableRow>
-                    </TableHead>
-                    <TableBody>
-                      {boardWiseDue?.map((obj, i) => {
-                        return (
-                          <StyledTableRow key={i}>
-                            <StyledTableCell>{i + 1}</StyledTableCell>
-                            <StyledTableCell>
-                              {obj.board_unique_name}
-                            </StyledTableCell>
-                            <TableCell
-                              sx={{
-                                fontSize: 14,
-                                border: "1px solid #DCDCDC",
-                                textAlign: "right",
-                                cursor: "pointer",
-                              }}
-                              onClick={() =>
-                                navigate(`/paid-at-board-school-wise`, {
-                                  state: obj.board_unique_id,
-                                })
-                              }
-                            >
-                              <span style={{ color: "#0000FF" }}>
-                                {obj.balance}
-                              </span>
-                            </TableCell>
-                          </StyledTableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
-            </Grid>
+            <GridIndex
+              rows={rows}
+              columns={columns}
+              getRowClassName={(params) => {
+                return params.row.isLastRow ? "last-row" : "";
+              }}
+              loading={loading}
+              rowSelectionModel={[]}
+              sx={{ width: "100%" }}
+            />
           </Grid>
+          <Grid item xs={12} md={12} lg={1} className="empty-grid"></Grid>
         </Grid>
-      </Paper>
+      </Box>
     </>
   );
 }
 export default PaidAtBoardReport;
+
+const CustomBreadCrumbs = ({ arr }) => {
+  if (arr.length <= 0) return null;
+
+  return (
+    <Box>
+      <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+        {arr.map((obj, i) => {
+          const { text, action, isParent } = obj;
+
+          if (isParent)
+            return (
+              <Typography
+                key={i}
+                variant="h5"
+                sx={{
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  color: "#2F38AB",
+                }}
+                onClick={action}
+              >
+                {" "}
+                {text}
+              </Typography>
+            );
+          return (
+            <Typography key={i} variant="h5" sx={{ fontWeight: "bold" }}>
+              {" "}
+              {text}
+            </Typography>
+          );
+        })}
+      </Breadcrumbs>
+    </Box>
+  );
+};

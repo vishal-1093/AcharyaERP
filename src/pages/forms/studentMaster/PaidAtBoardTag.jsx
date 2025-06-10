@@ -65,7 +65,7 @@ function PaidAtBoardTag() {
   useEffect(() => {
     getAcademicYearData();
     getSchoolData();
-    setCrumbs([{ name: "Paid At Board" }]);
+    setCrumbs([{ name: "Paid At Board", link: "/paid-at-board-index" }]);
   }, [pathname]);
 
   useEffect(() => {
