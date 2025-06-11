@@ -40,7 +40,7 @@ const CustomTab = styled(Tab)(({ theme }) => ({
 }));
 
 const StudentDetailsViewDocuments = ({ state, id }) => {
-  const [subTab, setSubTab] = useState("Proctor Meetings");
+  const [subTab, setSubTab] = useState("Meeting History");
   const [historyData, setHistoryData] = useState([]);
   const [historyIVRData, setIVRHistoryData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -49,14 +49,14 @@ const StudentDetailsViewDocuments = ({ state, id }) => {
 
   const setCrumbs = useBreadcrumbs();
 
-  useEffect(() => {
-    setCrumbs([
-      {
-        name: "Student Master",
-        link: "/student-master",
-      },
-    ]);
-  }, []);
+  // useEffect(() => {
+  //   setCrumbs([
+  //     {
+  //       name: "Student Master",
+  //       link: "/student-master",
+  //     },
+  //   ]);
+  // }, []);
 
   const getHistory = async () => {
     if (!id) return;
@@ -230,13 +230,13 @@ const StudentDetailsViewDocuments = ({ state, id }) => {
             variant="scrollable"
             className="customTabs"
           >
-            <CustomTab value="Proctor Meetings" label="Proctor Meetings" />
+            <CustomTab value="Meeting History" label="Meeting History" />
             <CustomTab value="IVR History" label="IVR History" />
           </CustomTabs>
         </Grid>
 
         <Grid item xs={12} md={10}>
-          {subTab === "Proctor Meetings" && (
+          {subTab === "Meeting History" && (
             <Box sx={{ position: "relative", mt: 2 }}>
               <CustomModal
                 open={modalOpen}
