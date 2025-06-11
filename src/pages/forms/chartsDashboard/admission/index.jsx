@@ -1347,7 +1347,6 @@ const AdmissionPage = () => {
 			.sort((a, b) => a - b); // Sort the years in ascending order
 
 		handleGeoLocationColumnAndRowData(data, acYears, "city", "City");
-
 		const allCities = [...new Map(data.map((obj) => [obj.cityId, obj])).values()];
 
 		setCityList(
@@ -2832,7 +2831,7 @@ const AdmissionPage = () => {
 													control={
 														<IOSSwitch
 															sx={{ m: 1 }}
-															ischecked={isTableView}
+															checked={isTableView}
 															handlechange={() => setIsTableView(!isTableView)}
 															disabled={selectedGraph === "Datewise Statistics" || isGroupColumnTable}
 														/>
