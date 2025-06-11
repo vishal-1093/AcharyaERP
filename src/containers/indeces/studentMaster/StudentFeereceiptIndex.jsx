@@ -318,6 +318,13 @@ function StudentFeereceiptIndex() {
       flex: 0.8,
       hideable: false,
       type: "number",
+      renderCell:(params)=>(<div style={{textAlign:"right",width:"100%"}}>{params.row.transaction_type?.toLowerCase() == "cash"
+          ? Number(
+              params.row.inr_value % 1 !== 0
+                ? params.row.inr_value?.toFixed(2)
+                : params.row.inr_value
+            )
+          : 0}</div>),
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "cash"
           ? Number(
@@ -333,6 +340,14 @@ function StudentFeereceiptIndex() {
       flex: 0.8,
       hideable: false,
       type: "number",
+      type: "number",
+      renderCell: (params) => (<div style={{ textAlign: "right", width: "100%" }}>{params.row.transaction_type?.toLowerCase() == "dd"
+        ? Number(
+          params.row.inr_value % 1 !== 0
+            ? params.row.inr_value?.toFixed(2)
+            : params.row.inr_value
+        )
+        : 0}</div>),
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "dd"
           ? Number(
@@ -348,6 +363,15 @@ function StudentFeereceiptIndex() {
       flex: 0.8,
       hideable: false,
       type: "number",
+      renderCell: (params) => (<div style={{ textAlign: "right", width: "100%" }}>{params.row.transaction_type?.toLowerCase() == "rtgs" ||
+        params.row.transaction_type?.toLowerCase() == "p_gateway" ||
+        params.row.transaction_type?.toLowerCase() == "online"
+          ? Number(
+              params.row.inr_value % 1 !== 0
+                ? params.row.inr_value?.toFixed(2)
+                : params.row.inr_value
+            )
+          : 0}</div>),
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "rtgs" ||
         row.transaction_type?.toLowerCase() == "p_gateway" ||
@@ -364,6 +388,13 @@ function StudentFeereceiptIndex() {
       headerName: "INR1",
       flex: 0.8,
       type: "number",
+      renderCell: (params) => (<div style={{ textAlign: "right", width: "100%" }}>{params.row.received_in?.toLowerCase() == "usd"
+        ? Number(
+          params.row.paid_amount % 1 !== 0
+            ? params.row.paid_amount?.toFixed(2)
+            : params.row.paid_amount
+        )
+        : ""}</div>),
       valueGetter: (value, row) =>
         row.received_in?.toLowerCase() == "usd"
           ? Number(

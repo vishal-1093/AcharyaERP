@@ -61,12 +61,14 @@ function StudentHostelPayment() {
 
         const checktill = [1];
 
-        const newArray = hostelDueResponse.data.data.map((obj) => ({
-          ...obj,
-          active: false,
-          checked: checktill[0] ? true : false,
-          freeze: checktill[0] ? true : false,
-        }));
+        const newArray = hostelDueResponse.data.data
+          .filter((obj) => obj.due > 0)
+          .map((ele) => ({
+            ...ele,
+            active: false,
+            checked: false,
+            freeze: false,
+          }));
 
         setHostelDueData(newArray);
 
@@ -138,8 +140,10 @@ function StudentHostelPayment() {
   const handleChangeTotalPay = (e) => {
     const checked = hostelDueData?.filter((obj) => obj.checked);
 
+    console.log(checked.length);
+
     // if (date1WithoutTime <= date2WithoutTime) {
-    if (checked?.[0]?.due > checked?.[0]?.minimum_amount)
+    if (checked?.[0]?.due > checked?.[0]?.minimum_amount && checked.length == 1)
       setTotalPay(e.target.value);
     // }
   };
@@ -172,7 +176,7 @@ function StudentHostelPayment() {
   };
 
   const isCheckboxDisabled = (index) => {
-    return index > 0 && !values[index - 1].checked;
+    return index > 0 && !hostelDueData[index - 1].checked;
   };
 
   const handleCreate = async () => {
@@ -248,6 +252,8 @@ function StudentHostelPayment() {
       setAlertOpen(true);
     }
   };
+
+  console.log(hostelDueData);
 
   return (
     <>

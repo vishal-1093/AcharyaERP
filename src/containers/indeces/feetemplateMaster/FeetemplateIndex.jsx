@@ -123,7 +123,7 @@ function FeetemplateIndex() {
     fee_admission_category_short_name: false,
     uniform_status: false,
     laptop_status: false,
-    remarks:false,
+    remarks: false,
     created_username: false,
     created_date: false,
   });
@@ -561,13 +561,13 @@ function FeetemplateIndex() {
       }
       const res = await axios.get(
         `/api/finance/fetchFeeTemplateDetailByAcYearId?page=${0}&page_size=${10000}&sort=created_date${API_URL}`
-      )
+      );
       if (res.status == 200 || res.status == 201) {
         setRows(res.data.data.Paginated_data.content);
-        setGridLoading(false)
+        setGridLoading(false);
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
       setGridLoading(false);
     }
   };
@@ -745,7 +745,7 @@ function FeetemplateIndex() {
   };
 
   return (
-    <Box sx={{position:"relative"}}>
+    <Box sx={{ position: "relative" }}>
       <CustomModal
         open={confirmModal}
         setOpen={setConfirmModal}
@@ -922,6 +922,9 @@ function FeetemplateIndex() {
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Name
                     </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Status
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -942,6 +945,9 @@ function FeetemplateIndex() {
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.student_name}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.active ? "Active" : "Inactive"}
                         </TableCell>
                       </TableRow>
                     );
@@ -1019,16 +1025,16 @@ function FeetemplateIndex() {
             </Button>
           </Grid>
           <Grid item xs={12} md={12}>
-            <Box sx={{position:"absolute",width:"100%"}}>
+            <Box sx={{ position: "absolute", width: "100%" }}>
               <GridIndex
-               rows={rows}
-               checkboxSelection
-               onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-               columns={columns}
-               getRowClassName={getRowClassName}
-               columnVisibilityModel={columnVisibilityModel}
-               setColumnVisibilityModel={setColumnVisibilityModel}
-               loading={gridLoading}
+                rows={rows}
+                checkboxSelection
+                onRowSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+                columns={columns}
+                getRowClassName={getRowClassName}
+                columnVisibilityModel={columnVisibilityModel}
+                setColumnVisibilityModel={setColumnVisibilityModel}
+                loading={gridLoading}
               />
             </Box>
           </Grid>

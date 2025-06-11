@@ -1,21 +1,15 @@
 import React, { lazy, useEffect, useState } from "react";
-import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
-import axios from "../../../../services/Api";
 import {
 	Box,
-	FormControl,
 	FormControlLabel,
 	FormGroup,
 	Grid,
 	IconButton,
-	InputAdornment,
-	InputLabel,
-	MenuItem,
-	Select,
 	Stack,
 	Typography,
+	Tooltip,
+	tooltipClasses,
 } from "@mui/material";
-import styled from "@emotion/styled";
 import OpenInFullRoundedIcon from "@mui/icons-material/OpenInFullRounded";
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -27,10 +21,30 @@ import {
 } from "../Chart";
 import moment from "moment";
 import { IOSSwitch } from "../IOSSwitch";
-import ClearIcon from "@mui/icons-material/Clear";
+import styled from "@emotion/styled";
+import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
+import axios from "../../../../services/Api";
+import useAlert from "../../../../hooks/useAlert.js";
 import CustomDatePicker from "../../../../components/Inputs/CustomDatePicker";
 import { GroupedColumnTable } from "./groupColumnTable";
+const CustomAutocomplete = lazy(() =>
+	import("../../../../components/Inputs/CustomAutocomplete.jsx")
+);
 const GridIndex = lazy(() => import("../../../../components/GridIndex"));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+	<Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+	[`& .${tooltipClasses.tooltip}`]: {
+		backgroundColor: "white",
+		color: "rgba(0, 0, 0, 0.6)",
+		maxWidth: 300,
+		fontSize: 12,
+		boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+		padding: "10px",
+		textAlign: "justify",
+	},
+}));
 
 const EnlargeChartIcon = styled(OpenInFullRoundedIcon)`
   position: absolute;
@@ -160,23 +174,30 @@ const AdmissionPage = () => {
 	const [schoolColorsArray, setSchoolColorsArray] = useState([]);
 	const [isTableView, setIsTableView] = useState(true);
 	const [instituteList, setInstituteList] = useState([]);
-	const [selectedInstitute, setSelectedInstitute] = useState("");
+	const [selectedInstitute, setSelectedInstitute] = useState(null);
 	const [allCountryList, setAllCountryList] = useState([]);
 	const [countryList, setCountryList] = useState([]);
 	const [stateList, setstateList] = useState([]);
 	const [cityList, setCityList] = useState([]);
-	const [selectedCountry, setSlectedCountry] = useState("");
-	const [selectedState, setSlectedState] = useState("");
-	const [selectedCity, setSlectedCity] = useState("");
+	const [selectedCountry, setSlectedCountry] = useState(null);
+	const [selectedState, setSlectedState] = useState(null);
+	const [selectedCity, setSlectedCity] = useState(null);
 	const [selectedDate, setSelectedDate] = useState(new Date());
-	const [isGroupColumnTable, setIsGroupColumntable] = useState(false)
-	const [data, setData] = useState([])
+	const [isGroupColumnTable, setIsGroupColumntable] = useState(false);
+	const [data, setData] = useState([]);
+	const [detailsRows, setDetailsRows] = useState([]);
+	const [isDetails, setIsDetails] = useState(false);
+	const { setAlertMessage, setAlertOpen } = useAlert();
+	const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
 
 	useEffect(() => {
 		setCrumbs([
-			
-			{ name: "Admission" },
+			isDetails ? { name: [selectedGraph], link: () => setIsDetails(false) } :
+				{ name: "Charts Dashboard", link: "/charts-dashboard/" }
 		]);
+	}, [selectedGraph, isDetails]);
+
+	useEffect(() => {
 		getInstituteList();
 		getSchoolColors();
 		getAcademicYearList();
@@ -185,16 +206,16 @@ const AdmissionPage = () => {
 
 	useEffect(() => {
 		if (selectedGraph === "GeoLocation") {
-			if (selectedCountry !== "") {
+			if (selectedCountry !== null) {
 				let apiPath = "/api/misGeolocationWiseReport?";
-				if (selectedInstitute !== "")
+				if (selectedInstitute !== null)
 					apiPath = apiPath + `schoolId=${selectedInstitute}&`;
-				if (selectedCountry !== "")
+				if (selectedCountry !== null)
 					apiPath = apiPath + `countryId=${selectedCountry}&`;
 				handleApiCall(apiPath, handleGeoLocationWiseDataCountry);
 			} else {
 				let apiPath = "/api/misGeolocationWiseReport?";
-				if (selectedInstitute !== "")
+				if (selectedInstitute !== null)
 					apiPath = apiPath + `schoolId=${selectedInstitute}&`;
 				handleApiCall(apiPath, handleGeoLocationWiseData);
 			}
@@ -203,40 +224,40 @@ const AdmissionPage = () => {
 
 	useEffect(() => {
 		if (selectedGraph === "GeoLocation") {
-			if (selectedCountry !== "" && selectedState !== "") {
+			if (selectedCountry !== null && selectedState !== null) {
 				let apiPath = "/api/misGeolocationWiseReport?";
-				if (selectedInstitute !== "")
+				if (selectedInstitute !== null)
 					apiPath = apiPath + `schoolId=${selectedInstitute}&`;
-				if (selectedCountry !== "")
+				if (selectedCountry !== null)
 					apiPath = apiPath + `countryId=${selectedCountry}&`;
-				if (selectedState !== "")
+				if (selectedState !== null)
 					apiPath = apiPath + `stateId=${selectedState}&`;
 				handleApiCall(apiPath, handleGeoLocationWiseDataState);
-			} else if (selectedCountry !== "" && selectedState === "") {
+			} else if (selectedCountry !== null && selectedState === null) {
 				let apiPath = "/api/misGeolocationWiseReport?";
-				if (selectedInstitute !== "")
+				if (selectedInstitute !== null)
 					apiPath = apiPath + `schoolId=${selectedInstitute}&`;
-				if (selectedCountry !== "")
+				if (selectedCountry !== null)
 					apiPath = apiPath + `countryId=${selectedCountry}&`;
 				handleApiCall(apiPath, handleGeoLocationWiseDataCountry);
 			} else {
 				setCityList([]);
-				setSlectedCity("");
+				setSlectedCity(null);
 			}
 		}
 	}, [selectedState]);
 
 	useEffect(() => {
 		if (selectedGraph === "GeoLocation") {
-			if (selectedCountry !== "" && selectedState !== "") {
+			if (selectedCountry !== null && selectedState !== null) {
 				let apiPath = "/api/misGeolocationWiseReport?";
-				if (selectedInstitute !== "")
+				if (selectedInstitute !== null)
 					apiPath = apiPath + `schoolId=${selectedInstitute}&`;
-				if (selectedCountry !== "")
+				if (selectedCountry !== null)
 					apiPath = apiPath + `countryId=${selectedCountry}&`;
-				if (selectedState !== "")
+				if (selectedState !== null)
 					apiPath = apiPath + `stateId=${selectedState}&`;
-				if (selectedCity !== "") apiPath = apiPath + `cityId=${selectedCity}&`;
+				if (selectedCity !== null) apiPath = apiPath + `cityId=${selectedCity}`;
 				handleApiCall(apiPath, handleGeoLocationWiseDataCity);
 			}
 		}
@@ -244,7 +265,7 @@ const AdmissionPage = () => {
 
 	useEffect(() => {
 		if (selectedGraph !== "") {
-			if (selectedGraph === "Institute" && selectedAcademicYear !== "")
+			if (selectedGraph === "Institute" && selectedAcademicYear !== null)
 				handleApiCall(
 					`/api/misInstituteWiseReport?acYearId=${selectedAcademicYear}`,
 					handleInstituteWiseData
@@ -257,7 +278,7 @@ const AdmissionPage = () => {
 					handleDayWiseData
 				);
 			else if (selectedGraph === "Programme") {
-				if (selectedAcademicYear !== "" && selectedInstitute !== "")
+				if (selectedAcademicYear !== "" && selectedInstitute !== null)
 					handleApiCall(
 						`/api/misProgramWiseReport?acYearId=${selectedAcademicYear}&schoolId=${selectedInstitute}`,
 						handleProgrammeWiseData
@@ -271,23 +292,23 @@ const AdmissionPage = () => {
 				else handleApiCall(`/api/misGenderWiseReport`, handleGenderWiseData);
 			} else if (selectedGraph === "GeoLocation") {
 				let apiPath = "/api/misGeolocationWiseReport?";
-				if (selectedInstitute !== "")
+				if (selectedInstitute !== null)
 					apiPath = apiPath + `schoolId=${selectedInstitute}&`;
-				if (selectedCountry !== "")
+				if (selectedCountry !== null)
 					apiPath = apiPath + `countryId=${selectedCountry}&`;
-				if (selectedState !== "")
+				if (selectedState !== null)
 					apiPath = apiPath + `stateId=${selectedState}&`;
-				if (selectedCity !== "") apiPath = apiPath + `cityId=${selectedCity}&`;
+				if (selectedCity !== null) apiPath = apiPath + `cityId=${selectedCity}&`;
 
 				if (
-					selectedCountry !== "" &&
-					selectedState !== "" &&
-					selectedCity !== ""
+					selectedCountry !== null &&
+					selectedState !== null &&
+					selectedCity !== null
 				)
 					handleApiCall(apiPath, handleGeoLocationWiseDataCity);
-				else if (selectedCountry !== "" && selectedState !== "")
+				else if (selectedCountry !== null && selectedState !== null)
 					handleApiCall(apiPath, handleGeoLocationWiseDataState);
-				else if (selectedCountry !== "")
+				else if (selectedCountry !== null)
 					handleApiCall(apiPath, handleGeoLocationWiseDataCountry);
 				else handleApiCall(apiPath, handleGeoLocationWiseData);
 			} else if (selectedGraph === "AdmissionCategory") {
@@ -297,7 +318,7 @@ const AdmissionPage = () => {
 				);
 			} else if (selectedGraph === "Datewise Statistics") {
 				const formattedDate = moment(selectedDate).format("DD-MM-YYYY");
-				if (selectedInstitute !== "")
+				if (selectedInstitute !== null)
 					handleApiCall(
 						`/api/student/getCountOfAdmissionDate?date_of_admission=${formattedDate}&school_id=${selectedInstitute}`,
 						handleDateWiseInstitute
@@ -320,7 +341,7 @@ const AdmissionPage = () => {
 
 	useEffect(() => {
 		setSelectedAcademicYear(
-			academicYears.length > 0 ? academicYears[0].ac_year_id : ""
+			academicYears.length > 0 ? academicYears[0].value : ""
 		);
 		setTableColumns([]);
 		setTableRows([]);
@@ -366,7 +387,7 @@ const AdmissionPage = () => {
 	const getSchoolColors = async () => {
 		await axios
 			.get(
-				`/api/institute/fetchAllSchoolDetail?page=${0}&page_size=${10000}&sort=created_date`
+				`/api/institute/fetchAllSchoolDetail?page=${0}&page_size=${10000000}&sort=created_date`
 			)
 			.then((Response) => {
 				const response = Response.data.data;
@@ -409,7 +430,8 @@ const AdmissionPage = () => {
 
 				return null;
 			});
-			setAcademicYears(yearsObj);
+			const acYear = yearsObj.map((ele) => ({ value: ele.ac_year_id, label: ele.ac_year }))?.filter((li) => (li.label).slice(0, 4) > "2024")
+			setAcademicYears(acYear);
 			setSelectedAcademicYear(
 				yearsObj.length > 0 ? yearsObj[0].ac_year_id : ""
 			);
@@ -420,6 +442,67 @@ const AdmissionPage = () => {
 			);
 		});
 	};
+
+	const detailsColumns = [
+		{
+			field: "student_name",
+			headerName: "Student Name",
+			headerClassName: "header-bg",
+			flex: 1,
+			valueGetter: (value, row) => (row.student_name.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())).join(" ")
+		},
+		{
+			field: "auid",
+			headerName: "Auid",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+		{
+			field: "concatProgram",
+			headerName: "Program & Specialization",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+		{
+			field: "date_of_admission",
+			headerName: "DOA",
+			flex: 1,
+			headerClassName: "header-bg",
+			valueGetter: (value, row) => (row.date_of_admission) ? `${moment(row.date_of_admission).format("DD-MM-YYYY")}` : ""
+		},
+		{
+			field: "fee_admission_category_short_name",
+			headerName: "Category",
+			flex: 1,
+			headerClassName: "header-bg",
+			valueGetter: (value, row) => (row.fee_admission_category_short_name || row.fee_admission_sub_category_short_name) ? `${row.fee_admission_category_short_name} - ${row.fee_admission_sub_category_short_name}` : ""
+		},
+		{
+			field: "counselorName",
+			headerName: "Counselor",
+			flex: 1,
+			headerClassName: "header-bg",
+			valueGetter: (value, row) => row.counselorName ? `${row.counselorName}` : row.counselorName1 ? `${row.counselorName1}` : ""
+		},
+		{
+			field: "countryName",
+			headerName: "Country",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+		{
+			field: "stateName",
+			headerName: "State",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+		{
+			field: "cityName",
+			headerName: "City",
+			flex: 1,
+			headerClassName: "header-bg",
+		},
+	];
 
 	const handleApiCall = (path, callback) => {
 		setLoading(true);
@@ -456,10 +539,12 @@ const AdmissionPage = () => {
 		let total_ = 0;
 		let id = 0;
 		for (const obj of data) {
-			const { school_name, Total } = obj;
+			const { school_name, Total, ac_year_id, Institute } = obj;
 			rowsToShow.push({
 				id: id,
 				School: school_name,
+				acYearId: ac_year_id,
+				instId: Institute,
 				"Student Entry": obj["Student Entry"],
 				"Lateral Entry": obj["Lateral Entry"],
 				InActive: obj["InActive"],
@@ -496,39 +581,75 @@ const AdmissionPage = () => {
 				field: "Student Entry",
 				headerName: "Regular",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "Lateral Entry",
 				headerName: "Lateral/WP",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "InActive",
 				headerName: "Cancellation",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "Graduates",
 				headerName: "Graduates ",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "Total",
 				headerName: "Active",
 				flex: 1,
-				type: "number",
 				headerClassName: "header-bg",
 				cellClassName: "last-column",
+				align: "center",
+				renderCell: (params) => {
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.Total}</Typography>
+						);
+					}
+					return (
+						<HtmlTooltip title="View Students Detail">
+							<IconButton
+								onClick={() => getSchoolWiseData(params.row)}
+							>
+								<Typography color="primary" variant="subtitle2">{params.row.Total}</Typography>
+							</IconButton>
+						</HtmlTooltip>
+					)
+				},
 			},
 		];
+
+		const getSchoolWiseData = async (rowData) => {
+			try {
+				setLoading(true);
+				const res = await axios.get(`api/misInstituteWiseStudentDetails?acYearId=${rowData.acYearId}&schoolId=${rowData.instId}`);
+				if (res.status == 200 || res.status == 201) {
+					const list = res.data.map((ele, index) => ({ id: index + 1, ...ele }));
+					setIsDetails(true);
+					setLoading(false);
+					setDetailsRows(list);
+				}
+			} catch (error) {
+				setLoading(false)
+				setAlertMessage({
+					severity: "error",
+					message: "An error occured",
+				});
+				setAlertOpen(true);
+			}
+		};
 
 		setTableColumns(columns);
 		setTableRows(rowsToShow);
@@ -581,10 +702,11 @@ const AdmissionPage = () => {
 		let total_ = 0;
 		let id = 0;
 		for (const obj of data) {
-			const { year, Total } = obj;
+			const { year, Total, ac_year_id } = obj;
 			rowsToShow.push({
 				id: id,
 				Year: year,
+				acYearId: ac_year_id,
 				"Student Entry": obj["Student Entry"],
 				"Lateral Entry": obj["Lateral Entry"],
 				InActive: obj["InActive"],
@@ -621,42 +743,77 @@ const AdmissionPage = () => {
 				field: "Student Entry",
 				headerName: "Regular",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "Lateral Entry",
 				headerName: "Lateral/WP",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "InActive",
 				headerName: "Cancellation",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "Graduates",
 				headerName: "Graduates",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "Total",
 				headerName: "Active",
 				flex: 1,
-				type: "number",
 				headerClassName: "header-bg",
 				cellClassName: "last-column",
+				align: "center",
+				renderCell: (params) => {
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.Total}</Typography>
+						);
+					}
+					return (
+						<HtmlTooltip title="View Students Details">
+							<IconButton
+								onClick={() => getYearWiseDetailData(params.row)}
+							>
+								<Typography color="primary" variant="subtitle2">{params.row.Total}</Typography>
+							</IconButton>
+						</HtmlTooltip>
+					)
+				},
 			},
 		];
 		setTableColumns(columns);
 		setTableRows(rowsToShow);
 
+		const getYearWiseDetailData = async (rowData) => {
+			try {
+				setLoading(true);
+				const res = await axios.get(`api/misInstituteWiseStudentDetails?acYearId=${rowData.acYearId}`);
+				if (res.status == 200 || res.status == 201) {
+					const list = res.data.map((ele, index) => ({ id: index + 1, ...ele }));
+					setIsDetails(true);
+					setLoading(false);
+					setDetailsRows(list);
+				}
+			} catch (error) {
+				setLoading(false)
+				setAlertMessage({
+					severity: "error",
+					message: "An error occured",
+				});
+				setAlertOpen(true);
+			}
+		};
 		const datasets = [
 			{
 				id: 0,
@@ -702,7 +859,7 @@ const AdmissionPage = () => {
 			const { created_day, Total } = obj;
 			rowsToShow.push({
 				id: id,
-				Date: moment(created_day).format("DD-MM-YYYY"),
+				Date: created_day,
 				"Student Entry": obj["Student Entry"],
 				"Lateral Entry": obj["Laternal Entry"],
 				Total: Total,
@@ -732,25 +889,61 @@ const AdmissionPage = () => {
 				field: "Student Entry",
 				headerName: "Regular Entry",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "Lateral Entry",
 				headerName: "Lateral Entry",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "Total",
 				headerName: "Total",
 				flex: 1,
-				type: "number",
 				headerClassName: "header-bg",
 				cellClassName: "last-column",
+				align: "center",
+				renderCell: (params) => {
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.Total}</Typography>
+						);
+					}
+					return (
+						<HtmlTooltip title="View Students Details">
+							<IconButton
+								onClick={() => getDayWiseDetailData(params.row)}
+							>
+								<Typography color="primary" variant="subtitle2">{params.row.Total}</Typography>
+							</IconButton>
+						</HtmlTooltip>
+					)
+				},
 			},
 		];
+
+		const getDayWiseDetailData = async (rowData) => {
+			try {
+				setLoading(true);
+				const res = await axios.get(`/api/misDayWiseStudentDetails?date1=${moment(rowData.Date).format("YYYY-MM-DD")}`);
+				if (res.status == 200 || res.status == 201) {
+					const list = res.data.map((ele, index) => ({ id: index + 1, ...ele }));
+					setIsDetails(true);
+					setLoading(false);
+					setDetailsRows(list);
+				}
+			} catch (error) {
+				setLoading(false)
+				setAlertMessage({
+					severity: "error",
+					message: "An error occured",
+				});
+				setAlertOpen(true);
+			}
+		};
 
 		setTableColumns(columns);
 		setTableRows(rowsToShow);
@@ -784,11 +977,15 @@ const AdmissionPage = () => {
 		let total = 0;
 		let id = 0;
 		for (const obj of data) {
-			const { course, Total } = obj;
+			const { course, Total, ac_year_id, school_id, program_id, program_specialization_id } = obj;
 			rowsToShow.push({
 				id: id,
 				course: course,
+				acYearId: ac_year_id,
+				schoolId: school_id,
 				Total: Total,
+				programId: program_id,
+				programSpecializationId: program_specialization_id
 			});
 			total += Total;
 			id += 1;
@@ -811,11 +1008,47 @@ const AdmissionPage = () => {
 				field: "Total",
 				headerName: "Total",
 				flex: 1,
-				type: "number",
 				headerClassName: "header-bg",
 				cellClassName: "last-column",
+				align: "center",
+				renderCell: (params) => {
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.Total}</Typography>
+						);
+					}
+					return (
+						<HtmlTooltip title="View Students Details">
+							<IconButton
+								onClick={() => getProgrammeWiseDetailData(params.row)}
+							>
+								<Typography color="primary" variant="subtitle2">{params.row.Total}</Typography>
+							</IconButton>
+						</HtmlTooltip>
+					)
+				},
 			},
 		];
+
+		const getProgrammeWiseDetailData = async (rowData) => {
+			try {
+				setLoading(true);
+				const res = await axios.get(`/api/misProgramWiseStudentDetails?acYearId=${rowData.acYearId}&schoolId=${rowData.schoolId}&programId=${rowData.programId}&program_specializationId=${rowData.programSpecializationId}`);
+				if (res.status == 200 || res.status == 201) {
+					const list = res.data.map((ele, index) => ({ id: index + 1, ...ele }));
+					setIsDetails(true);
+					setLoading(false);
+					setDetailsRows(list);
+				}
+			} catch (error) {
+				setLoading(false)
+				setAlertMessage({
+					severity: "error",
+					message: "An error occured",
+				});
+				setAlertOpen(true);
+			}
+		};
 
 		setTableColumns(columns);
 		setTableRows(rowsToShow);
@@ -872,21 +1105,21 @@ const AdmissionPage = () => {
 				field: "Student Entry",
 				headerName: "Regular Entry",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "Lateral Entry",
 				headerName: "Lateral Entry",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			},
 			{
 				field: "Total",
 				headerName: "Total",
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 				cellClassName: "last-column",
 			},
@@ -938,7 +1171,7 @@ const AdmissionPage = () => {
 				field: year,
 				headerName: year,
 				flex: 1,
-				type: "number",
+				align: "center",
 				headerClassName: "header-bg",
 			});
 		});
@@ -946,10 +1179,61 @@ const AdmissionPage = () => {
 			field: "Total",
 			headerName: "Total",
 			flex: 1,
-			type: "number",
 			headerClassName: "header-bg",
 			cellClassName: "last-column",
+			align: "center",
+			renderCell: (params) => {
+				if (params.row.id === "last_row_of_table") {
+					return (
+						<Typography color="#fff" variant="subtitle2">{params.row.Total}</Typography>
+					);
+				}
+				return (
+					<HtmlTooltip title="View Students Detail">
+						<IconButton
+							onClick={() => getGeoLocationWiseDetailData(params.row, data)}
+						>
+							<Typography color="primary" variant="subtitle2">{params.row.Total}</Typography>
+						</IconButton>
+					</HtmlTooltip>
+				)
+			},
 		});
+
+		const getGeoLocationWiseDetailData = async (rowData, details) => {
+			try {
+				const country_id = details.find((ele) => ele.name == rowData.country)?.id;
+				const state_id = details.find((ele) => ele.name == rowData.state)?.states_id;
+				const city_id = details.find((ele) => ele.name == rowData.city)?.cityId;
+				setLoading(true);
+				const params = new URLSearchParams();
+				const paramsObj = {
+					schoolId: selectedInstitute,
+					countryId: selectedCountry || country_id,
+					stateId: selectedState || state_id,
+					cityId: selectedCity || city_id
+				};
+				Object.entries(paramsObj).forEach(([key, value]) => {
+					if (value != null) {
+						params.append(key, value);
+					}
+				});
+				const res = await axios.get(`/api/misGeolocationWiseStudentDetails?${params.toString()}`);
+				if (res.status == 200 || res.status == 201) {
+					const list = res.data.map((ele, index) => ({ id: index + 1, ...ele }));
+					setIsDetails(true);
+					setLoading(false);
+					setDetailsRows(list);
+				}
+			} catch (error) {
+				setLoading(false)
+				setAlertMessage({
+					severity: "error",
+					message: "An error occured",
+				});
+				setAlertOpen(true);
+			}
+		};
 
 		const rows = [];
 		const groupedData = {};
@@ -1023,7 +1307,7 @@ const AdmissionPage = () => {
 
 		handleGeoLocationColumnAndRowData(data, acYears, "country", "Country");
 
-		if (selectedCountry === "") {
+		if (selectedCountry === null) {
 			const countryId = [...new Set(data.map((obj) => obj.id))];
 			const countriesToShow = allCountryList.filter((obj) => {
 				return countryId.find((id) => id.toString() === obj.value.toString());
@@ -1032,8 +1316,8 @@ const AdmissionPage = () => {
 			setCountryList(countriesToShow);
 			setstateList([]);
 			setCityList([]);
-			setSlectedState("");
-			setSlectedCity("");
+			setSlectedState(null);
+			setSlectedCity(null);
 		}
 	};
 
@@ -1044,17 +1328,17 @@ const AdmissionPage = () => {
 
 		handleGeoLocationColumnAndRowData(data, acYears, "state", "State");
 
-		const allStates = [...new Map(data.map((obj) => [obj.id, obj])).values()];
+		const allStates = [...new Map(data.map((obj) => [obj.states_id, obj])).values()];
 
 		setstateList(
 			allStates.map((obj) => ({
-				value: obj.id,
+				value: obj.states_id,
 				label: obj.name,
 			}))
 		);
 		setCityList([]);
-		setSlectedState("");
-		setSlectedCity("");
+		setSlectedState(null);
+		setSlectedCity(null);
 	};
 
 	const handleGeoLocationWiseDataState = (data) => {
@@ -1064,15 +1348,15 @@ const AdmissionPage = () => {
 
 		handleGeoLocationColumnAndRowData(data, acYears, "city", "City");
 
-		const allCities = [...new Map(data.map((obj) => [obj.id, obj])).values()];
+		const allCities = [...new Map(data.map((obj) => [obj.cityId, obj])).values()];
 
 		setCityList(
 			allCities.map((obj) => ({
-				value: obj.id,
+				value: obj.cityId,
 				label: obj.name,
 			}))
 		);
-		setSlectedCity("");
+		setSlectedCity(null);
 	};
 
 	const handleGeoLocationWiseDataCity = (data) => {
@@ -1084,8 +1368,6 @@ const AdmissionPage = () => {
 	};
 
 	const getAdmissionReports = (data, type) => {
-		console.log(data, type, "From handleAdmissionCategory");
-
 		if (
 			data?.id !== "last_row_of_table" &&
 			type === "Admission Category Report"
@@ -1095,7 +1377,6 @@ const AdmissionPage = () => {
 				admissionCategoryReportCallBack
 			);
 			setCrumbs([
-				
 				{
 					name: "Admission",
 					link: () => {
@@ -1117,7 +1398,6 @@ const AdmissionPage = () => {
 				admissionCategoryReportInstituteWiseCallBack
 			);
 			setCrumbs([
-				
 				{
 					name: "Admission",
 					link: () => {
@@ -1133,7 +1413,6 @@ const AdmissionPage = () => {
 	};
 
 	const admissionReports = (data, type) => {
-		console.log(data, type, "hhhhhhhh");
 
 		if (data?.id !== "last_row_of_table" && type === "Institute Wise") {
 			handleApiCall(
@@ -1141,11 +1420,9 @@ const AdmissionPage = () => {
 				instituteWiseCallBack
 			);
 			setCrumbs([
-				
 				{
 					name: "Admission",
 					link: () => {
-						console.log("ttt");
 						handleApiCall(
 							`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`,
 							handleAdmissionCategory
@@ -1160,7 +1437,6 @@ const AdmissionPage = () => {
 							admissionCategoryReportCallBack
 						);
 						setCrumbs([
-							
 							{
 								name: "Admission",
 								link: () => {
@@ -1183,7 +1459,6 @@ const AdmissionPage = () => {
 				admissionCategoryReportInstituteWiseCallBack
 			);
 			setCrumbs([
-				
 				{
 					name: "Admission",
 					link: () => {
@@ -1199,17 +1474,15 @@ const AdmissionPage = () => {
 	};
 
 	const admissionReportsSecondTable = (data, type) => {
-		if (data?.id !== "last_row_of_table" && type === "secondtable") {			
+		if (data?.id !== "last_row_of_table" && type === "secondtable") {
 			handleApiCall(
 				`api/admissionCategoryReport/getAdmissionCategoryTotalReportAcademicYearAndSchoolWise?acYearId=${selectedAcademicYear}&schoolId=${data?.schoolId}`,
 				admissionReportSecondTableInstituteWise
 			);
 			setCrumbs([
-				
 				{
 					name: "Admission",
 					link: () => {
-						console.log("ttt");
 						handleApiCall(
 							`/api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${selectedAcademicYear}`,
 							handleAdmissionCategory
@@ -1224,7 +1497,6 @@ const AdmissionPage = () => {
 							admissionCategoryReportInstituteWiseCallBack
 						);
 						setCrumbs([
-							
 							{
 								name: "Admission",
 								link: () => {
@@ -1248,7 +1520,6 @@ const AdmissionPage = () => {
 				admissionReportSecondTableInstituteWise
 			);
 			setCrumbs([
-				
 				{
 					name: "Admission",
 					link: () => {
@@ -1266,7 +1537,6 @@ const AdmissionPage = () => {
 							admissionCategoryReportInstituteWiseCallBack
 						);
 						setCrumbs([
-							
 							{
 								name: "Admission",
 								link: () => {
@@ -1326,16 +1596,23 @@ const AdmissionPage = () => {
 				flex: 1,
 				headerClassName: "header-bg",
 				renderCell: (params) => {
-					return (
-						<>
-							<Typography
-								sx={{ cursor: "pointer" }}
-								onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
-							>
-								{params.row.feeAdmissionType}
-							</Typography>
-						</>
-					);
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.feeAdmissionType}</Typography>
+						);
+					} else {
+						return (
+							<>
+								<Typography
+									sx={{ cursor: "pointer" }}
+									color="primary" variant="subtitle2"
+									onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
+								>
+									{params.row.feeAdmissionType}
+								</Typography>
+							</>
+						);
+					}
 				},
 			},
 			{
@@ -1343,18 +1620,25 @@ const AdmissionPage = () => {
 				headerName: "Intake",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
 				renderCell: (params) => {
-					return (
-						<>
-							<Typography
-								sx={{ cursor: "pointer" }}
-								onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
-							>
-								{params.row.intake}
-							</Typography>
-						</>
-					);
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.intake}</Typography>
+						);
+					} else {
+						return (
+							<>
+								<Typography
+									sx={{ cursor: "pointer" }}
+									color="primary" variant="subtitle2"
+									onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
+								>
+									{params.row.intake}
+								</Typography>
+							</>
+						);
+					}
 				},
 			},
 			{
@@ -1362,18 +1646,25 @@ const AdmissionPage = () => {
 				headerName: "Admitted",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
 				renderCell: (params) => {
-					return (
-						<>
-							<Typography
-								sx={{ cursor: "pointer" }}
-								onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
-							>
-								{params.row.admitted}
-							</Typography>
-						</>
-					);
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.admitted}</Typography>
+						);
+					} else {
+						return (
+							<>
+								<Typography
+									sx={{ cursor: "pointer" }}
+									color="primary" variant="subtitle2"
+									onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
+								>
+									{params.row.admitted}
+								</Typography>
+							</>
+						);
+					}
 				},
 			},
 			{
@@ -1381,18 +1672,25 @@ const AdmissionPage = () => {
 				headerName: "Vacant",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
 				renderCell: (params) => {
-					return (
-						<>
-							<Typography
-								sx={{ cursor: "pointer" }}
-								onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
-							>
-								{params.row.vacant}
-							</Typography>
-						</>
-					);
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.vacant}</Typography>
+						);
+					} else {
+						return (
+							<>
+								<Typography
+									sx={{ cursor: "pointer" }}
+									color="primary" variant="subtitle2"
+									onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
+								>
+									{params.row.vacant}
+								</Typography>
+							</>
+						);
+					}
 				},
 			},
 			// { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
@@ -1401,8 +1699,7 @@ const AdmissionPage = () => {
 		setTableColumns(columns);
 		setTableRows(rowsToShow);
 		setCrumbs([
-			
-			{ name: "Admission" },
+			{ name: "Charts Dashboard", link: "/charts-dashboard/" },
 		]);
 		const datasets = [
 			{
@@ -1486,16 +1783,23 @@ const AdmissionPage = () => {
 				flex: 1,
 				headerClassName: "header-bg",
 				renderCell: (params) => {
-					return (
-						<>
-							<Typography
-								sx={{ cursor: "pointer" }}
-								onClick={() => admissionReports(params.row, "Institute Wise")}
-							>
-								{params.row.schoolName}
-							</Typography>
-						</>
-					);
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.schoolName}</Typography>
+						);
+					} else {
+						return (
+							<>
+								<Typography
+									sx={{ cursor: "pointer" }}
+									color="primary" variant="subtitle2"
+									onClick={() => admissionReports(params.row, "Institute Wise")}
+								>
+									{params.row.schoolName}
+								</Typography>
+							</>
+						);
+					}
 				},
 			},
 			{
@@ -1503,18 +1807,25 @@ const AdmissionPage = () => {
 				headerName: "Intake",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
 				renderCell: (params) => {
-					return (
-						<>
-							<Typography
-								sx={{ cursor: "pointer" }}
-								onClick={() => admissionReports(params.row, "Institute Wise")}
-							>
-								{params.row.intake}
-							</Typography>
-						</>
-					);
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.intake}</Typography>
+						);
+					} else {
+						return (
+							<>
+								<Typography
+									sx={{ cursor: "pointer" }}
+									color="primary" variant="subtitle2"
+									onClick={() => admissionReports(params.row, "Institute Wise")}
+								>
+									{params.row.intake}
+								</Typography>
+							</>
+						);
+					}
 				},
 			},
 			{
@@ -1522,18 +1833,25 @@ const AdmissionPage = () => {
 				headerName: "Admitted",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
 				renderCell: (params) => {
-					return (
-						<>
-							<Typography
-								sx={{ cursor: "pointer" }}
-								onClick={() => admissionReports(params.row, "Institute Wise")}
-							>
-								{params.row.admitted}
-							</Typography>
-						</>
-					);
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.admitted}</Typography>
+						);
+					} else {
+						return (
+							<>
+								<Typography
+									sx={{ cursor: "pointer" }}
+									color="primary" variant="subtitle2"
+									onClick={() => admissionReports(params.row, "Institute Wise")}
+								>
+									{params.row.admitted}
+								</Typography>
+							</>
+						);
+					}
 				},
 			},
 			{
@@ -1541,18 +1859,25 @@ const AdmissionPage = () => {
 				headerName: "Vacant",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
 				renderCell: (params) => {
-					return (
-						<>
-							<Typography
-								sx={{ cursor: "pointer" }}
-								onClick={() => admissionReports(params.row, "Institute Wise")}
-							>
-								{params.row.vacant}
-							</Typography>
-						</>
-					);
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.vacant}</Typography>
+						);
+					} else {
+						return (
+							<>
+								<Typography
+									sx={{ cursor: "pointer" }}
+									color="primary" variant="subtitle2"
+									onClick={() => admissionReports(params.row, "Institute Wise")}
+								>
+									{params.row.vacant}
+								</Typography>
+							</>
+						);
+					}
 				},
 			},
 			// { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
@@ -1648,7 +1973,7 @@ const AdmissionPage = () => {
 				headerName: "Intake",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
 				renderCell: (params) => {
 					return (
 						<>
@@ -1667,7 +1992,7 @@ const AdmissionPage = () => {
 				headerName: "Admitted",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
 				renderCell: (params) => {
 					return (
 						<>
@@ -1686,7 +2011,7 @@ const AdmissionPage = () => {
 				headerName: "Vacant",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
 				renderCell: (params) => {
 					return (
 						<>
@@ -1779,7 +2104,7 @@ const AdmissionPage = () => {
 			Total: intakeTotalCount + admittedTotalCount + vacantTotalCount,
 		});
 
-		const columns = [
+		const detailscolumn = [
 			{
 				field: "schoolName",
 				headerName: "School",
@@ -1804,38 +2129,59 @@ const AdmissionPage = () => {
 				headerName: "Intake",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
 				renderCell: (params) => {
-					return (
-						<>
-							<Typography
-								sx={{ cursor: "pointer" }}
-							//   onClick={() => getAdmissionReports(params.row,"AdmissionCategoryReport")}
-							>
-								{params.row.intake}
-							</Typography>
-						</>
-					);
-				},
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.intake}</Typography>
+						);
+					} else {
+						return (
+							<Typography color="#000" variant="body2">{params.row.intake}</Typography>
+						)
+					}
+				}
 			},
 			{
 				field: "admitted",
 				headerName: "Admitted",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
+				renderCell: (params) => {
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.admitted}</Typography>
+						);
+					} else {
+						return (
+							<Typography color="#000" variant="body2">{params.row.admitted}</Typography>
+						)
+					}
+				}
 			},
 			{
 				field: "vacant",
 				headerName: "Vacant",
 				flex: 1,
 				headerClassName: "header-bg",
-				type: "number",
+				align: "center",
+				renderCell: (params) => {
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row.vacant}</Typography>
+						);
+					} else {
+						return (
+							<Typography color="#000" variant="body2">{params.row.vacant}</Typography>
+						)
+					}
+				}
 			},
 			// { field: "Total", headerName: "Total", flex: 1, type: 'number', headerClassName: "header-bg", cellClassName: "last-column" },
 		];
 
-		setTableColumns(columns);
+		setTableColumns(detailscolumn);
 		setTableRows(rowsToShow);
 
 		const datasets = [
@@ -1871,92 +2217,6 @@ const AdmissionPage = () => {
 		setData(data)
 	}
 
-	// const getStudentDetailsGeoloactionWiseCallBack = data => {
-
-	//     const rowsToShow = []
-	//     let id_ = 0
-	//     let intakeTotalCount = 0
-	//     let admittedTotalCount = 0
-	//     let vacantTotalCount = 0
-	//     for (const obj of data) {
-	//         const { student_name,date_of_admission, admitted, feeAdmissionId, intake, vacant, program_short_name, program_specialization_short_name, fee_admission_category_type } = obj
-	//         rowsToShow.push({
-	//             "id": id_, "student_name": student_name,"date_of_admission":date_of_admission, "program_short_name": program_short_name, "program_specialization_short_name": program_specialization_short_name, "fee_admission_category_type": fee_admission_category_type, "admitted": admitted,
-	//             "feeAdmissionId": feeAdmissionId, "intake": intake, "vacant": vacant, "Total": admitted + intake + vacant
-	//         })
-	//         id_ += 1
-	//         intakeTotalCount += intake
-	//         admittedTotalCount += admitted
-	//         vacantTotalCount += vacant
-	//     }
-
-	//     rowsToShow.push({
-	//         "id": "last_row_of_table", "student_name": "Total", "admitted": admittedTotalCount,
-	//         "feeAdmissionId": 999999, "intake": intakeTotalCount, "vacant": vacantTotalCount,
-	//         "Total": intakeTotalCount + admittedTotalCount + vacantTotalCount
-	//     })
-
-	//     const columns = [
-	//         { field: "student_name", headerName: "Student", flex: 1, headerClassName: "header-bg" },
-	//         { field: "program_short_name", headerName: "Program", flex: 1, headerClassName: "header-bg" },
-	//         { field: "program_specialization_short_name", headerName: "Specialization", flex: 1, headerClassName: "header-bg" },
-	//         {
-	//             field: "date_of_admission",
-	//             headerName: "DOA",
-	//             flex: 1,
-	//             headerClassName: "header-bg"
-	//           },
-
-	//     ]
-
-	//     setTableColumns(columns)
-	//     setTableRows(rowsToShow)
-
-	//     const datasets = [
-	//         {
-	//             id: 0,
-	//             label: "Intake",
-	//             data: data.map(obj => obj.intake),
-	//             borderColor: `rgb(19, 35, 83)`,
-	//             backgroundColor: `rgb(19, 35, 83, 0.5)`
-	//         },
-	//         {
-	//             id: 0,
-	//             label: "Admitted",
-	//             data: data.map(obj => obj.admitted),
-	//             borderColor: `rgb(19, 35, 83)`,
-	//             backgroundColor: `rgb(19, 35, 83, 0.5)`
-	//         },
-	//         {
-	//             id: 0,
-	//             label: "Vacant",
-	//             data: data.map(obj => obj.vacant),
-	//             borderColor: `rgb(19, 35, 83)`,
-	//             backgroundColor: `rgb(19, 35, 83, 0.5)`
-	//         },
-	//     ]
-
-	//     const finalData = { labels: data.map(obj => obj.schoolName), datasets }
-	//     setChartData(finalData)
-	// }
-	// const getStudentDetailsGeoloactionWise = (data, type) => {
-	//     if (data?.countryID) {
-	//         let apiPath = "/api/getStudentDetailsGeoloactionWise?"
-	//         if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
-	//         if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&countryId=${data?.countryID}&`
-	//         handleApiCall(apiPath, getStudentDetailsGeoloactionWiseCallBack)
-	//     } else {
-	//         let apiPath = "/api/getStudentDetailsGeoloactionWise?"
-	//         if (selectedAcademicYear !== "") apiPath = apiPath + `acYearId=${selectedAcademicYear}&`
-	//         if (selectedInstitute !== "") apiPath = apiPath + `schoolId=${selectedInstitute}&`
-	//         handleApiCall(apiPath, getStudentDetailsGeoloactionWiseCallBack)
-	//     }
-	//     setCrumbs([
-	//         
-	//         { name: type },
-	//     ])
-	// }
-
 	const handleDateWise = (data) => {
 		// Filter data for years >= 2022-2023
 		const filteredData = data.filter((item) => item.ac_year >= "2023-2024");
@@ -1973,7 +2233,7 @@ const AdmissionPage = () => {
 
 		// Create the grouped structure
 		const result = schoolNames.map((school, i) => {
-			const row = { schoolName: school };
+			let row = { schoolName: school };
 
 			academicYears.forEach((year) => {
 				const entry = filteredData.find(
@@ -1982,7 +2242,7 @@ const AdmissionPage = () => {
 				row[year] = entry ? entry.studentCount : 0;
 			});
 			row.id = `${school}__${i}`;
-
+			row.schoolId = filteredData.find((ele) => ele.school_name_short == school)?.school_id;
 			return row;
 		});
 
@@ -2012,12 +2272,29 @@ const AdmissionPage = () => {
 						headerName: year,
 						flex: 1,
 						headerClassName: "header-bg",
-						type: "number",
+						align: "center",
 						cellClassName: (params) => {
 							if (params.row.id === "last_row_of_table") {
 								return "";
 							}
 							return academicYears.length === i + 1 ? "latest-year" : "";
+						},
+						renderCell: (params) => {
+							if (params.row.id === "last_row_of_table") {
+								return (
+									<Typography color="#fff" variant="subtitle2">{params.row[`${year}`]}</Typography>
+								);
+							}
+							return (
+								<HtmlTooltip title="View Students Detail">
+									<IconButton
+										disabled={params.row[`${year}`] == 0}
+										onClick={() => getDateWiseDetailData(params.row, year, filteredData)}
+									>
+										<Typography color="primary" variant="subtitle2">{params.row[`${year}`]}</Typography>
+									</IconButton>
+								</HtmlTooltip>
+							)
 						},
 					};
 
@@ -2026,10 +2303,55 @@ const AdmissionPage = () => {
 					headerName: year,
 					flex: 1,
 					headerClassName: "header-bg",
-					type: "number",
+					align: "center",
+					cellClassName: (params) => {
+						if (params.row.id === "last_row_of_table") {
+							return "";
+						}
+						return academicYears.length === i + 1 ? "latest-year" : "";
+					},
+					renderCell: (params) => {
+						if (params.row.id === "last_row_of_table") {
+							return (
+								<Typography color="#fff" variant="subtitle2">{params.row[`${year}`]}</Typography>
+							);
+						}
+						return (
+							<HtmlTooltip title="View Students Detail">
+								<IconButton
+									disabled={params.row[`${year}`] == 0}
+									onClick={() => getDateWiseDetailData(params.row, year, filteredData)}
+								>
+									<Typography color="primary" variant="subtitle2">{params.row[`${year}`]}</Typography>
+								</IconButton>
+							</HtmlTooltip>
+						)
+					},
 				};
 			})
 		);
+
+		const getDateWiseDetailData = async (rowData, year, filteredData) => {
+			try {
+				const date = selectedDate;
+				const acYearId = filteredData.find((ele) => ele?.ac_year == year && ele?.school_id == rowData?.schoolId)?.ac_year_id;
+				setLoading(true);
+				const res = await axios.get(`/api/student/getCountOfAdmissionDateStudentDetails?date_of_admission=${year.slice(0, 5)}${moment(date).format("MM-DD")}&school_id=${rowData.schoolId}&ac_year_id=${acYearId}`);
+				if (res.status == 200 || res.status == 201) {
+					const list = res.data.data.map((ele, index) => ({ id: index + 1, ...ele }));
+					setIsDetails(true);
+					setLoading(false);
+					setDetailsRows(list);
+				}
+			} catch (error) {
+				setLoading(false)
+				setAlertMessage({
+					severity: "error",
+					message: "An error occured",
+				});
+				setAlertOpen(true);
+			}
+		};
 
 		setTableColumns(columns);
 		setTableRows(result);
@@ -2055,23 +2377,26 @@ const AdmissionPage = () => {
 		].sort();
 
 		// Create the grouped structure
-		const result = programmeSpecializations.map((programmeSpec, i) => {
-			const [programme, specialization] = programmeSpec.split(" ("); // Separate program and specialization
+		const result = filteredData.map((programmeSpec, i) => {
+			// const [programme, specialization] = programmeSpec.split(" ("); // Separate program and specialization
 			const row = {
-				programmeName: programme,
-				specialization: specialization.replace(")", ""),
+				programmeName: programmeSpec.program_short_name,
+				specialization: programmeSpec.program_specialization_short_name,
+				programmeId: programmeSpec.program_id,
+				specializationId: programmeSpec.program_specialization_id,
 			};
 
 			academicYears.forEach((year) => {
 				const entry = filteredData.find(
 					(item) =>
-						`${item.program_short_name} (${item.program_specialization_short_name})` ===
-						programmeSpec && item.ac_year === year
+						item.program_short_name == programmeSpec.program_short_name && item.program_specialization_short_name === programmeSpec.program_specialization_short_name
+						&& item.ac_year === year
 				);
 				row[year] = entry ? entry.studentCount : 0;
-			});
 
-			row.id = `${programme}__${specialization}__${i}`;
+			});
+			row.id = `${programmeSpec.program_short_name}__${programmeSpec.program_specialization_short_name}__${i}`;
+			row.schoolId = selectedInstitute;
 			return row;
 		});
 
@@ -2107,12 +2432,29 @@ const AdmissionPage = () => {
 						headerName: year,
 						flex: 1,
 						headerClassName: "header-bg",
-						type: "number",
+						align: "center",
 						cellClassName: (params) => {
 							if (params.row.id === "last_row_of_table") {
 								return "";
 							}
 							return academicYears.length === i + 1 ? "latest-year" : "";
+						},
+						renderCell: (params) => {
+							if (params.row.id === "last_row_of_table") {
+								return (
+									<Typography color="#fff" variant="subtitle2">{params.row[`${year}`]}</Typography>
+								);
+							}
+							return (
+								<HtmlTooltip title="View Students Detail">
+									<IconButton
+										disabled={params.row[`${year}`] == 0}
+										onClick={() => getDateWiseDetailData(params.row, year, filteredData)}
+									>
+										<Typography color="primary" variant="subtitle2">{params.row[`${year}`]}</Typography>
+									</IconButton>
+								</HtmlTooltip>
+							)
 						},
 					};
 
@@ -2121,10 +2463,55 @@ const AdmissionPage = () => {
 					headerName: year,
 					flex: 1,
 					headerClassName: "header-bg",
-					type: "number",
+					align: "center",
+					cellClassName: (params) => {
+						if (params.row.id === "last_row_of_table") {
+							return "";
+						}
+						return academicYears.length === i + 1 ? "latest-year" : "";
+					},
+					renderCell: (params) => {
+						if (params.row.id === "last_row_of_table") {
+							return (
+								<Typography color="#fff" variant="subtitle2">{params.row[`${year}`]}</Typography>
+							);
+						}
+						return (
+							<HtmlTooltip title="View Students Detail">
+								<IconButton
+									disabled={params.row[`${year}`] == 0}
+									onClick={() => getDateWiseDetailData(params.row, year, filteredData)}
+								>
+									<Typography color="primary" variant="subtitle2">{params.row[`${year}`]}</Typography>
+								</IconButton>
+							</HtmlTooltip>
+						)
+					},
 				};
 			})
 		);
+
+		const getDateWiseDetailData = async (rowData, year, filteredData) => {
+			try {
+				const date = selectedDate;
+				const acYearId = filteredData.find((ele) => ele?.ac_year == year && ele?.school_id == rowData?.schoolId)?.ac_year_id;
+				setLoading(true);
+				const res = await axios.get(`/api/student/getCountOfAdmissionDateStudentDetails?date_of_admission=${year.slice(0, 5)}${moment(date).format("MM-DD")}&school_id=${rowData.schoolId}&ac_year_id=${acYearId}&program_id=${rowData.programmeId}&program_specialization_id=${rowData.specializationId}`);
+				if (res.status == 200 || res.status == 201) {
+					const list = res.data.data.map((ele, index) => ({ id: index + 1, ...ele }));
+					setIsDetails(true);
+					setLoading(false);
+					setDetailsRows(list);
+				}
+			} catch (error) {
+				setLoading(false)
+				setAlertMessage({
+					severity: "error",
+					message: "An error occured",
+				});
+				setAlertOpen(true);
+			}
+		};
 
 		setTableColumns(columns);
 		setTableRows(result);
@@ -2293,14 +2680,12 @@ const AdmissionPage = () => {
 	};
 
 	return (
-		<>
-			<Grid
-				container
-				alignItems="center"
-				justifyContent="space-between"
-				pt={3}
-				rowGap={4}
-			>
+		<Box
+			sx={{
+				position: "relative"
+			}}
+		>
+			<Grid container>
 				{enlargeChart && (
 					<ChartSection>
 						<ChartContainer>
@@ -2314,287 +2699,167 @@ const AdmissionPage = () => {
 						</ChartContainer>
 					</ChartSection>
 				)}
+				<Grid item xs={2}></Grid>
+				{!isDetails && <Grid item xs={10} sx={{ marginTop: { xs: 1, md: -5 } }}>
+					<Grid container>
+						<Grid item xs={12}>
+							<Grid container sx={{ display: "flex", justifyContent: "flex-end", gap: "15px" }}>
+								<Grid item xs={12} md={2}>
+									<CustomAutocomplete
+										name="graph"
+										value={selectedGraph}
+										label="Graph By"
+										handleChangeAdvance={(name, newValue) => setSelectedGraph(newValue)}
+										options={GraphOptions || []}
+										required
+									/>
+								</Grid>
 
-				<Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ zIndex: 3 }}>
-					<Grid container columnGap={1} rowGap={2}>
-						<Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
-							<FormControl size="medium" fullWidth>
-								<InputLabel>Graph By</InputLabel>
-								<Select
-									size="medium"
-									name="graph"
-									value={selectedGraph}
-									label="Graph by"
-									onChange={(e) => setSelectedGraph(e.target.value)}
-								>
-									{GraphOptions.map((obj, index) => (
-										<MenuItem key={index} value={obj.value}>
-											{obj.label}
-										</MenuItem>
-									))}
-								</Select>
-							</FormControl>
-						</Grid>
+								{selectedGraph === "Datewise Statistics" && (
+									<Grid item xs={12} md={2}>
+										<CustomDatePicker
+											name="Datewise"
+											label="Datewise"
+											minDate="01-01-2025"
+											value={selectedDate}
+											handleChangeAdvance={(name, newValue) =>
+												setSelectedDate(newValue)
+											}
+										/>
+									</Grid>
+								)}
 
-						{selectedGraph === "Datewise Statistics" && (
-							<Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
-								<CustomDatePicker
-									name="Datewise"
-									label="Datewise"
-									value={selectedDate}
-									handleChangeAdvance={(name, newValue) =>
-										setSelectedDate(newValue)
-									}
-								/>
+								{selectedGraph !== "Year Wise" &&
+									selectedGraph !== "Day Wise" &&
+									selectedGraph !== "GeoLocation" &&
+									selectedGraph !== "Datewise Statistics" && (
+										<Grid item xs={12} md={2}>
+											<CustomAutocomplete
+												name="AcademicYear"
+												value={selectedAcademicYear}
+												label="Academic Year"
+												handleChangeAdvance={(name, newValue) => setSelectedAcademicYear(newValue)}
+												options={academicYears || []}
+												required
+											/>
+										</Grid>
+									)}
+
+								{selectedGraph === "GeoLocation" && (
+									<>
+										<Grid item xs={12} md={2}>
+											<CustomAutocomplete
+												name="Country"
+												value={selectedCountry}
+												label="Country"
+												handleChangeAdvance={(name, newValue) => setSlectedCountry(newValue)}
+												options={countryList || []}
+											/>
+										</Grid>
+										<Grid item xs={12} md={2}>
+											<CustomAutocomplete
+												name="State"
+												value={selectedState}
+												label="State"
+												handleChangeAdvance={(name, newValue) => setSlectedState(newValue)}
+												options={stateList || []}
+											/>
+										</Grid>
+										<Grid item xs={12} md={2}>
+											<CustomAutocomplete
+												name="City"
+												value={selectedCity}
+												label="City"
+												handleChangeAdvance={(name, newValue) => setSlectedCity(newValue)}
+												options={cityList || []}
+											/>
+										</Grid>
+									</>
+								)}
+
+								{(selectedGraph === "Programme" ||
+									selectedGraph === "Gender" ||
+									selectedGraph === "GeoLocation" ||
+									selectedGraph === "Datewise Statistics") && (
+										<Grid item xs={12} md={1}>
+											<CustomAutocomplete
+												name="Institute"
+												value={selectedInstitute}
+												label="Institute"
+												handleChangeAdvance={(name, newValue) => setSelectedInstitute(newValue)}
+												options={instituteList || []}
+											/>
+										</Grid>
+									)}
+
+								{selectedGraph === "Day Wise" && (
+									<>
+										<Grid item xs={12} md={2}>
+											<CustomAutocomplete
+												name="month"
+												value={selectedMonth}
+												label="Month"
+												handleChangeAdvance={(name, newValue) => setSelectedMonth(newValue)}
+												options={MonthOptions || []}
+											/>
+										</Grid>
+										<Grid item xs={12} md={2}>
+											<CustomAutocomplete
+												name="year"
+												value={selectedYear}
+												label="Year"
+												handleChangeAdvance={(name, newValue) => setSelectedYear(newValue)}
+												options={yearOptions || []}
+											/>
+										</Grid>
+									</>
+								)}
+								<Grid item xs={12} md={2}>
+									<CustomAutocomplete
+										name="chart"
+										value={selectedChart}
+										label="Chart"
+										handleChangeAdvance={(name, newValue) => setSelectedChart(newValue)}
+										options={ChartOptions || []}
+									/>
+								</Grid>
+								<Grid item xs={12} md={3}>
+									<FormGroup>
+										<Box>
+											<Stack direction="row" spacing={1} alignItems="center">
+												<Typography>Chart view</Typography>
+												<FormControlLabel
+													control={
+														<IOSSwitch
+															sx={{ m: 1 }}
+															ischecked={isTableView}
+															handlechange={() => setIsTableView(!isTableView)}
+															disabled={selectedGraph === "Datewise Statistics" || isGroupColumnTable}
+														/>
+													}
+												/>
+												<Typography>Table view</Typography>
+											</Stack>
+										</Box>
+									</FormGroup>
+								</Grid>
 							</Grid>
-						)}
-
-						{selectedGraph !== "Year Wise" &&
-							selectedGraph !== "Day Wise" &&
-							selectedGraph !== "GeoLocation" &&
-							selectedGraph !== "Datewise Statistics" && (
-								<Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
-									<FormControl size="medium" fullWidth>
-										<InputLabel>Academic Year</InputLabel>
-										<Select
-											size="medium"
-											name="AcademicYear"
-											value={selectedAcademicYear}
-											label="Academic Year"
-											onChange={(e) => setSelectedAcademicYear(e.target.value)}
-										>
-											{academicYears.map((obj, index) => (
-												<MenuItem key={index} value={obj.ac_year_id}>
-													{obj.ac_year}
-												</MenuItem>
-											))}
-										</Select>
-									</FormControl>
-								</Grid>
-							)}
-
-						{selectedGraph === "GeoLocation" && (
-							<>
-								<Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
-									<FormControl size="medium" fullWidth>
-										<InputLabel>Country</InputLabel>
-										<Select
-											size="medium"
-											name="Country"
-											value={selectedCountry}
-											label="Country"
-											onChange={(e) => setSlectedCountry(e.target.value)}
-											endAdornment={
-												selectedCountry !== "" && <InputAdornment
-													sx={{ marginRight: "10px" }}
-													position="end"
-												>
-													<IconButton onClick={() => setSlectedCountry("")}>
-														<ClearIcon />
-													</IconButton>
-												</InputAdornment>
-											}
-										>
-											{countryList.map((obj, index) => (
-												<MenuItem key={index} value={obj.value}>
-													{obj.label}
-												</MenuItem>
-											))}
-										</Select>
-									</FormControl>
-								</Grid>
-
-								<Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
-									<FormControl size="medium" fullWidth>
-										<InputLabel>State</InputLabel>
-										<Select
-											size="medium"
-											name="State"
-											value={selectedState}
-											label="State"
-											onChange={(e) => setSlectedState(e.target.value)}
-											endAdornment={
-												selectedState !== "" && <InputAdornment
-													sx={{ marginRight: "10px" }}
-													position="end"
-												>
-													<IconButton onClick={() => setSlectedState("")}>
-														<ClearIcon />
-													</IconButton>
-												</InputAdornment>
-											}
-										>
-											{stateList.map((obj, index) => (
-												<MenuItem key={index} value={obj.value}>
-													{obj.label}
-												</MenuItem>
-											))}
-										</Select>
-									</FormControl>
-								</Grid>
-
-								<Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
-									<FormControl size="medium" fullWidth>
-										<InputLabel>City</InputLabel>
-										<Select
-											size="medium"
-											name="City"
-											value={selectedCity}
-											label="City"
-											onChange={(e) => setSlectedCity(e.target.value)}
-											endAdornment={
-												selectedCity !== "" && <InputAdornment
-													sx={{ marginRight: "10px" }}
-													position="end"
-												>
-													<IconButton onClick={() => setSlectedCity("")}>
-														<ClearIcon />
-													</IconButton>
-												</InputAdornment>
-											}
-										>
-											{cityList.map((obj, index) => (
-												<MenuItem key={index} value={obj.value}>
-													{obj.label}
-												</MenuItem>
-											))}
-										</Select>
-									</FormControl>
-								</Grid>
-							</>
-						)}
-
-						{(selectedGraph === "Programme" ||
-							selectedGraph === "Gender" ||
-							selectedGraph === "GeoLocation" ||
-							selectedGraph === "Datewise Statistics") && (
-								<Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
-									<FormControl size="medium" fullWidth>
-										<InputLabel>Institute</InputLabel>
-										<Select
-											size="medium"
-											name="Institute"
-											value={selectedInstitute}
-											label="Institute"
-											onChange={(e) => setSelectedInstitute(e.target.value)}
-											endAdornment={
-												selectedInstitute !== "" && <InputAdornment
-													sx={{ marginRight: "10px" }}
-													position="start"
-												>
-													<IconButton onClick={() => setSelectedInstitute("")}>
-														<ClearIcon />
-													</IconButton>
-												</InputAdornment>
-											}
-										>
-											{instituteList.map((obj, index) => (
-												<MenuItem key={index} value={obj.value}>
-													{obj.label}
-												</MenuItem>
-											))}
-										</Select>
-									</FormControl>
-								</Grid>
-							)}
-
-						{selectedGraph === "Day Wise" && (
-							<>
-								<Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
-									<FormControl size="medium" fullWidth>
-										<InputLabel>Month</InputLabel>
-										<Select
-											size="medium"
-											name="month"
-											value={selectedMonth}
-											label="Month"
-											onChange={(e) => setSelectedMonth(e.target.value)}
-										>
-											{MonthOptions.map((obj, index) => (
-												<MenuItem key={index} value={obj.value}>
-													{obj.label}
-												</MenuItem>
-											))}
-										</Select>
-									</FormControl>
-								</Grid>
-
-								<Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
-									<FormControl size="medium" fullWidth>
-										<InputLabel>Year</InputLabel>
-										<Select
-											size="medium"
-											name="year"
-											value={selectedYear}
-											label="Year"
-											onChange={(e) => setSelectedYear(e.target.value)}
-										>
-											{yearOptions.map((obj, index) => (
-												<MenuItem key={index} value={obj.value}>
-													{obj.label}
-												</MenuItem>
-											))}
-										</Select>
-									</FormControl>
-								</Grid>
-							</>
-						)}
-
-						<Grid item xs={12} sm={12} md={4} lg={2} xl={2}>
-							<FormControl size="medium" fullWidth>
-								<InputLabel>Chart</InputLabel>
-								<Select
-									size="medium"
-									name="chart"
-									value={selectedChart}
-									label="Chart"
-									onChange={(e) => setSelectedChart(e.target.value)}
-									disabled={
-										chartData.datasets.length <= 0 ||
-										pieChartData.length <= 0 ||
-										selectedGraph === "Datewise Statistics"
-									}
-								>
-									{ChartOptions.map((obj, index) => (
-										<MenuItem key={index} value={obj.value}>
-											{obj.label}
-										</MenuItem>
-									))}
-								</Select>
-							</FormControl>
 						</Grid>
 					</Grid>
-				</Grid>
+				</Grid>}
 
 				<Grid container spacing={2}>
 					<Grid item xs={12}>
-						<FormGroup>
-							<Box sx={{ display: "flex", gap: "40px" }}>
-								<Stack direction="row" spacing={1} alignItems="center">
-									<Typography>Chart view</Typography>
-									<FormControlLabel
-										control={
-											<IOSSwitch
-												sx={{ m: 1 }}
-												ischecked={isTableView}
-												handlechange={() => setIsTableView(!isTableView)}
-												disabled={selectedGraph === "Datewise Statistics" || isGroupColumnTable}
-											/>
-										}
-									/>
-									<Typography>Table view</Typography>
-								</Stack>
-							</Box>
-						</FormGroup>
 						<Grid container sx={{ justifyContent: "center" }}>
 							{isTableView ? (
 								<Grid
 									item
 									xs={12}
 									md={12}
-									lg={isGroupColumnTable ? [...new Set(data.map((item) => item.fee_admission_category_short_name))].length > 2 ? 12 : 8 : tableColumns.length <= 4 ? 8 : 12}
+									lg={isGroupColumnTable ? [...new Set(data.map((item) => item.fee_admission_category_short_name))].length > 2 ? 12 : 8 : (tableColumns.length <= 4 && !isDetails) ? 8 : 12}
 									pt={1}
 									sx={{
+										position: "absolute", width: "100%",
 										"& .last-row": {
 											fontWeight: "bold",
 											backgroundColor: "#376a7d !important",
@@ -2617,7 +2882,7 @@ const AdmissionPage = () => {
 									}}
 								>
 									{isGroupColumnTable ? <GroupedColumnTable data={data} /> :
-										<GridIndex
+										!isDetails ? <GridIndex
 											rows={tableRows}
 											columns={tableColumns}
 											getRowId={(row) => row.id}
@@ -2630,7 +2895,26 @@ const AdmissionPage = () => {
 													: "";
 											}}
 											loading={loading}
-										/>}
+											columnVisibilityModel={columnVisibilityModel}
+											setColumnVisibilityModel={setColumnVisibilityModel}
+										/> :
+											<GridIndex
+												rows={detailsRows}
+												columns={detailsColumns}
+												getRowId={(row) => row.id}
+												isRowSelectable={(params) =>
+													tableRows.length - 1 !== params.row.id
+												}
+												getRowClassName={(params) => {
+													return params.row.id === "last_row_of_table"
+														? "last-row"
+														: "";
+												}}
+												loading={loading}
+												columnVisibilityModel={columnVisibilityModel}
+												setColumnVisibilityModel={setColumnVisibilityModel}
+											/>
+									}
 								</Grid>
 							) : (
 								<Grid
@@ -2654,7 +2938,7 @@ const AdmissionPage = () => {
 					</Grid>
 				</Grid>
 			</Grid>
-		</>
+		</Box>
 	);
 };
 
