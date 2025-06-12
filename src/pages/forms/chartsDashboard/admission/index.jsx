@@ -1347,7 +1347,6 @@ const AdmissionPage = () => {
 			.sort((a, b) => a - b); // Sort the years in ascending order
 
 		handleGeoLocationColumnAndRowData(data, acYears, "city", "City");
-
 		const allCities = [...new Map(data.map((obj) => [obj.cityId, obj])).values()];
 
 		setCityList(
@@ -2832,7 +2831,7 @@ const AdmissionPage = () => {
 													control={
 														<IOSSwitch
 															sx={{ m: 1 }}
-															ischecked={isTableView}
+															checked={isTableView}
 															handlechange={() => setIsTableView(!isTableView)}
 															disabled={selectedGraph === "Datewise Statistics" || isGroupColumnTable}
 														/>
@@ -2847,10 +2846,12 @@ const AdmissionPage = () => {
 						</Grid>
 					</Grid>
 				</Grid>}
+				{!isDetails && <Box mt={1} mb={1} sx={{display:"flex",flexDirection:"row",alignItems:"center", gap:"5px"}}><b>Note: </b><Typography color="error" variant="subtitle2">Data shown up to 2024–25 is migrated data and includes only active Count. For complete and accurate records, please refer to the old ERP software.</Typography></Box>}
 
 				<Grid container spacing={2}>
 					<Grid item xs={12}>
 						<Grid container sx={{ justifyContent: "center" }}>
+							
 							{isTableView ? (
 								<Grid
 									item
