@@ -17,6 +17,7 @@ import {
   IconButton,
   Stack,
   styled,
+  Chip,
 } from "@mui/material";
 import CustomFileInput from "./Inputs/CustomFileInput";
 import FilePresentIcon from "@mui/icons-material/FilePresent";
@@ -27,6 +28,9 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { makeStyles } from "@mui/styles";
 import EditIcon from "@mui/icons-material/Edit";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import ModalWrapper from "./ModalWrapper";
+import DOCView from "./DOCView";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -125,6 +129,8 @@ const StudentDetailsViewDocuments = ({
 
   const userType = sessionStorage.getItem("usertype");
   const setCrumbs = useBreadcrumbs();
+  const [templateWrapperOpen, setTemplateWrapperOpen] = useState(false);
+  const [attachment, setAttachment] = useState("");
 
   const handleCreate = async () => {
     if (values.document !== "") {
@@ -142,7 +148,7 @@ const StudentDetailsViewDocuments = ({
           });
           setAlertOpen(true);
           setDocumentWrapperOpen(false);
-          getAttachmentDetails();
+          // getAttachmentDetails();
         })
         .catch((err) => console.error(err));
     }
@@ -152,47 +158,60 @@ const StudentDetailsViewDocuments = ({
 
   const CandidateContractKey = "candidatecontract";
 
-  const getAttachmentDetails = () => {
+
+  const getAttachment = () => {
     axios
       .get(
-        `/api/student/CandidateAttachmentDetails/${applicantData?.candidate_id}`
+        `/api/student/getStudentAttachmentData/${applicantData?.student_id}`
       )
       .then((response) => {
-        setPersonalFile(
-          response.data.data.filter((obj) => obj.attachment_purpose !== "photo")
-        );
-        const attachmentsArray = response.data.data;
-        if (attachmentsArray.length <= 0) return setHasFile(false);
-
-        for (const obj of attachmentsArray) {
-          const { attachment_purpose, attachment_path } = obj;
-          if (attachment_purpose === CandidateContractKey) {
-            setFilePath(attachment_path);
-            setHasFile(true);
-          }
-        }
+        setPersonalFile(response.data.data);
       })
       .catch((err) => console.error(err));
   };
 
+  // const getAttachmentDetails = () => {
+  //   axios
+  //     .get(
+  //       `/api/student/CandidateAttachmentDetails/${applicantData?.candidate_id}`
+  //     )
+  //     .then((response) => {
+  //       setPersonalFile(
+  //         response.data.data.filter((obj) => obj.attachment_purpose !== "photo")
+  //       );
+  //       const attachmentsArray = response.data.data;
+  //       if (attachmentsArray.length <= 0) return setHasFile(false);
+
+  //       for (const obj of attachmentsArray) {
+  //         const { attachment_purpose, attachment_path } = obj;
+  //         if (attachment_purpose === CandidateContractKey) {
+  //           setFilePath(attachment_path);
+  //           setHasFile(true);
+  //         }
+  //       }
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
+
   useEffect(() => {
-    getAttachmentDetails();
-    if (state) {
-      setCrumbs([
-        {
-          name: "Student Master",
-          link: "/student-master",
-        },
-        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
-      ]);
-    } else {
-      setCrumbs([
-        {
-          name: "Student Master",
-        },
-        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
-      ]);
-    }
+    getAttachment()
+    // getAttachmentDetails();
+    // if (state) {
+    //   setCrumbs([
+    //     {
+    //       name: "Student Master",
+    //       link: "/student-master",
+    //     },
+    //     { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+    //   ]);
+    // } else {
+    //   setCrumbs([
+    //     {
+    //       name: "Student Master",
+    //     },
+    //     { name: applicantData?.candidate_name + "-" + applicantData?.auid },
+    //   ]);
+    // }
   }, []);
 
   const downloadContract = () => {
@@ -309,12 +328,12 @@ const StudentDetailsViewDocuments = ({
       values.photo !== "",
       values.photo && values.photo.size < 2000000,
       (values.photo && values.photo.name.endsWith(".jpg")) ||
-        (values.photo && values.photo.name.endsWith(".png")),
+      (values.photo && values.photo.name.endsWith(".png")),
     ],
     academicDocuments: [
       values.academicDocuments !== "",
       values.academicDocuments &&
-        values.academicDocuments.name.endsWith(".pdf"),
+      values.academicDocuments.name.endsWith(".pdf"),
       values.academicDocuments && values.academicDocuments.size < 2000000,
     ],
   };
@@ -360,7 +379,7 @@ const StudentDetailsViewDocuments = ({
           setAlertOpen(true);
           setAcademicLoading(false);
           setIsEdit(false);
-          getAttachmentDetails();
+          // getAttachmentDetails();
         } else {
           setAlertMessage({
             severity: "error",
@@ -380,6 +399,10 @@ const StudentDetailsViewDocuments = ({
         setAlertOpen(true);
         setAcademicLoading(false);
       });
+  };
+  const handleView = async (params) => {
+    setTemplateWrapperOpen(true)
+    setAttachment(params.attachments_file_path)
   };
 
   return (
@@ -421,6 +444,17 @@ const StudentDetailsViewDocuments = ({
           </Box>
         </Box>
       </Modal>
+      <ModalWrapper
+        open={templateWrapperOpen}
+        setOpen={setTemplateWrapperOpen}
+        maxWidth={1200}
+      >
+        <>
+          {attachment && <DOCView
+            attachmentPath={`/api/student/viewStudentFiles?fileName=${attachment}`}
+          />}
+        </>
+      </ModalWrapper>
       <Grid container spacing={2} columnSpacing={4} sx={{ marginTop: "1px" }}>
         <Grid item xs={4} md={2}>
           <CustomTabs
@@ -487,7 +521,7 @@ const StudentDetailsViewDocuments = ({
                         </ul>
                       </div>
                     </Grid>
-                     {(roleId == 1 || roleId == 5 || roleId === 6) && <Grid item xs={12} md={4}>
+                    {(roleId == 1 || roleId == 5 || roleId === 6) && <Grid item xs={12} md={4}>
                       <CustomFileInput
                         name="photo"
                         label="3x4 rasm"
@@ -612,7 +646,7 @@ const StudentDetailsViewDocuments = ({
           )}
           {subTab === "Personal" && (
             <>
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <Card>
                   <CardHeader
                     title="Documents"
@@ -656,7 +690,84 @@ const StudentDetailsViewDocuments = ({
                     <CardContent>No Documents Available</CardContent>
                   )}
                 </Card>
+              </Grid> */}
+              <Grid item xs={12}>
+                <Card>
+                  <CardHeader
+                    title="Documents"
+                    titleTypographyProps={{ variant: "subtitle2" }}
+                    sx={{
+                      backgroundColor: "rgba(74, 87, 169, 0.08)",
+                      color: "#3f3f46",
+                      py: 1,
+                      px: 2,
+                    }}
+                  />
+                  {personalFile.length > 0 ? (
+                    <CardContent>
+                      <Grid container spacing={1.5}>
+                        {personalFile.map((file, i) => (
+                          <Grid item xs={12} sm={6} md={3} key={i}>
+                            <Box
+                              sx={{
+                                border: "1px solid #e0e0e0",
+                                borderRadius: 2,
+                                p: 1.5,
+                                backgroundColor: "#fcfcfc",
+                                height: "100%",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "space-between",
+                                transition: "0.2s",
+                                "&:hover": {
+                                  boxShadow: 2,
+                                  backgroundColor: "#fff",
+                                },
+                              }}
+                            >
+                              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                                <PictureAsPdfIcon sx={{ color: "#d32f2f", fontSize: 28 }} />
+                                <Box>
+                                  <Typography variant="body2" fontWeight={500} noWrap>
+                                    {file.attachments_subcategory_name}
+                                  </Typography>
+                                  <Chip
+                                    label={file.attachments_category_name_short}
+                                    size="small"
+                                    sx={{
+                                      mt: 0.5,
+                                      backgroundColor: "#e3f2fd",
+                                      color: "#1976d2",
+                                      fontSize: "0.7rem",
+                                      height: 20,
+                                    }}
+                                  />
+                                </Box>
+                              </Box>
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ fontSize: "0.75rem", textTransform: "none" }}
+                                onClick={() => handleView(file)}
+                              >
+                                View PDF
+                              </Button>
+                            </Box>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </CardContent>
+                  ) : (
+                    <CardContent>
+                      <Typography variant="body2" color="textSecondary">
+                        No Documents Available
+                      </Typography>
+                    </CardContent>
+                  )}
+                </Card>
               </Grid>
+
             </>
           )}
 
@@ -665,7 +776,7 @@ const StudentDetailsViewDocuments = ({
               <Grid item xs={12}>
                 <Card>
                   {subTab === "Academics" &&
-                  userType.toLowerCase() !== "student" ? (
+                    userType.toLowerCase() !== "student" ? (
                     <CardHeader
                       title="Academic Documents"
                       titleTypographyProps={{ variant: "subtitle2" }}
@@ -731,9 +842,9 @@ const StudentDetailsViewDocuments = ({
                               disabled={
                                 values.academicDocuments === "" ||
                                 checks?.academicDocuments?.includes(false) ===
-                                  true ||
+                                true ||
                                 checks?.academicDocuments?.includes(null) ===
-                                  true
+                                true
                               }
                             >
                               {academicLoading ? (

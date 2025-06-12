@@ -73,8 +73,10 @@ const FacultyFeedbackReportCourseForm = lazy(() =>
 );
 
 const FacultyFeedbackReportByCourse = lazy(() =>
-  import("./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportByCourse.jsx")
-)
+  import(
+    "./pages/forms/facultyFeedbackMasterCourse/facultyFeedbackReportByCourse.jsx"
+  )
+);
 
 const EmpDocumentCollection = lazy(() =>
   import("./components/EmpDocumentCollectionPdf")
@@ -87,7 +89,9 @@ const PoPaymentList = lazy(() =>
 const StudentDetailsSearch = lazy(() =>
   import("./pages/indeces/StudentDetailsSearch")
 );
-
+const StudentDetailsViewAttendance = lazy(() =>
+  import("./components/StudentDetailsViewAttendance.jsx")
+);
 const StudentFeedbackForm = lazy(() =>
   import("./pages/forms/studentFeedbackMaster/StudentFeedbackForm")
 );
@@ -215,6 +219,11 @@ const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
 const FeeRecieptDayBookMaster = lazy(() =>
   import("./pages/masters/FeeReceiptMaster.jsx")
 );
+
+const FeereceiptReportInst = lazy(() =>
+  import("./containers/indeces/studentMaster/FeereceiptReportInst.jsx")
+);
+
 const StudentPaymentMaster = lazy(() =>
   import("./pages/masters/StudentPaymentMaster.jsx")
 );
@@ -1962,9 +1971,17 @@ const AddonReport = lazy(() => import("./pages/indeces/AddonReportAll.jsx"));
 
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
-const StudentDueReportDetail = lazy(() => import("./containers/indeces/studentDueReportDetail/studentDueReportDetailIndex.jsx"));
+const StudentDueReportDetail = lazy(() =>
+  import(
+    "./containers/indeces/studentDueReportDetail/studentDueReportDetailIndex.jsx"
+  )
+);
 
-const StudentDueReportForProgramme = lazy(()=>import("./containers/indeces/studentDueReportDetail/studentDueReportDetail-programme.jsx"));
+const StudentDueReportForProgramme = lazy(() =>
+  import(
+    "./containers/indeces/studentDueReportDetail/studentDueReportDetail-programme.jsx"
+  )
+);
 
 const DirectDemandIndex = lazy(() =>
   import("./pages/indeces/DirectDemandIndex.jsx")
@@ -1996,8 +2013,12 @@ const DDDetailReport = lazy(() =>
   import("./pages/indeces/DDDetailsReport.jsx")
 );
 const SalaryMisIndex = lazy(() => import("./pages/indeces/SalaryMisIndex.jsx"));
-const ServiceIndentReport = lazy(() => import("./pages/indeces/ServiceIndentReport.jsx"));
-const ServiceIndentTransportReport = lazy(() => import("./pages/indeces/ServiceIndentTransportReport.jsx"));
+const ServiceIndentReport = lazy(() =>
+  import("./pages/indeces/ServiceIndentReport.jsx")
+);
+const ServiceIndentTransportReport = lazy(() =>
+  import("./pages/indeces/ServiceIndentTransportReport.jsx")
+);
 const SalaryReport = lazy(() => import("./pages/indeces/SalaryReport.jsx"));
 
 const LaptopIssueIndex = lazy(() =>
@@ -2228,7 +2249,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/student-due-report-detail"
             element={
@@ -2237,7 +2258,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/student-due-report-detail/programme"
             element={
@@ -5281,6 +5302,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/StudentDetailsViewAttendance/:studentId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDetailsViewAttendance />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/Attendancesheet"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -6549,6 +6579,16 @@ function RouteConfig() {
               />
             )
           )}
+
+          <Route
+            exact
+            path="/feereceipt-daybook-index-inst"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeereceiptReportInst />
+              </Suspense>
+            }
+          />
 
           {/* Payment Master */}
           <>

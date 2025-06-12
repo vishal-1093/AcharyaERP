@@ -61,12 +61,14 @@ function StudentHostelPayment() {
 
         const checktill = [1];
 
-        const newArray = hostelDueResponse.data.data.map((obj) => ({
-          ...obj,
-          active: false,
-          checked: checktill[0] ? true : false,
-          freeze: checktill[0] ? true : false,
-        }));
+        const newArray = hostelDueResponse.data.data
+          .filter((obj) => obj.due > 0)
+          .map((ele) => ({
+            ...ele,
+            active: false,
+            checked: false,
+            freeze: false,
+          }));
 
         setHostelDueData(newArray);
 
@@ -120,8 +122,30 @@ function StudentHostelPayment() {
     setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const date = new Date(hostelDueData?.[0]?.till_date);
+  const currentDate = new Date();
+  const partFeeDate = new Date(date);
+
+  const date1WithoutTime = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    currentDate.getDate()
+  );
+  const date2WithoutTime = new Date(
+    partFeeDate.getFullYear(),
+    partFeeDate.getMonth(),
+    partFeeDate.getDate()
+  );
+
   const handleChangeTotalPay = (e) => {
-    setTotalPay(e.target.value);
+    const checked = hostelDueData?.filter((obj) => obj.checked);
+
+    console.log(checked.length);
+
+    // if (date1WithoutTime <= date2WithoutTime) {
+    if (checked?.[0]?.due > checked?.[0]?.minimum_amount && checked.length == 1)
+      setTotalPay(e.target.value);
+    // }
   };
 
   const handleCheckboxChange = (index) => {
@@ -152,7 +176,7 @@ function StudentHostelPayment() {
   };
 
   const isCheckboxDisabled = (index) => {
-    return index > 0 && !values[index - 1].checked;
+    return index > 0 && !hostelDueData[index - 1].checked;
   };
 
   const handleCreate = async () => {
@@ -164,6 +188,16 @@ function StudentHostelPayment() {
         });
         setAlertOpen(true);
       } else {
+        const checked = hostelDueData?.filter((obj) => obj.checked);
+        if (totalPay < checked?.[0]?.minimum_amount) {
+          setAlertMessage({
+            severity: "error",
+            message: `Total paying is less than minimum amount ${hostelDueData?.[0]?.minimum_amount}`,
+          });
+          setAlertOpen(true);
+          return;
+        }
+
         const allSems = [];
 
         const hostelPay = [];
@@ -218,6 +252,8 @@ function StudentHostelPayment() {
       setAlertOpen(true);
     }
   };
+
+  console.log(hostelDueData);
 
   return (
     <>

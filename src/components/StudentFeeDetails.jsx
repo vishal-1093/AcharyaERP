@@ -81,6 +81,10 @@ function StudentFeeDetails({ id, isPrintClick = false }) {
   const [refundReceiptData, setRefundReceiptData] = useState([]);
   const [refundReceiptHeaders, setRefundReceiptHeaders] = useState([]);
   const [refundTotalReceiptWise, setRefundTotalReceiptWise] = useState([]);
+  const [hostelVoucherHeads, setHostelVoucherHeads] = useState([]);
+  const [hostelReceipts, setHostelReceipts] = useState([]);
+  const [hostelReceiptData, setHostelReceiptData] = useState([]);
+  const [hostelModelOpen, setHostelModalOpen] = useState(false);
 
   useEffect(() => {
     getFeeData();
@@ -161,6 +165,7 @@ function StudentFeeDetails({ id, isPrintClick = false }) {
       const voucherReceiptAmt = {};
       const refundReceiptAmt = {};
       const refundTotal = {};
+      const hostelPaid = {};
 
       yearSemesters.forEach((obj) => {
         const { key } = obj;
@@ -315,6 +320,31 @@ function StudentFeeDetails({ id, isPrintClick = false }) {
       const hostelResponse = await axios.get(
         `/api/hostel/getHostelDetailsForLedger/${id}`
       );
+
+      const hostelPaidResponse = await axios.get(
+        `/api/finance/hostelFeeReceiptDetailsByStudentId/${id}`
+      );
+
+      const hostelVoucherHeaders = Array.from(
+        new Map(
+          hostelPaidResponse?.data?.data?.map((obj) => [obj.voucherHead, obj])
+        ).values()
+      );
+
+      const hostelFeeReceipt = Array.from(
+        new Map(
+          hostelPaidResponse?.data?.data?.map((obj) => [obj.feeReceipt, obj])
+        ).values()
+      );
+
+      hostelPaidResponse?.data?.data?.forEach((ele) => {
+        const key = `${ele.feeReceipt}-${ele.voucherHeadNewId}`;
+        if (!hostelPaid[key]) {
+          hostelPaid[key] = 0;
+        }
+        hostelPaid[key] = Number(ele.payingAmount);
+      });
+
       setNoOfYears(yearSemesters);
       setData(subAmountDetails);
       setIsExpanded(expands);
@@ -329,6 +359,9 @@ function StudentFeeDetails({ id, isPrintClick = false }) {
       setHostelData(hostelResponse.data.data);
       setRefundReceiptHeaders(filterRefundReceiptHeaders);
       setRefundReceiptData(refundReceiptAmt);
+      setHostelVoucherHeads(hostelVoucherHeaders);
+      setHostelReceipts(hostelFeeReceipt);
+      setHostelReceiptData(hostelPaid);
     } catch (err) {
       console.error(err);
 
@@ -384,6 +417,10 @@ function StudentFeeDetails({ id, isPrintClick = false }) {
       key: year,
     });
     setModalOpen(true);
+  };
+
+  const handleHostelModal = () => {
+    setHostelModalOpen(true);
   };
 
   const DisplayHeaderText = ({ label }) => (
@@ -590,6 +627,44 @@ function StudentFeeDetails({ id, isPrintClick = false }) {
                     );
                 })}
               </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={hostelModelOpen}
+        setOpen={setHostelModalOpen}
+        maxWidth={1200}
+        title={`Hostel Paid History`}
+      >
+        <TableContainer>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>Fee Heads</StyledTableCell>
+                {hostelReceipts.map((ele, i) => (
+                  <StyledTableCell key={i}>{`${ele.feeReceipt}/${moment(
+                    ele.created_date
+                  ).format("DD-MM-YYYY")}`}</StyledTableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {hostelVoucherHeads?.map((ele, i) => (
+                <TableRow key={i}>
+                  <StyledTableCellBody>{ele.voucherHead}</StyledTableCellBody>
+                  {hostelReceipts?.map((item, j) => (
+                    <StyledTableCellBody key={j} sx={{ textAlign: "right" }}>
+                      {
+                        hostelReceiptData?.[
+                          `${item.feeReceipt}-${ele.voucherHeadNewId}`
+                        ]
+                      }
+                    </StyledTableCellBody>
+                  ))}
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
@@ -879,7 +954,20 @@ function StudentFeeDetails({ id, isPrintClick = false }) {
                       </StyledTableCellBody>
                       <TableBodyText label={obj.totalAmount} />
                       <TableBodyText label={obj.waiverAmount} />
-                      <TableBodyText label={obj.paidAmount} />
+                      {obj.paidAmount > 0 ? (
+                        <StyledTableCellBody sx={{ textAlign: "center" }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ cursor: "pointer", color: "blue" }}
+                            onClick={() => handleHostelModal()}
+                          >
+                            {obj.paidAmount}
+                          </Typography>
+                        </StyledTableCellBody>
+                      ) : (
+                        <TableBodyText label={obj.paidAmount} />
+                      )}
+
                       <TableBodyText label={obj.dueAmount} />
                       <StyledTableCellBody sx={{ textAlign: "center" }}>
                         <Typography

@@ -252,6 +252,7 @@ function RecruitmentForm() {
     getOfferDetails();
     handleDetails();
     getSalaryStructureOptions();
+    getRoles();
   }, [pathname]);
 
   useEffect(() => {
@@ -436,6 +437,38 @@ function RecruitmentForm() {
         })
         .catch((err) => console.error(err));
     }
+  };
+
+  const getRoles = async () => {
+    // Get Roles
+    await axios
+      .get(`/api/Roles`)
+      .then((res) => {
+        const optionData = [];
+
+        res.data.data
+          .filter(
+            (ele) =>
+              ele.role_short_name === "NOR" || ele.role_short_name === "TCH"
+          )
+          .forEach((obj) => {
+            optionData.push({
+              value: obj.role_id,
+              label: obj.role_name,
+            });
+          });
+
+        setRoleOptions(optionData);
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
   };
 
   const getOfferDetails = async () => {
@@ -914,29 +947,6 @@ function RecruitmentForm() {
           await axios
             .post(`/api/employee/emailToStaffsRegardingNewRecruit`, temp)
             .then((res) => {})
-            .catch((err) => {
-              setAlertMessage({
-                severity: "error",
-                message: err.response
-                  ? err.response.data.message
-                  : "An error occured",
-              });
-              setAlertOpen(true);
-            });
-
-          // Get Roles
-          await axios
-            .get(`/api/Roles`)
-            .then((res) => {
-              const optionData = [];
-              res.data.data.forEach((obj) => {
-                optionData.push({
-                  value: obj.role_id,
-                  label: obj.role_name,
-                });
-              });
-              setRoleOptions(optionData);
-            })
             .catch((err) => {
               setAlertMessage({
                 severity: "error",

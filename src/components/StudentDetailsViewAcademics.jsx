@@ -31,6 +31,7 @@ import { styled } from "@mui/system";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import OverlayLoader from "./OverlayLoader";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
+import StudentAttendancePopup from "./StudentAttendancePopup";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -131,40 +132,50 @@ const StudentDetailsViewDocuments = ({
   const [modalOpen, setModalOpen] = useState(false);
   const Id = id || sessionStorage.getItem("empId");
   const setCrumbs = useBreadcrumbs();
+  const [currentSem, setCurrentSemData] = useState({})
+  const [open, setOpen] = useState(false);
+  const [rowData, setRowData] = useState({});
 
-  const handleCourseClick = (course) => {
+  const handleCourseClick = (course, data) => {
     setSelectedCourse(course);
     setModalOpen(true);
     getModalData(course);
   };
 
   const handlePresentButtonClick = (data) => {
-    navigate(`/StudentDetailsViewAttendance/${Id}`, {
-      state: { data, Id, applicantData },
-    });
+    setOpen(true)
+    setRowData(data)
+    // navigate(`/StudentDetailsViewAttendance/${Id}`, {
+    //   state: { data, Id, applicantData },
+    // });
   };
   useEffect(() => {
-    const getHistory = () => {
-      axios(`/api/student/reportingStudentsHistoryByStudentId/${Id}`)
-        .then((res) => {
-          setHistoryData(res.data.data);
-        })
-        .catch((err) => console.error(err));
+    const getHistory = async () => {
+      try {
+        const res = await axios(`/api/student/reportingStudentsHistoryByStudentIdLatestData/${Id}`);
+        const history = res?.data?.data;
+        setHistoryData(history);
+        console.log(history, "history");
+
+        const lastItem = history?.at(-1);
+        if (lastItem) {
+          const courseRes = await axios.get(`/api/academic/getfetchCourseDetail/${lastItem?.current_sem || lastItem?.current_year}/${Id}`);
+          setCourseData(courseRes?.data?.data);
+          const attendanceRes = await axios.get(`/api/student/attendanceReportForStudentProfileByStudentId/${Id}/${lastItem?.current_sem || lastItem?.current_year}`);
+          setData(attendanceRes?.data?.data);
+          setCurrentSemData(lastItem)
+        }
+      } catch (err) {
+        console.error(err);
+      }
     };
     getAssesmentId();
     getHistory();
-    getCourseData();
-    getdata();
-    if (state) {
-      setCrumbs([
-        {
-          name: "Student Master",
-          link: "/student-master",
-        },
-        { name: applicantData?.candidate_name + "-" + applicantData?.auid },
-      ]);
-    }
-  }, []);
+    // getdata();
+    // getStudMarks();
+  }, [Id]);
+
+
 
   const openSyllabusModal = async ({ name, courseId }) => {
     setIsModalOpen(true);
@@ -187,6 +198,10 @@ const StudentDetailsViewDocuments = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "yearSem") {
+      getdata(value);
+    }
     setValues((prevValues) => ({
       ...prevValues,
       [name]: value,
@@ -205,53 +220,50 @@ const StudentDetailsViewDocuments = ({
       .catch((err) => console.error(err));
   };
 
-  const getCourseData = async () => {
-    await axios
-      .get(`/api/student/getCourseDetailData/${Id}`)
-      .then((res) => {
-        setCourseData(res.data.data);
-      })
-      .catch((err) => console.error(err));
-  };
+
 
   const getStudMarks = async () => {
-    await axios
-      .get(
-        `/api/student/getStudentMarkDetails/${Id}/${
-          values.assesmentId || defaultAssessmentId
-        }`
-      )
-      .then((res) => {
-        setMarksData(res.data.data);
-      })
-      .catch((err) => console.error(err));
+    const assessmentId = values.assesmentId || defaultAssessmentId;
+
+    if (!Id || !assessmentId) return;
+
+    try {
+      const response = await axios.get(
+        `/api/student/getStudentMarksData/${Id}/${assessmentId}`
+      );
+      setMarksData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching student marks:", error);
+    }
   };
 
+
   const getCourseSyllabusData = async (courseId) => {
-    setLoading(true);
-    await axios
-      .get(`/api/academic/getSyllabusByCourseAssignmentId/${courseId}`)
-      .then((res) => {
-        setSyllabusData(res.data.data);
-      });
-    setLoading(false).catch((err) => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`/api/academic/getSyllabusByCourseAssignmentId/${courseId}`);
+      // const res = await axios.get(`/api/academic/fetchSyllabusDetails/${courseId}`);
+      setSyllabusData(res.data.data);
+    } catch (err) {
       console.error(err);
+    } finally {
       setLoading(false);
-    });
+    }
   };
 
   const getCourseObjectiveData = async (courseId) => {
-    setLoading(true);
-    await axios
-      .get(`/api/academic/getCourseObjectiveAndOutcome/${courseId}`)
-      .then((res) => {
-        setCourseObjectiveData(res.data.data);
-      });
-    setLoading(false).catch((err) => {
+    try {
+      setLoading(true);
+      // const res = await axios.get(`/api/academic/fetchCourseObjective/${courseId}`);
+      const res = await axios.get(`/api/academic/getCourseObjectiveAndOutcome/${courseId}`);
+      setCourseObjectiveData(res.data.data);
+    } catch (err) {
       console.error(err);
+    } finally {
       setLoading(false);
-    });
+    }
   };
+
 
   const getCourseOutcomesData = async (courseId) => {
     setLoading(true);
@@ -268,21 +280,20 @@ const StudentDetailsViewDocuments = ({
 
   const getAssesmentId = async (params) => {
     await axios
-      .get(`/api/student/getAllActiveInternal/${Id}`)
+      .get(`/api/academic/InternalTypes`)
       .then((res) => {
         setAssessmentId(
           res.data.data.map((obj) => ({
-            value: obj.internal_id,
+            value: obj.internal_master_id,
             label: obj.internal_name,
           }))
         );
       })
       .catch((error) => console.error(error));
   };
-
   const getdata = async (params) => {
     await axios
-      .get(`/api/student/getAttendanceReportForStudentProfileByStudentId/${Id}`)
+      .get(`/api/student/attendanceReportForStudentProfileByStudentId/${Id}/${params}`)
       .then((res) => {
         setData(res.data.data);
       })
@@ -513,7 +524,7 @@ const StudentDetailsViewDocuments = ({
                               <StyledTableCell
                                 sx={{ color: "white", textAlign: "center" }}
                               >
-                                Sem
+                                Year/Sem
                               </StyledTableCell>
                               <StyledTableCell
                                 sx={{ color: "white", textAlign: "center" }}
@@ -543,15 +554,15 @@ const StudentDetailsViewDocuments = ({
                             </TableRow>
                           </TableHead>
                           <TableBody className={classes.table}>
-                            {courseData.map((obj, i) => {
+                            {courseData?.length > 0 ? courseData.map((obj, i) => {
                               return (
                                 <TableRow key={i}>
                                   <StyledTableCell>
                                     {obj?.course_name ? obj?.course_name : "--"}
                                   </StyledTableCell>
                                   <StyledTableCell>
-                                    {obj?.course_assignment_coursecode
-                                      ? obj?.course_assignment_coursecode
+                                    {obj?.course_code
+                                      ? obj?.course_code
                                       : "--"}
                                   </StyledTableCell>
 
@@ -559,13 +570,13 @@ const StudentDetailsViewDocuments = ({
                                     {obj?.year_sem ? obj?.year_sem : "--"}
                                   </StyledTableCell>
                                   <StyledTableCell>
-                                    {obj?.courseCategoryName
-                                      ? obj?.courseCategoryName
+                                    {obj?.course_category_code
+                                      ? obj?.course_category_code
                                       : "--"}
                                   </StyledTableCell>
                                   <StyledTableCell>
-                                    {obj?.courseCredits
-                                      ? obj?.courseCredits
+                                    {obj?.total_credit
+                                      ? obj?.total_credit
                                       : "--"}
                                   </StyledTableCell>
                                   <StyledTableCell
@@ -618,7 +629,13 @@ const StudentDetailsViewDocuments = ({
                                   </StyledTableCell>
                                 </TableRow>
                               );
-                            })}
+                            }) : (
+                              <TableRow>
+                                <TableCell colSpan={7} align="center">
+                                  No Course Data Found
+                                </TableCell>
+                              </TableRow>
+                            )}
                           </TableBody>
                         </Table>
                       </TableContainer>
@@ -652,7 +669,7 @@ const StudentDetailsViewDocuments = ({
                     </Grid>
 
                     <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">Current Sem</Typography>
+                      <Typography variant="subtitle2">Current Year/Sem</Typography>
                     </Grid>
                     <Grid item xs={12} md={9}>
                       <Typography variant="body2" color="textSecondary">
@@ -712,7 +729,7 @@ const StudentDetailsViewDocuments = ({
                             </TableRow>
                           </TableHead>
                           <TableBody className={classes.table}>
-                            {historyData.map((obj, i) => {
+                            {historyData.length > 0 ? historyData.map((obj, i) => {
                               return (
                                 <TableRow key={obj.auid}>
                                   <TableCell>{obj.student_name}</TableCell>
@@ -722,30 +739,36 @@ const StudentDetailsViewDocuments = ({
                                   <TableCell>
                                     {obj.reporting_date
                                       ? obj.reporting_date
-                                          .slice(0, 10)
-                                          .split("-")
-                                          .reverse()
-                                          .join("-")
-                                      : ""}
+                                        .slice(0, 10)
+                                        .split("-")
+                                        .reverse()
+                                        .join("-")
+                                      : obj.remarks ?? ""}
                                   </TableCell>
                                   <TableCell>{obj.created_username}</TableCell>
                                   <TableCell>
                                     {obj.created_date
                                       ? moment(obj.created_date).format(
-                                          "DD-MM-YYYY"
-                                        )
+                                        "DD-MM-YYYY"
+                                      )
                                       : ""}
                                   </TableCell>
                                   <TableCell>
                                     {obj.reporting_date
                                       ? "Reported"
                                       : ELIGIBLE_REPORTED_STATUS[
-                                          obj.eligible_reported_status
-                                        ]}
+                                      obj.eligible_reported_status
+                                      ]}
                                   </TableCell>
                                 </TableRow>
                               );
-                            })}
+                            }) : (
+                              <TableRow>
+                                <TableCell colSpan={7} align="center">
+                                  No Course Data Found
+                                </TableCell>
+                              </TableRow>
+                            )}
                           </TableBody>
                         </Table>
                       </TableContainer>
@@ -769,6 +792,25 @@ const StudentDetailsViewDocuments = ({
                 />
                 <CardContent>
                   <Grid container columnSpacing={1} rowSpacing={1}>
+                    <Grid item xs={12} md={4}>
+                      <CustomSelect
+                        name="yearSem"
+                        label="Year/Sem"
+                        value={values.yearSem || currentSem?.current_sem}
+                        items={[
+                          { value: 1, label: "1" },
+                          { value: 2, label: "2" },
+                          { value: 3, label: "3" },
+                          { value: 4, label: "4" },
+                          { value: 5, label: "5" },
+                          { value: 6, label: "6" },
+                          { value: 7, label: "7" },
+                          { value: 8, label: "8" },
+                        ]}
+                        handleChange={handleChange}
+                        required
+                      />
+                    </Grid>
                     <Grid item xd={12} md={12} mt={2}>
                       <TableContainer component={Paper}>
                         <Table className={classes.table} size="small">
@@ -782,7 +824,12 @@ const StudentDetailsViewDocuments = ({
                               <TableCell
                                 sx={{ color: "white", textAlign: "center" }}
                               >
-                                Sem
+                                Year/Sem
+                              </TableCell>
+                              <TableCell
+                                sx={{ color: "white", textAlign: "center" }}
+                              >
+                                Percentage %
                               </TableCell>
                               <TableCell
                                 sx={{ color: "white", textAlign: "center" }}
@@ -797,7 +844,7 @@ const StudentDetailsViewDocuments = ({
                             </TableRow>
                           </TableHead>
                           <TableBody className={classes.table}>
-                            {Data.map((obj, i) => {
+                            {Data.length > 0 ? Data.map((obj, i) => {
                               return (
                                 <TableRow key={i}>
                                   <TableCell>
@@ -809,11 +856,13 @@ const StudentDetailsViewDocuments = ({
                                     </Button>
                                   </TableCell>
                                   <TableCell>{obj.year_or_sem}</TableCell>
+                                  <TableCell>{obj.percentage}</TableCell>
                                   <TableCell>
                                     <Button
                                       onClick={() =>
                                         handlePresentButtonClick(obj)
                                       }
+                                      //  onClick={() => setOpen(true)}
                                       style={{
                                         color: "green",
                                       }}
@@ -831,7 +880,13 @@ const StudentDetailsViewDocuments = ({
                                   </TableCell>
                                 </TableRow>
                               );
-                            })}
+                            }) : (
+                              <TableRow>
+                                <TableCell colSpan={7} align="center">
+                                  No Course Data Found
+                                </TableCell>
+                              </TableRow>
+                            )}
                           </TableBody>
                         </Table>
                       </TableContainer>
@@ -911,19 +966,25 @@ const StudentDetailsViewDocuments = ({
                         </TableRow>
                       </TableHead>
                       <TableBody className={classes.table}>
-                        {marksData.map((obj, i) => {
+                        {marksData?.length > 0 ? marksData.map((obj, i) => {
                           return (
                             <TableRow key={obj.student_id}>
-                              <TableCell>{obj.courseName}</TableCell>
+                              <TableCell>{obj.course_name}</TableCell>
                               <TableCell>
-                                {obj.marks_obtained_internal}
+                                {obj.marks_obtained}
                               </TableCell>
 
-                              <TableCell>{obj.max_marks}</TableCell>
+                              <TableCell>{obj.total_marks}</TableCell>
                               <TableCell>{obj.percentage}</TableCell>
                             </TableRow>
                           );
-                        })}
+                        }) : (
+                          <TableRow>
+                            <TableCell colSpan={7} align="center">
+                              No Course Data Found
+                            </TableCell>
+                          </TableRow>
+                        )}
                       </TableBody>
                     </Table>
                   </TableContainer>
@@ -937,12 +998,11 @@ const StudentDetailsViewDocuments = ({
       <ModalWrapper
         open={modalOpen}
         setOpen={setModalOpen}
-        maxWidth={900}
         title={
-          "Detailed Student Attendance-" +
-          SelectedCourse.course_name +
-          "-" +
-          SelectedCourse.course_assignment_coursecode
+          "Detailed Student Attendance - " +
+          (SelectedCourse?.course_name || "") +
+          " - " +
+          (SelectedCourse?.course_assignment_coursecode || "")
         }
       >
         <Box mt={2} p={3}>
@@ -1000,6 +1060,13 @@ const StudentDetailsViewDocuments = ({
           </TableContainer>
         </Box>
       </ModalWrapper>
+      <StudentAttendancePopup
+        open={open}
+        onClose={() => setOpen(false)}
+        studentId={id}
+        data={rowData}
+        applicantData={applicantData}
+      />
     </>
   );
 };

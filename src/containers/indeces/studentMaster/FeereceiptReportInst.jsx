@@ -20,6 +20,7 @@ import { makeStyles } from "@mui/styles";
 import axios from "../../../services/Api";
 import PrintIcon from "@mui/icons-material/Print";
 import moment from "moment";
+import useAlert from "../../../hooks/useAlert.js";
 
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete.jsx")
@@ -66,19 +67,22 @@ const filterLists = [
   { label: "Today", value: "today" },
   { label: "1 Week", value: "week" },
   { label: "1 Month", value: "month" },
+  { label: "6 Months", value: "6month" },
   { label: "Custom Date", value: "custom" },
 ];
 
 const initialValues = {
   filterList: filterLists,
-  filter: filterLists[0].value,
+  filter: filterLists[3].value,
   startDate: "",
   endDate: "",
   schoolList: [],
   schoolId: "",
 };
 
-function StudentFeereceiptIndex() {
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+function FeereceiptReportInst() {
   const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
   const [cashTotal, setCashTotal] = useState(0);
@@ -87,20 +91,53 @@ function StudentFeereceiptIndex() {
   const [loading, setLoading] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     fee_template_name: false,
-    inr1:false,
+    inr1: false,
     created_username: false,
     paid_year: false,
     transaction_no: false,
     remarks: false,
+    transaction_date: false,
+    cheque_dd_no: false,
+    bank_name: false,
   });
 
   const navigate = useNavigate();
   const classes = useStyles();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     getSchoolDetails();
-    getData(values.filterList[0].value);
+    getData(values.filterList[3].value);
+    getEmployeeDetails();
   }, []);
+
+  const getEmployeeDetails = async () => {
+    try {
+      const response = await axios.get(
+        `/api/employee/getEmployeeDetailsBasedOnUserID/${userID}`
+      );
+
+      if (response.data.data) {
+        // setEmployeeData(response.data.data);
+        setValues((prev) => ({
+          ...prev,
+          ["schoolId"]: response.data.data.school_id,
+        }));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "School not found for this employee",
+        });
+        setAlertOpen(true);
+      }
+    } catch {
+      setAlertMessage({
+        severity: "error",
+        message: "Error Occured",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const getSchoolDetails = async () => {
     try {
@@ -127,78 +164,45 @@ function StudentFeereceiptIndex() {
   const getData = async (filterKey, value) => {
     setLoading(true);
     let params = null;
-    if (
-      filterKey == "custom" &&
-      !!value &&
-      !!values.startDate &&
-      !values.schoolId
-    ) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(
-        values.startDate
-      ).format("YYYY-MM-DD")}&end_date=${moment(value).format("YYYY-MM-DD")}`;
-    } else if (
-      filterKey == "custom" &&
-      !!value &&
-      !!values.startDate &&
-      !!values.schoolId
-    ) {
+
+    if (filterKey === "custom") {
       params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${
         values.schoolId
       }&date_range=custom&start_date=${moment(values.startDate).format(
         "YYYY-MM-DD"
       )}&end_date=${moment(value).format("YYYY-MM-DD")}`;
-    } else if (
-      filterKey == "schoolId" &&
-      !!values.endDate &&
-      !!values.startDate
-    ) {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=custom&start_date=${moment(
-        values.startDate
-      ).format("YYYY-MM-DD")}&end_date=${moment(values.endDate).format(
-        "YYYY-MM-DD"
-      )}`;
-    } else if (
-      filterKey == "schoolId" &&
-      !!values.filter &&
-      !values.endDate &&
-      !values.startDate
-    ) {
-      if (value === null) {
-        params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${
-          values.filter
-        }`;
-      } else {
-        params = `page=${0}&page_size=${1000000}&sort=created_date&school_id=${value}&date_range=${
-          values.filter
-        }`;
-      }
-    } else if (filterKey !== "custom" && !!values.schoolId) {
+    } else {
       params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}&school_id=${
         values.schoolId
       }`;
-    } else {
-      params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`;
     }
 
     if (params) {
       await axios
         .get(`/api/finance/fetchAllFeeReceipt?${params}`)
         .then((res) => {
-          const cashLists = res.data.data.filter(
+          const filterRowData = res.data.data.filter(
+            (ele) =>
+              ele.receipt_type === "General" &&
+              ele.paid_year === "1" &&
+              ele.active
+          );
+
+          const cashLists = filterRowData.filter(
             (el) => el.transaction_type?.toLowerCase() == "cash"
           );
           const cashGrandTotal = cashLists.reduce(
             (sum, acc) => sum + acc?.inr_value,
             0
           );
-          const ddLists = res.data.data.filter(
+          const ddLists = filterRowData.filter(
             (el) => el.transaction_type?.toLowerCase() == "dd"
           );
           const ddGrandTotal = ddLists.reduce(
             (sum, acc) => sum + acc?.inr_value,
             0
           );
-          const onlineLists = res.data.data.filter(
+          const onlineLists = filterRowData.filter(
             (el) =>
               el.transaction_type?.toLowerCase() == "rtgs" ||
               el.transaction_type?.toLowerCase() == "p_gateway" ||
@@ -208,8 +212,9 @@ function StudentFeereceiptIndex() {
             (sum, acc) => sum + acc?.inr_value,
             0
           );
+
           setLoading(false);
-          setRows(res.data.data);
+          setRows(filterRowData);
           setCashTotal(cashGrandTotal);
           setDdTotal(ddGrandTotal);
           setOnlineTotal(onlineGrandTotal);
@@ -318,13 +323,6 @@ function StudentFeereceiptIndex() {
       flex: 0.8,
       hideable: false,
       type: "number",
-      renderCell:(params)=>(<div style={{textAlign:"right",width:"100%"}}>{params.row.transaction_type?.toLowerCase() == "cash"
-          ? Number(
-              params.row.inr_value % 1 !== 0
-                ? params.row.inr_value?.toFixed(2)
-                : params.row.inr_value
-            )
-          : 0}</div>),
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "cash"
           ? Number(
@@ -340,14 +338,6 @@ function StudentFeereceiptIndex() {
       flex: 0.8,
       hideable: false,
       type: "number",
-      type: "number",
-      renderCell: (params) => (<div style={{ textAlign: "right", width: "100%" }}>{params.row.transaction_type?.toLowerCase() == "dd"
-        ? Number(
-          params.row.inr_value % 1 !== 0
-            ? params.row.inr_value?.toFixed(2)
-            : params.row.inr_value
-        )
-        : 0}</div>),
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "dd"
           ? Number(
@@ -363,15 +353,6 @@ function StudentFeereceiptIndex() {
       flex: 0.8,
       hideable: false,
       type: "number",
-      renderCell: (params) => (<div style={{ textAlign: "right", width: "100%" }}>{params.row.transaction_type?.toLowerCase() == "rtgs" ||
-        params.row.transaction_type?.toLowerCase() == "p_gateway" ||
-        params.row.transaction_type?.toLowerCase() == "online"
-          ? Number(
-              params.row.inr_value % 1 !== 0
-                ? params.row.inr_value?.toFixed(2)
-                : params.row.inr_value
-            )
-          : 0}</div>),
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "rtgs" ||
         row.transaction_type?.toLowerCase() == "p_gateway" ||
@@ -388,13 +369,6 @@ function StudentFeereceiptIndex() {
       headerName: "INR1",
       flex: 0.8,
       type: "number",
-      renderCell: (params) => (<div style={{ textAlign: "right", width: "100%" }}>{params.row.received_in?.toLowerCase() == "usd"
-        ? Number(
-          params.row.paid_amount % 1 !== 0
-            ? params.row.paid_amount?.toFixed(2)
-            : params.row.paid_amount
-        )
-        : ""}</div>),
       valueGetter: (value, row) =>
         row.received_in?.toLowerCase() == "usd"
           ? Number(
@@ -422,7 +396,9 @@ function StudentFeereceiptIndex() {
       flex: 2,
       hideable: false,
       valueGetter: (value, row) =>
-      (row?.cheque_dd_no || row?.dd_number || row?.dd_bank_name) ? row?.cheque_dd_no || row?.dd_number + "_" + row?.dd_bank_name : "",
+        row?.cheque_dd_no || row?.dd_number || row?.dd_bank_name
+          ? row?.cheque_dd_no || row?.dd_number + "_" + row?.dd_bank_name
+          : "",
     },
     {
       field: "transaction_no",
@@ -460,7 +436,7 @@ function StudentFeereceiptIndex() {
           params.row.receipt_type.toLowerCase() === "bulk fee") &&
         params.row.student_id !== null ? (
           <IconButton
-          disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/BulkFeeReceiptPdfV1`, {
                 state: {
@@ -470,7 +446,7 @@ function StudentFeereceiptIndex() {
                   financialYearId: params.row.financial_year_id,
                   linkStatus: true,
                 },
-              }) 
+              })
             }
             color="primary"
           >
@@ -480,7 +456,7 @@ function StudentFeereceiptIndex() {
             params.row.receipt_type.toLowerCase() === "bulk fee") &&
           params.row.student_id === null ? (
           <IconButton
-           disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/BulkFeeReceiptPdfV1`, {
                 state: {
@@ -498,7 +474,7 @@ function StudentFeereceiptIndex() {
           </IconButton>
         ) : params.row.receipt_type.toLowerCase() === "hos" ? (
           <IconButton
-           disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/HostelFeePdfV1`, {
                 state: { feeReceiptId: params.row.id, linkStatus: true },
@@ -511,7 +487,7 @@ function StudentFeereceiptIndex() {
         ) : params.row.receipt_type.toLowerCase() === "exam" ||
           params.row.receipt_type.toLowerCase() === "exam fee" ? (
           <IconButton
-           disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/ExamReceiptPdfV1`, {
                 state: { feeReceiptId: params.row.id, linkStatus: true },
@@ -524,7 +500,7 @@ function StudentFeereceiptIndex() {
           </IconButton>
         ) : params.row.receipt_type.toLowerCase() === "hosb" ? (
           <IconButton
-           disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/HostelBulkFeeReceiptV1`, {
                 state: {
@@ -540,7 +516,7 @@ function StudentFeereceiptIndex() {
           </IconButton>
         ) : (
           <IconButton
-           disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/FeeReceiptDetailsPDFV1`, {
                 state: {
@@ -550,7 +526,7 @@ function StudentFeereceiptIndex() {
                   transactionType: params.row.transaction_type,
                   feeReceiptId: params.row.id,
                   financialYearId: params.row.financial_year_id,
-                  linkStatus: true,
+                  reportStatus: true,
                 },
               })
             }
@@ -588,7 +564,11 @@ function StudentFeereceiptIndex() {
   };
 
   const getRowClassName = (params) => {
-    return !params.row?.active ? classes.redRow : params.row?.received_in == "USD" ? classes.blueRow : "";
+    return !params.row?.active
+      ? classes.redRow
+      : params.row?.received_in == "USD"
+      ? classes.blueRow
+      : "";
   };
 
   return (
@@ -599,7 +579,7 @@ function StudentFeereceiptIndex() {
           display: "flex",
           justifyContent: "flex-end",
           gap: "10px",
-          marginTop: { xs: 2, md: -5 },
+          marginTop: { xs: 2 },
         }}
       >
         <Grid xs={12} md={3}>
@@ -609,6 +589,7 @@ function StudentFeereceiptIndex() {
             value={values.schoolId}
             options={values.schoolList || []}
             handleChangeAdvance={handleChangeAdvance}
+            disabled
           />
         </Grid>
         <Grid xs={12} md={2}>
@@ -734,4 +715,4 @@ function StudentFeereceiptIndex() {
   );
 }
 
-export default StudentFeereceiptIndex;
+export default FeereceiptReportInst;

@@ -1,3 +1,4 @@
+import React, {useEffect } from "react";
 import {
   Button,
   CardActions,
@@ -5,8 +6,8 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import React from "react";
 import { styled } from "@mui/material/styles";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import Paper from "@mui/material/Paper";
 import { useNavigate } from "react-router-dom";
 
@@ -17,6 +18,11 @@ const BoxShadow = styled(Paper)(({ theme }) => ({
 }));
 
 const ChartsDashboard = () => {
+  const setCrumbs = useBreadcrumbs();
+    useEffect(() => {
+      setCrumbs([]);
+    }, []);
+
   return (
     <Grid container alignItems="flex-start" spacing={3}>
       <Grid item sm={12} md={6} lg={4}>

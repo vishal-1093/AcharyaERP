@@ -37,8 +37,8 @@ const styles = StyleSheet.create({
 
 
 export const GenerateSalaryMisReport = (
-  schoolShortName,pageSNo,salaryType, data=[], date, columns,totalValue , totalGrossEarning,esimTotal,
-  attendanceColumns,attendanceRows,particularsColumns,earningRows,deductionRows,employeeType,consultationTotal,consultantionTdsTotal,consultationPayableTotal
+  schoolShortName, pageSNo, salaryType, data = [], date, columns, totalValue, totalGrossEarning, esimTotal,
+  attendanceColumns, attendanceRows, particularsColumns, earningRows, deductionRows, employeeType, consultationTotal, consultantionTdsTotal, consultationPayableTotal
 ) => {
   const DispayRow = ({ children }) => (
     <View style={styles.tableRow}>{children}</View>
@@ -80,15 +80,15 @@ export const GenerateSalaryMisReport = (
     </View>
   );
 
-  const ReportData = ({data,schoolShortName, salaryType, pageIndex, date, listData, columns,totalValue,totalGrossEarning,esimTotal, employeeType,
-    consultationTotal,consultantionTdsTotal,consultationPayableTotal
+  const ReportData = ({ data, schoolShortName, salaryType, pageIndex, date, listData, columns, totalValue, totalGrossEarning, esimTotal, employeeType,
+    consultationTotal, consultantionTdsTotal, consultationPayableTotal
   }) => (
     <View style={{ ...styles.layout }}>
       <View>
         <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "8px", fontSize: 14, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{`${schoolShortName && salaryType !== "school" ? schoolShortName : `JMJ`} EDUCATION SOCIETY`}</Text>
       </View>
       <View style={{ marginBottom: "5px" }}>
-        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{date && employeeType ? `${(employeeType)?.toUpperCase()} ${(salaryType)?.toUpperCase()} Report For The Month of ${moment(date).format("MMM").toUpperCase()} ${moment(date).format("YYYY")}` :  `${(salaryType)?.toUpperCase()} Report For The Month of ${moment(date).format("MMM").toUpperCase()} ${moment(date).format("YYYY")}`}</Text>
+        <Text style={{ backgroundColor: "#33495E", color: "#fff", padding: "4px", fontSize: 12, textAlign: "center", fontWeight: "heavy", fontFamily: "Times-Bold" }}>{date && employeeType ? `${(employeeType)?.toUpperCase()} ${(salaryType)?.toUpperCase()} Report For The Month of ${moment(date).format("MMM").toUpperCase()} ${moment(date).format("YYYY")}` : `${(salaryType)?.toUpperCase()} Report For The Month of ${moment(date).format("MMM").toUpperCase()} ${moment(date).format("YYYY")}`}</Text>
       </View>
       <View style={[styles.borderTable]}>
         <DispayRow>
@@ -118,8 +118,8 @@ export const GenerateSalaryMisReport = (
         {listData.rows.map((obj, i) => {
           return (
             <>
-            <DispayRow key={i}>
-              <DisplayCells
+              <DispayRow key={i}>
+                <DisplayCells
                   key={i}
                   label={(pageIndex) * (pageSNo) + (i + 1)}
                   style="Times-Roman"
@@ -128,27 +128,27 @@ export const GenerateSalaryMisReport = (
                   align="center"
                   labelType="text"
                 />
-              {columns.filter((f) => !f.hide).map((c, id) => (
+                {columns.filter((f) => !f.hide).map((c, id) => (
                   <DisplayCells
                     key={i}
-                    label={typeof (obj[`${c.field}`]) == "number" ? new Intl.NumberFormat().format((obj[`${c.field}`])) : (obj[`${c.field}`]?.toUpperCase())}
+                    label={typeof (obj[`${c.field}`]) == "number" ? (obj[`${c.field}`]) : (obj[`${c.field}`]?.toUpperCase())}
                     style="Times-Roman"
                     right={1}
                     bottom={1}
                     customWidth={c.field == "employee_name" ? 3 : c.field == "bank_account_no" ? 2 : c.field == "bank_ifsccode" ? 2 : ""}
                     align={c.field == "netpay" || c.field == "lic" || c.field == "advance" || c.field == "tds" || c.field == "gross_pay" ||
-                     c.field == "pt" || c.field == "total_earning" || c.field == "totalNetPay" || c.field == "esi" || c.field == "esi_contribution_employee" || 
-                     c.field == "pay_days" || c.field == "grossWages" || c.field == "edliWages" || c.field == "epfWages" || c.field == "epsWages" ||
-                     c.field == "epscontriRemitted" || c.field == "epfContriRemitted" || c.field == "epfEpsDiffRemitted" || 
-                     c.field == "ncpDays" || c.field == "refundOfAdvances" || c.field == "s715" || c.field == "s742" || c.field == "s725" ? "right" : c.field == "empcode" || c.field == "bank_account_no" ||
-                      c.field == "lic_number" || c.field == "schoolNameShort" || c.field == "school" ? "center": "left"}
+                      c.field == "pt" || c.field == "total_earning" || c.field == "totalNetPay" || c.field == "esi" || c.field == "esi_contribution_employee" ||
+                      c.field == "pay_days" || c.field == "grossWages" || c.field == "edliWages" || c.field == "epfWages" || c.field == "epsWages" ||
+                      c.field == "epscontriRemitted" || c.field == "epfContriRemitted" || c.field == "epfEpsDiffRemitted" ||
+                      c.field == "ncpDays" || c.field == "refundOfAdvances" || c.field == "s715" || c.field == "s742" || c.field == "s725" ? "right" : c.field == "empcode" || c.field == "bank_account_no" ||
+                        c.field == "lic_number" || c.field == "schoolNameShort" || c.field == "school" ? "center" : "left"}
                     labelType="text"
                   />))}
-            </DispayRow>
+              </DispayRow>
             </>
           );
         })}
-        {(pageIndex+1) == data.length && salaryType !== "epf"  && <DispayRow>
+        {(pageIndex + 1) == data.length && salaryType !== "epf" && <DispayRow>
           <DisplayCells
             key={new Date()}
             label=""
@@ -158,27 +158,27 @@ export const GenerateSalaryMisReport = (
           {columns.filter((f) => !f.hide).map((c, idx) => (
             <DisplayCells
               key={idx}
-              label={salaryType == "esi" && salaryType != "school" &&  (columns.filter((f) => !f.hide).length - 5) == idx ? "Grand Total" : ((salaryType != "esi" && salaryType != "school" && salaryType != "tds" && salaryType !== "pt" && salaryType !== "epf" && salaryType != "summary") && (columns.filter((f) => !f.hide).length - 2) == idx) ? "Grand Total":
-                ((salaryType != "esi" && salaryType != "school" && salaryType != "tds" && salaryType == "pt" && salaryType !== "epf") && (columns.filter((f) => !f.hide).length - 3) == idx) ? "Grand Total":
-                ((salaryType == "tds") && (columns.filter((f) => !f.hide).length - 3) == idx) ? "Grand Total" :
-                (salaryType != "esi" && salaryType == "school") && (columns.filter((f) => !f.hide).length - 2) == idx ? "Grand Total": 
-                (salaryType == "summary" && employeeType == "consultant") && (columns.filter((f) => !f.hide).length - 4) == idx ? "Grand Total": 
-                ((salaryType == "esi") && (columns.filter((f) => !f.hide).length - 3) == idx) ? new Intl.NumberFormat().format(totalGrossEarning) :
-                ((salaryType == "tds" || salaryType == "pt") && (columns.filter((f) => !f.hide).length - 2) == idx) ? new Intl.NumberFormat().format(totalGrossEarning) :
-                ((salaryType == "esi") && (columns.filter((f) => !f.hide).length - 2) == idx) ? new Intl.NumberFormat().format(totalValue) :
-                (salaryType == "esi" && (columns.filter((f) => !f.hide).length - 1) == idx) ? new Intl.NumberFormat().format(esimTotal):
-                 (salaryType != "esi" && salaryType != "summary" && (columns.filter((f) => !f.hide).length - 1) == idx)?  new Intl.NumberFormat().format(totalValue):
-                 salaryType == "epf" &&  (columns.filter((f) => !f.hide).length - 10) == idx ? "Grand Total":
-                 (salaryType == "summary" && employeeType == "consultant" && (columns.filter((f) => !f.hide).length - 1) == idx)?  new Intl.NumberFormat().format(consultationPayableTotal):
-                 (salaryType == "summary" && employeeType == "consultant" && (columns.filter((f) => !f.hide).length - 2) == idx)?  new Intl.NumberFormat().format(consultantionTdsTotal):
-                 (salaryType == "summary" && employeeType == "consultant"&& (columns.filter((f) => !f.hide).length - 3) == idx)?  new Intl.NumberFormat().format(consultationTotal): ""}
+              label={salaryType == "esi" && salaryType != "school" && (columns.filter((f) => !f.hide).length - 5) == idx ? "Grand Total" : ((salaryType != "esi" && salaryType != "school" && salaryType != "tds" && salaryType !== "pt" && salaryType !== "epf" && salaryType != "summary") && (columns.filter((f) => !f.hide).length - 2) == idx) ? "Grand Total" :
+                ((salaryType != "esi" && salaryType != "school" && salaryType != "tds" && salaryType == "pt" && salaryType !== "epf") && (columns.filter((f) => !f.hide).length - 3) == idx) ? "Grand Total" :
+                  ((salaryType == "tds") && (columns.filter((f) => !f.hide).length - 3) == idx) ? "Grand Total" :
+                    (salaryType != "esi" && salaryType == "school") && (columns.filter((f) => !f.hide).length - 2) == idx ? "Grand Total" :
+                      (salaryType == "summary" && employeeType == "consultant") && (columns.filter((f) => !f.hide).length - 4) == idx ? "Grand Total" :
+                        ((salaryType == "esi") && (columns.filter((f) => !f.hide).length - 3) == idx) ? totalGrossEarning :
+                          ((salaryType == "tds" || salaryType == "pt") && (columns.filter((f) => !f.hide).length - 2) == idx) ? totalGrossEarning :
+                            ((salaryType == "esi") && (columns.filter((f) => !f.hide).length - 2) == idx) ? totalValue :
+                              (salaryType == "esi" && (columns.filter((f) => !f.hide).length - 1) == idx) ? esimTotal :
+                                (salaryType != "esi" && salaryType != "summary" && (columns.filter((f) => !f.hide).length - 1) == idx) ? totalValue :
+                                  salaryType == "epf" && (columns.filter((f) => !f.hide).length - 10) == idx ? "Grand Total" :
+                                    (salaryType == "summary" && employeeType == "consultant" && (columns.filter((f) => !f.hide).length - 1) == idx) ? consultationPayableTotal :
+                                      (salaryType == "summary" && employeeType == "consultant" && (columns.filter((f) => !f.hide).length - 2) == idx) ? consultantionTdsTotal :
+                                        (salaryType == "summary" && employeeType == "consultant" && (columns.filter((f) => !f.hide).length - 3) == idx) ? consultationTotal : ""}
               style="Times-Bold"
               right={1}
               bottom={1}
               align={(salaryType == "esi" && salaryType != "school" && (columns.filter((f) => !f.hide).length - 5) == idx) ? "center" :
                 ((salaryType == "advance" || salaryType == "lic" || salaryType == "bank" || salaryType == "school") && columns.filter((f) => !f.hide).length - 2) == idx ? "center" :
-                ((salaryType !== "esi" && salaryType != "school") && (salaryType == "tds" || salaryType == "pt") && columns.filter((f) => !f.hide).length - 3) == idx ? "center" :
-                ((salaryType == "epf") && columns.filter((f) => !f.hide).length - 10) == idx ? "center": "right"}
+                  ((salaryType !== "esi" && salaryType != "school") && (salaryType == "tds" || salaryType == "pt") && columns.filter((f) => !f.hide).length - 3) == idx ? "center" :
+                    ((salaryType == "epf") && columns.filter((f) => !f.hide).length - 10) == idx ? "center" : "right"}
               customWidth={c.field == "employee_name" ? 3 : c.field == "bank_account_no" ? 2 : c.field == "bank_ifsccode" ? 2 : ""}
               labelType="text"
             />
@@ -188,7 +188,7 @@ export const GenerateSalaryMisReport = (
     </View>
   );
 
-  const SummaryComponent = ({ attendanceRows, attendanceColumns, particularsColumns, earningRows, deductionRows,employeeType }) => (
+  const SummaryComponent = ({ attendanceRows, attendanceColumns, particularsColumns, earningRows, deductionRows, employeeType }) => (
     <>
       {employeeType == "regular" && <AttendanceData attendanceRows={attendanceRows} attendanceColumns={attendanceColumns} />}
       {employeeType == "regular" && <ParticularsData particularsColumns={particularsColumns} earningRows={earningRows} deductionRows={deductionRows} />}
@@ -243,7 +243,7 @@ export const GenerateSalaryMisReport = (
               {attendanceColumns.filter((f) => !f.hide).map((c, id) => (
                 <DisplayCells
                   key={i}
-                  label={typeof (obj[`${c.field}`]) == "number" ? new Intl.NumberFormat().format((obj[`${c.field}`])) : (obj[`${c.field}`])}
+                  label={typeof (obj[`${c.field}`]) == "number" ? (obj[`${c.field}`]) : (obj[`${c.field}`])}
                   style="Times-Roman"
                   right={1}
                   bottom={1}
@@ -265,7 +265,7 @@ export const GenerateSalaryMisReport = (
               key={idx}
               label={salaryType == "summary" && (attendanceColumns.filter((f) => !f.hide).length - 2) == idx ? "Grand Total" :
                 salaryType == "summary" && (attendanceColumns.filter((f) => !f.hide).length - 1) == idx ?
-                  new Intl.NumberFormat().format(attendanceRows.reduce((acc, curr) => acc + curr?.value, 0)) : ""}
+                  attendanceRows.reduce((acc, curr) => acc + curr?.value, 0) : ""}
               style="Times-Bold"
               right={1}
               bottom={1}
@@ -308,7 +308,7 @@ export const GenerateSalaryMisReport = (
         </DispayRow>
         return (
         <>
-          {[...earningRows,...deductionRows].map((obj, i) => (
+          {[...earningRows, ...deductionRows].map((obj, i) => (
             <DispayRow key={i}>
               <DisplayCells
                 key={i}
@@ -322,8 +322,8 @@ export const GenerateSalaryMisReport = (
               {particularsColumns.filter((f) => !f.hide).map((c, id) => (
                 <DisplayCells
                   key={i}
-                  label={typeof (obj[`${c.field}`]) == "number" ? new Intl.NumberFormat().format((obj[`${c.field}`])) : (obj[`${c.field}`])}
-                  style={obj.name == "Total Gross Salary" || obj.name == "Net Salary Payable" ? "Times-Bold": "Times-Roman"}
+                  label={typeof (obj[`${c.field}`]) == "number" ? (obj[`${c.field}`]) : (obj[`${c.field}`])}
+                  style={obj.name == "Total Gross Salary" || obj.name == "Net Salary Payable" ? "Times-Bold" : "Times-Roman"}
                   right={1}
                   bottom={1}
                   align={c.field == "value" ? "right" : c.field == "name" ? "left" : "center"}
@@ -332,28 +332,6 @@ export const GenerateSalaryMisReport = (
             </DispayRow>
           ))}
         </>
-        {/* <DispayRow>
-          <DisplayCells
-            key={new Date()}
-            label=""
-            right={1}
-            bottom={1}
-          />
-          {particularsColumns.filter((f) => !f.hide).map((c, idx) => (
-            <DisplayCells
-              key={idx}
-              label={salaryType == "summary" && (particularsColumns.filter((f) => !f.hide).length - 2) == idx ? "Grand Total" :
-                salaryType == "summary" && (particularsColumns.filter((f) => !f.hide).length - 1) == idx ?
-                  new Intl.NumberFormat().format(earningRows.reduce((acc, curr) => acc + curr?.value, 0)) : ""}
-              style="Times-Bold"
-              right={1}
-              bottom={1}
-              align={(salaryType == "summary" && (particularsColumns.filter((f) => !f.hide).length - 2) == idx) ? "center" :
-                salaryType == "summary" && (particularsColumns.filter((f) => !f.hide).length - 1) == idx ? "right" : ""}
-              labelType="text"
-            />
-          ))}
-        </DispayRow> */}
         );
       </View>
     </View>
@@ -363,15 +341,15 @@ export const GenerateSalaryMisReport = (
     try {
       const HallTicketCopy = (
         <Document title={`Salary Mis`}>
-        {!(salaryType == "summary") &&  data.map((ele, index) => (
+          {!(salaryType == "summary") && data.map((ele, index) => (
             <Page
               key={index}
               size="A4"
               style={{ ...styles.pageLayout }}
             >
-            <ReportData data={data} schoolShortName={schoolShortName} pageSNo={pageSNo} salaryType={salaryType} pageIndex={index} date={date} listData={ele}
-               columns={columns} totalValue={totalValue} totalGrossEarning={totalGrossEarning}
-               esimTotal={esimTotal}/>
+              <ReportData data={data} schoolShortName={schoolShortName} pageSNo={pageSNo} salaryType={salaryType} pageIndex={index} date={date} listData={ele}
+                columns={columns} totalValue={totalValue} totalGrossEarning={totalGrossEarning}
+                esimTotal={esimTotal} />
               <View style={{ position: "absolute", bottom: 20, width: "100%" }}>
                 <Text style={{ textAlign: "center", fontSize: 8, fontFamily: "Times-Bold" }}>
                   Page {index + 1} of {data.length}
@@ -379,15 +357,15 @@ export const GenerateSalaryMisReport = (
               </View>
             </Page>
           ))}
-          {(salaryType == "summary" &&  employeeType == "consultant") &&  data.map((ele, index) => (
+          {(salaryType == "summary" && employeeType == "consultant") && data.map((ele, index) => (
             <Page
               key={index}
               size="A4"
               style={{ ...styles.pageLayout }}
             >
-            <ReportData data={data} schoolShortName={schoolShortName} pageSNo={pageSNo} salaryType={salaryType} pageIndex={index} date={date} listData={ele}
-               columns={columns} totalValue={totalValue} totalGrossEarning={totalGrossEarning}
-               esimTotal={esimTotal} employeeType={employeeType} consultationTotal={consultationTotal} consultantionTdsTotal={consultantionTdsTotal} consultationPayableTotal={consultationPayableTotal}/>
+              <ReportData data={data} schoolShortName={schoolShortName} pageSNo={pageSNo} salaryType={salaryType} pageIndex={index} date={date} listData={ele}
+                columns={columns} totalValue={totalValue} totalGrossEarning={totalGrossEarning}
+                esimTotal={esimTotal} employeeType={employeeType} consultationTotal={consultationTotal} consultantionTdsTotal={consultantionTdsTotal} consultationPayableTotal={consultationPayableTotal} />
               <View style={{ position: "absolute", bottom: 20, width: "100%" }}>
                 <Text style={{ textAlign: "center", fontSize: 8, fontFamily: "Times-Bold" }}>
                   Page {index + 1} of {data.length}
@@ -395,15 +373,15 @@ export const GenerateSalaryMisReport = (
               </View>
             </Page>
           ))}
-          {salaryType == "summary" && employeeType == "regular" &&  <Page
-              key={new Date()}
-              size="A4"
-              style={{ ...styles.pageLayout }}
-            >
-              <SummaryComponent  attendanceColumns={attendanceColumns} attendanceRows={attendanceRows}
+          {salaryType == "summary" && employeeType == "regular" && <Page
+            key={new Date()}
+            size="A4"
+            style={{ ...styles.pageLayout }}
+          >
+            <SummaryComponent attendanceColumns={attendanceColumns} attendanceRows={attendanceRows}
               particularsColumns={particularsColumns} earningRows={earningRows} deductionRows={deductionRows} employeeType={employeeType}
-              />
-            </Page>}
+            />
+          </Page>}
         </Document>
       );
       const blob = await pdf(HallTicketCopy).toBlob();

@@ -8,6 +8,7 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 
 const initialValues = {
   amount: "",
@@ -16,7 +17,7 @@ const initialValues = {
   schoolId: null,
   programId: null,
   receivedYear: null,
-  feeTemplateId: null,
+  feeTemplateId: [],
   neftNo: "",
   bulkNo: "",
   remarks: "",
@@ -64,7 +65,7 @@ function PaidAtBoardTag() {
   useEffect(() => {
     getAcademicYearData();
     getSchoolData();
-    setCrumbs([{ name: "Paid At Board" }]);
+    setCrumbs([{ name: "Paid At Board", link: "/paid-at-board-index" }]);
   }, [pathname]);
 
   useEffect(() => {
@@ -101,13 +102,11 @@ function PaidAtBoardTag() {
   };
 
   const getBoardData = async () => {
-    if (values.feeTemplateId)
+    if (values.feeTemplateId.length > 0)
       try {
         const getBoardResponse = await axios.get(
           `/api/finance/boardAssignedToFeeTemplate/${values.feeTemplateId}`
         );
-
-        console.log(getBoardResponse);
 
         const data = [];
 
@@ -139,7 +138,7 @@ function PaidAtBoardTag() {
 
         getTemplateResponse.data.data.forEach((ele) => {
           data.push({
-            label: ele.fee_template_name,
+            label: `${ele.fee_template_name} - ${ele.fee_template_id}`,
             value: ele.fee_template_id,
           });
         });
@@ -190,15 +189,16 @@ function PaidAtBoardTag() {
         boardId: values.boardId,
         yearSem: values.receivedYear,
         neftNo: values.neftNo,
-        amount: values.amount,
+        amount: Number(values.amount),
         bulkReceiptNo: values.bulkNo,
         remarks: values.remarks,
         paidByStudent: true,
         receivedDate: values.receivedDate,
         schoolId: values.schoolId,
-        taggedAmount: values.amount,
+        taggedAmount: 0,
         lockStatus: false,
-        feeTemplateId: values.feeTemplateId,
+        feeTemplateId: values.feeTemplateId.toString(),
+        remainingBalance: Number(values.amount),
         active: true,
       };
 
@@ -259,7 +259,7 @@ function PaidAtBoardTag() {
           </Grid>
 
           <Grid item xs={12} md={2.4}>
-            <CustomAutocomplete
+            <CustomMultipleAutocomplete
               name="feeTemplateId"
               label="Fee template"
               value={values.feeTemplateId}
