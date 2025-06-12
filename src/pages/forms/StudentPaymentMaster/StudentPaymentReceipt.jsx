@@ -102,9 +102,39 @@ function StudentPaymentReceipt() {
             (obj) => obj.receiptNo
           );
 
-          console.log("filter", filteredArray);
-          // If the response is successful, append its data to the updatedArray
           updatedArray = [...filteredArray]; // Default to empty array if no data
+        } catch (error) {
+          console.error("Error in fetching fee receipt details:", error);
+          // Handle error - response will be undefined or fail gracefully
+          // You can either leave updatedArray as it is (empty array) or provide fallback data
+        }
+
+        try {
+          // Fetch fee receipt details (first request)
+          const response = await axios.get(
+            `/api/getUniformCmaReceipt/${studentDataResponse.data?.data?.[0]?.student_id}`
+          );
+
+          const data = [];
+
+          response.data.data.forEach((ele) => {
+            data.push({
+              studentName: ele.studentName,
+              college: ele.college,
+              totalAmount: null,
+              receiptType:
+                ele.receiptType === "cma" ? "Add on fee" : "Uniform fee",
+              receiptDate: moment(ele.receiptDate).format("DD-MM-YYYY"),
+              receiptNo: ele.receiptNo,
+              amount: ele.amount,
+              auid: ele.auid,
+              fcYear: ele.fcYear,
+              course: ele.course,
+            });
+          });
+
+          // If the response is successful, append its data to the updatedArray
+          updatedArray = [...updatedArray, ...data]; // Default to empty array if no data
         } catch (error) {
           console.error("Error in fetching fee receipt details:", error);
           // Handle error - response will be undefined or fail gracefully
@@ -342,6 +372,22 @@ function StudentPaymentReceipt() {
                                         <Download fontSize="small" />
                                       </IconButton>
                                     ) : obj.receiptType.toLowerCase() ===
+                                      "hos" ? (
+                                      <IconButton
+                                        onClick={() =>
+                                          navigate(`/HostelFeePdfV1`, {
+                                            state: {
+                                              feeReceiptId: obj.fee_receipt_id,
+                                              studentStatus: true,
+                                            },
+                                          })
+                                        }
+                                        color="primary"
+                                        sx={{ cursor: "pointer" }}
+                                      >
+                                        <Download fontSize="small" />
+                                      </IconButton>
+                                    ) : obj.receiptType.toLowerCase() ===
                                         "exam" ||
                                       obj.receiptType.toLowerCase() ===
                                         "exam fee" ? (
@@ -351,6 +397,36 @@ function StudentPaymentReceipt() {
                                             state: {
                                               feeReceiptId: obj.fee_receipt_id,
                                               studentStatus: true,
+                                            },
+                                          })
+                                        }
+                                        color="primary"
+                                        sx={{ cursor: "pointer" }}
+                                      >
+                                        <Download fontSize="small" />
+                                      </IconButton>
+                                    ) : obj.receiptType.toLowerCase() ===
+                                      "add on fee" ? (
+                                      <IconButton
+                                        onClick={() =>
+                                          navigate(`/NiniskillPdf`, {
+                                            state: {
+                                              rowData: obj,
+                                            },
+                                          })
+                                        }
+                                        color="primary"
+                                        sx={{ cursor: "pointer" }}
+                                      >
+                                        <Download fontSize="small" />
+                                      </IconButton>
+                                    ) : obj.receiptType.toLowerCase() ===
+                                      "uniform fee" ? (
+                                      <IconButton
+                                        onClick={() =>
+                                          navigate(`/UniformReceiptPdf`, {
+                                            state: {
+                                              rowData: obj,
                                             },
                                           })
                                         }
