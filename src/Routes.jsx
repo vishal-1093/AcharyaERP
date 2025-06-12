@@ -1576,6 +1576,10 @@ const PaidAtBoardStdList = lazy(() =>
   import("./containers/indeces/studentMaster/PaidAtBoardStdList.jsx")
 );
 
+const PaidAtBoardReceipt = lazy(() =>
+  import("./containers/indeces/studentMaster/PaidAtBoardReceipt.jsx")
+);
+
 const PaidAtBoardReport = lazy(() =>
   import("./pages/forms/studentMaster/PaidAtBoardReport.jsx")
 );
@@ -1730,12 +1734,20 @@ const NiniskillupPdf = lazy(() =>
   import("./pages/forms/studentMaster/NiniskillupPdf.jsx")
 );
 
+const NiniskillPdf = lazy(() =>
+  import("./pages/forms/studentMaster/NiniskillPdf.jsx")
+);
+
 const UniformAndStationaryFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/UniformAndStationaryFeeReceipt.jsx")
 );
 
 const UniformAndStationaryReceiptPdf = lazy(() =>
   import("./pages/forms/studentMaster/UniformAndStationaryReceiptPdf.jsx")
+);
+
+const UniformReceiptPdf = lazy(() =>
+  import("./pages/forms/studentMaster/UniformReceiptPdf.jsx")
 );
 
 const StudentFeeReceipt = lazy(() =>
@@ -8427,6 +8439,16 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/paid-at-board-receipt"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardReceipt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/received-amount"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -8755,6 +8777,16 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/NiniskillPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NiniskillPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/UniformAndStationaryFeeReceipt"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -8769,6 +8801,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <UniformAndStationaryReceiptPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/UniformReceiptPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <UniformReceiptPdf />
               </Suspense>
             }
           />

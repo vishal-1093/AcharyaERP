@@ -12,6 +12,7 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
+import PrintIcon from "@mui/icons-material/Print";
 import { Check, HighlightOff } from "@mui/icons-material";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
@@ -122,13 +123,6 @@ function PaidAtBoardStdList() {
     }
   };
 
-  const handleChangeAdvance = async (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -180,6 +174,10 @@ function PaidAtBoardStdList() {
     payload.boardTagAmountDtoList = boardTagAmountDtoList;
     setLoading(true);
 
+    const checkStdPaying = rows
+      ?.filter((ele) => ele.checked)
+      ?.every((ele) => Number(ele.eachPay) <= Number(ele.BalanceAmount));
+
     try {
       if (values.amountPerHead * checkedLength > rowData.remainingBalance) {
         setAlertMessage({
@@ -187,6 +185,17 @@ function PaidAtBoardStdList() {
           message: "Paying now cannot be greater than balance",
         });
         setAlertOpen(true);
+        setLoading(false);
+        return;
+      }
+
+      if (!checkStdPaying) {
+        setAlertMessage({
+          severity: "error",
+          message: "Paying now of student should be less than balance amount",
+        });
+        setAlertOpen(true);
+        setLoading(false);
         return;
       }
 
@@ -281,6 +290,29 @@ function PaidAtBoardStdList() {
       headerName: "Paying now",
       flex: 1,
       align: "right",
+    },
+
+    {
+      field: "print",
+      headerName: "Print",
+      flex: 1,
+      align: "center",
+      renderCell: (params) => {
+        if (params.row.BalanceAmount <= 0) {
+          return (
+            <IconButton
+              color="primary"
+              onClick={() =>
+                navigate(`/paid-at-board-receipt`, {
+                  state: { rowData: rowData },
+                })
+              }
+            >
+              <PrintIcon fontSize="small" />
+            </IconButton>
+          );
+        }
+      },
     },
   ];
 

@@ -139,7 +139,6 @@ function PaidAtBoardStdList() {
       const stdWiseResponse = await axios.get(
         `/api/finance/studentDetailsByBoardSchoolAcademicYear/${boardUniqueId}/${schoolId}/${acYearId}`
       );
-      console.log(stdWiseResponse);
 
       setStdList(stdWiseResponse.data.data);
     } catch (error) {
