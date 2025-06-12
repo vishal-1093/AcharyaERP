@@ -66,7 +66,7 @@ function StudentDueReportForProgramme() {
     { field: "hostelWaiver", headerName: "H-Waiver", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center' },
     { field: "hostelDue", headerName: "Hostel Due", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center' },
     {
-      field: "totalDue", headerName: "Total Due", align: "right", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center',
+      field: "totalDue", headerName: "Total Due", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center',
       renderCell: (params) => {
         const total = Number(params?.row?.totalDue) || 0;
         return <Typography fontWeight="bold">{total}</Typography>;
