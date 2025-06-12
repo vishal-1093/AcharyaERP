@@ -122,13 +122,6 @@ function PaidAtBoardStdList() {
     }
   };
 
-  const handleChangeAdvance = async (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -180,11 +173,24 @@ function PaidAtBoardStdList() {
     payload.boardTagAmountDtoList = boardTagAmountDtoList;
     setLoading(true);
 
+    const checkStdPaying = rows?.every(
+      (ele) => Number(ele.eachPay) <= Number(ele.BalanceAmount)
+    );
+
     try {
       if (values.amountPerHead * checkedLength > rowData.remainingBalance) {
         setAlertMessage({
           severity: "error",
           message: "Paying now cannot be greater than balance",
+        });
+        setAlertOpen(true);
+        return;
+      }
+
+      if (!checkStdPaying) {
+        setAlertMessage({
+          severity: "error",
+          message: "Paying now of student should be less than balance amount",
         });
         setAlertOpen(true);
         return;
