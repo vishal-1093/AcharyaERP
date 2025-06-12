@@ -76,6 +76,12 @@ function BankIndex() {
         </IconButton>,
       ],
     },
+    {
+      field: "opening_balance",
+      headerName: "Opening Balance",
+      flex: 1,
+      align: 'right'
+    },
 
     {
       field: "id",
