@@ -253,7 +253,7 @@ const PaidAtBoardReceipt = () => {
                 </Grid>
                 <Grid item xs={7}>
                   <Typography variant="body1" sx={bookmanFont}>
-                    {rowData?.bulkReceiptNo}
+                    {rowData?.bulkReceiptNo}/a
                   </Typography>
                 </Grid>
 
