@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  Box,
   Grid,
   Button,
   Typography,
-  Checkbox,
   CircularProgress,
   Paper,
   TableContainer,
@@ -24,6 +22,7 @@ import { makeStyles } from "@mui/styles";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomModal from "../../../components/CustomModal";
 import StudentDetails from "../../../components/StudentDetails";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const label = { inputprops: { "aria-label": "Checkbox demo" } };
 
@@ -64,6 +63,7 @@ const initialValues = {
   bankId: null,
   fromName: "",
   checkAuid: "",
+  financialYearId: null,
 };
 
 const initialValuesOne = {
@@ -100,6 +100,7 @@ function NiniskillupForm() {
   const [values, setValues] = useState(initialValues);
   const [studentData, setStudentData] = useState([]);
   const [open, setOpen] = useState(false);
+  const [fcYearOptions, setFcYearOptions] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -119,6 +120,24 @@ function NiniskillupForm() {
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
+
+  useEffect(() => {
+    getFcYearData();
+  }, []);
+
+  const getFcYearData = async () => {
+    await axios
+      .get(`/api/FinancialYear`)
+      .then((res) => {
+        setFcYearOptions(
+          res.data.data.map((obj) => ({
+            label: obj.financial_year,
+            value: obj.financial_year_id,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
+  };
 
   const getStudentData = async () => {
     try {
@@ -221,6 +240,10 @@ function NiniskillupForm() {
     );
   };
 
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({ ...prev, [name]: newValue }));
+  };
+
   const handleChange = async (e, i) => {
     const { name, value } = e.target;
     setValues((prev) => ({ ...prev, [name]: value }));
@@ -237,6 +260,7 @@ function NiniskillupForm() {
           school_id: studentData?.school_id,
           paid_year: obj.key,
           receipt_type: "Add On Fee",
+          financial_year_id: obj.financialYearId,
           total_amount: noOfYears.reduce(
             (total, sum) => Number(total) + Number(sum.payingAmount),
             0
@@ -250,7 +274,6 @@ function NiniskillupForm() {
       );
 
       if (response.status === 200 || response.status === 201) {
-        console.log(response);
         navigate(`/NiniskillupPdf`, { state: { res: response.data.data[0] } });
         setAlertMessage({ severity: "success", message: "Created" });
         setAlertOpen(true);
@@ -294,6 +317,16 @@ function NiniskillupForm() {
                 label="AUID"
                 value={values.auid}
                 handleChange={handleChange}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={2.4}>
+              <CustomAutocomplete
+                name="financialYearId"
+                label="FC Year"
+                value={values.financialYearId}
+                options={fcYearOptions}
+                handleChangeAdvance={handleChangeAdvance}
               />
             </Grid>
 
