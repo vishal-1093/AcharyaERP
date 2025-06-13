@@ -1861,6 +1861,22 @@ const StudentOnlineClass = lazy(() =>
   import("./pages/forms/academicMaster/StudentOnlineClass")
 );
 
+const LedgerDayWiseTransactionDetail = lazy(()=>
+import("./containers/indeces/vendorMaster/LedgerDayTransactionDetail.jsx")
+) 
+
+const LedgerDayTransaction = lazy(()=>
+  import("./containers/indeces/vendorMaster/LedgerDayTransaction.jsx")
+)
+
+const VendorMonthlyDetails = lazy(()=>
+  import("./containers/indeces/vendorMaster/vendorMonthlyDetails.jsx")
+)
+
+const VendorDetailMaster = lazy(()=>
+  import("./pages/masters/VendorHeadMaster.jsx")
+)
+
 //  Vacation Leave
 const VacationLeaveIndex = lazy(() =>
   import("./containers/indeces/vacationLeaveMaster/VacationLeaveIndex.jsx")
@@ -10284,6 +10300,42 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <LaptopIssueForm />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path={"/Accounts-ledger"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VendorDetailMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/Accounts-ledger-monthly-detail"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VendorMonthlyDetails />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/Accounts-ledger-day-transaction"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LedgerDayTransaction />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/Accounts-ledger-day-transaction-detail"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LedgerDayWiseTransactionDetail />
               </Suspense>
             }
           />

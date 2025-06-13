@@ -228,3 +228,16 @@ ol.custom-tabs > li > div:before {
   src: url('../fonts/BookmanOldStyle-Bold.ttf') format('truetype');
   font-weight: bold;
 }
+
+@media print {
+  .ledger-print-enhanced * {
+    font-size: 20px !important;
+    line-height: 1.6 !important;
+    font-family: "Bookman Old Style", serif !important;
+  }
+
+  .ledger-print-enhanced th,
+  .ledger-print-enhanced td {
+    padding: 8px 16px !important;
+  }
+}

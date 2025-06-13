@@ -38,24 +38,26 @@ function StudentDueReportDetail() {
         { field: "paid", headerName: "Paid", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center', },
         { field: "scholarship", headerName: "Scholarship", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center', },
         { field: "collageWaiver", headerName: "C-Waiver", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center', },
-        { field: "due", headerName: "Due", align: "center", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center', },
-        { field: "add_on", headerName: "Add On Due", align: "center", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center', },
+        { field: "due", headerName: "Due", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center', },
+        { field: "add_on", headerName: "Add On Due", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center', },
         { field: "hostelWaiver", headerName: "H-Waiver", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center', },
-        { field: "hostel_due", headerName: "Hostel Due", align: "right", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center', },
+        { field: "hostel_due", headerName: "Hostel Due", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center', },
         {
-            field: "totalDue", headerName: "Total Due", align: "right", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center',
+            field: "totalDue", headerName: "Total Due", flex: 1, headerClassName: "header-bg", align: 'right', headerAlign: 'center',
             renderCell: (params) => {
                 const total = Number(params?.row?.totalDue) || 0;
-                return <Typography fontWeight="bold">{total}</Typography>;
+                return (
+                    <Box display="flex" alignItems="center" height="100%" width="100%" justifyContent="flex-end">
+                        <Typography fontWeight="bold">{total}</Typography>
+                    </Box>
+                );
             }
         },
     ];
     useEffect(() => {
-
         setCrumbs([
             { name: "Student Due Report" }
         ])
-
         getSchoolDetails();
         getAcademicYearDetails();
     }, []);
@@ -159,20 +161,20 @@ function StudentDueReportDetail() {
             .then((res) => {
                 const { data } = res?.data
                 const optionData = [];
-               if(roleShortName ==="SAA"){
-                data?.length > 0 && data?.forEach((obj) => {
-                    optionData.push({
-                        value: obj?.ac_year_id,
-                        label: obj?.ac_year,
-                        ac_year_code: obj?.ac_year_code,
+                if (roleShortName === "SAA") {
+                    data?.length > 0 && data?.forEach((obj) => {
+                        optionData.push({
+                            value: obj?.ac_year_id,
+                            label: obj?.ac_year,
+                            ac_year_code: obj?.ac_year_code,
+                        });
                     });
-                });
-               }else{
-                 optionData.push({
-                     value: data[0]?.ac_year_id,
-                    label: data[0]?.ac_year,
-                })
-            }
+                } else {
+                    optionData.push({
+                        value: data[0]?.ac_year_id,
+                        label: data[0]?.ac_year,
+                    })
+                }
                 setAcYearOptions(optionData);
             })
             .catch((err) => console.error(err));
@@ -192,7 +194,7 @@ function StudentDueReportDetail() {
                             label: obj?.program_name
                         }
                     })
-                     setProgramOptions(programOption || []);
+                    setProgramOptions(programOption || []);
                 })
                 .catch((err) => {
                     console.error(err)
@@ -210,7 +212,7 @@ function StudentDueReportDetail() {
                 [name]: newValue,
                 ['programId']: ''
             }));
-             setProgramOptions([]);
+            setProgramOptions([]);
 
         } else {
             setValues((prev) => ({
@@ -275,11 +277,11 @@ function StudentDueReportDetail() {
                         '& .last-column': { fontWeight: "bold" },
                         '& .last-row:hover': { fontWeight: 700, backgroundColor: "#376a7d !important", color: "#fff", fontSize: "13px" },
                         '& .header-bg': { fontWeight: "bold", backgroundColor: "#376a7d !important", color: "#fff", fontSize: "15px" },
-                        '& .MuiDataGrid-cell:focus': { outline: 'none' },
-                        '& .MuiDataGrid-cell:focus-within': { outline: 'none' },
-                        '& .MuiDataGrid-row.Mui-selected': {
-                            backgroundColor: 'inherit !important',
-                        },
+                        // '& .MuiDataGrid-cell:focus': { outline: 'none' },
+                        // '& .MuiDataGrid-cell:focus-within': { outline: 'none' },
+                        // '& .MuiDataGrid-row.Mui-selected': {
+                        //     backgroundColor: 'inherit !important',
+                        // },
                     }}
                         className="children-grid"
                     >
@@ -306,7 +308,7 @@ function StudentDueReportDetail() {
                             }}
                             sx={{
                                 "& .MuiDataGrid-row:hover": {
-                                    cursor: 'pointer',      
+                                    cursor: 'pointer',
                                     backgroundColor: '#f5f5f5',
                                 },
                                 '& .MuiDataGrid-cell:focus': { outline: 'none' },
