@@ -20,6 +20,7 @@ function StudentHostelPayment() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({ mobile: "" });
   const [hostelDueData, setHostelDueData] = useState([]);
+  const [message, setMessage] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ function StudentHostelPayment() {
   }, [hostelDueData]);
 
   const getStudentDues = async () => {
+    setMessage(true);
     try {
       const studentDataResponse = await axios.get(
         `/api/student/studentDetailsByAuid/${username}`
@@ -97,6 +99,8 @@ function StudentHostelPayment() {
       });
       setAlertOpen(true);
       setLoading(false);
+    } finally {
+      setMessage(false);
     }
   };
 
@@ -436,7 +440,7 @@ function StudentHostelPayment() {
                 <>
                   <Grid item xs={12} align="center">
                     <Typography variant="subtitle2" color="error">
-                      NO DATA FOUND!!!
+                      {message ? "PLEASE WAIT !!!" : "NO DATA FOUND!!!"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} mt={1} md={12} align="center">
