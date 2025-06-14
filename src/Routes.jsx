@@ -47,6 +47,9 @@ import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/Proctor
 import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
 import RazorPayPendingSettlementDetail from "./containers/indeces/razorpaySettlementMaster/razorpayPendingSettlement.jsx";
 import NewAdmissionsDueReport from "./pages/forms/studentDueReport/newAdmissionsDueReport.jsx";
+import LedgerDayCreditTransaction from "./containers/indeces/vendorMaster/LedgerDayTransaction-credit.jsx";
+import BankGroupBankBalanceMaster from "./pages/masters/BankGroupBankBalanceMaster.jsx";
+import InstituteBankBalance from "./containers/indeces/bankGroupBankBalanceMaster/InstituteBankBalance.jsx";
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
@@ -10294,6 +10297,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <LedgerDayWiseTransactionDetail />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path={"/Accounts-ledger-day-credit-transaction"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LedgerDayCreditTransaction />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/bank-group-bank-balance"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BankGroupBankBalanceMaster />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path={"/institute-bank-balance"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InstituteBankBalance />
               </Suspense>
             }
           />

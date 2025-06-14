@@ -9,7 +9,8 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const initialValues = {
     voucherHeadId: "",
     fcYearId: "",
-    fcYear: ""
+    fcYear: "",
+    voucherHeadName:""
 };
 
 function VendorMasterIndex() {
@@ -75,12 +76,21 @@ function VendorMasterIndex() {
                 data?.vendorDetails?.length > 0 && data?.vendorDetails?.map((obj) => {
                     rowData.push({
                         school_name_short: obj?.school_name_short,
-                        openingBalance: obj?.openingBalance < 0 ? `${obj?.openingBalance} Cr` : obj?.openingBalance === 0 ? 0 : `${obj?.openingBalance} Dr`,
                         debit: obj?.debit,
                         credit: obj?.credit,
-                        closingBalance: obj?.closingBalance < 0 ? `${obj?.closingBalance} Cr` : obj?.closingBalance === 0 ? 0 : `${obj?.closingBalance} Dr`,
                         school_id: obj?.school_id,
-                        isLastRow: false
+                        isLastRow: false,
+                        openingBalance: obj?.openingBalance < 0
+                            ? `${Math.abs(obj?.openingBalance)} Cr`
+                            : obj?.openingBalance === 0
+                                ? 0
+                                : `${obj?.openingBalance} Dr`,
+
+                        closingBalance: obj?.closingBalance < 0
+                            ? `${Math.abs(obj?.closingBalance?.toFixed(2))} Cr`
+                            : obj?.closingBalance === 0
+                                ? 0
+                                : `${obj?.closingBalance?.toFixed(2)} Dr`,
                     })
                 })
                 if (data?.vendorDetails?.length > 0) {
@@ -127,10 +137,10 @@ function VendorMasterIndex() {
             .then((res) => {
                 const { data } = res?.data
                 const filteredOptions = data?.length > 0 && data?.filter(item => item?.financial_year >= "2025-2026")
-                 const optionData = filteredOptions?.map(item => ({
-                        label: item.financial_year,
-                        value: item.financial_year_id
-                    }));
+                const optionData = filteredOptions?.map(item => ({
+                    label: item.financial_year,
+                    value: item.financial_year_id
+                }));
 
                 setFCYearOptions(optionData || []);
                 if (!location?.state) {
@@ -189,18 +199,18 @@ function VendorMasterIndex() {
     };
 
     return (
-    <Box sx={{ position: "relative", p: 2 }}>
+        <Box sx={{ position: "relative" }}>
   <Box sx={{
     display: 'flex',
     flexWrap: 'wrap',
     gap: 2,
-    mb: 3,
+    mb: 2,
     p: 2,
     backgroundColor: 'rgba(245, 245, 245, 0.5)',
     borderRadius: 1,
     alignItems: 'flex-end',
     width: '70%',
-    margin:'auto',
+    margin: 'auto',
   }}>
     <Box sx={{ flex: 1, minWidth: 250 }}>
       <CustomAutocomplete
@@ -212,7 +222,7 @@ function VendorMasterIndex() {
         size="small"
       />
     </Box>
-    
+
     <Box sx={{ width: 200 }}>
       <CustomAutocomplete
         name="fcYearId"
@@ -224,35 +234,54 @@ function VendorMasterIndex() {
         size="small"
       />
     </Box>
-    
+
     <ButtonGroup variant="contained" size="small">
       <Button
         onClick={handlePrevOBClick}
-       disabled={values?.fcYearId === fcYearOptions[fcYearOptions?.length - 1]?.value}
+        disabled={values?.fcYearId === fcYearOptions[fcYearOptions?.length - 1]?.value}
       >
         Prev Year
       </Button>
       <Button
         onClick={handleNextOBClick}
-       disabled={values?.fcYearId === fcYearOptions[0]?.value}
+        disabled={values?.fcYearId === fcYearOptions[0]?.value}
       >
         Next Year
       </Button>
     </ButtonGroup>
   </Box>
   <Box sx={{
-    height: 'calc(100vh - 200px)',
     width: '70%',
-    margin:'auto',
-    '& .last-row': { 
-      fontWeight: 700, 
-      backgroundColor: "#376a7d !important", 
-      color: "#fff" 
+    margin: '20px auto 10px auto', 
+    textAlign: 'left',
+    paddingRight: '12px'
+  }}>
+    <Typography variant="subtitle2" sx={{ 
+      fontWeight: 600,
+      color: '#376a7d',
+      fontStyle: 'italic',
+      fontSize:'16px'
+    }}>
+      As reported on {new Date().toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      })}
+    </Typography>
+  </Box>
+  <Box sx={{
+    height: 'calc(100vh - 220px)',
+    width: '70%',
+    margin: 'auto',
+    '& .last-row': {
+      fontWeight: 700,
+      backgroundColor: "#376a7d !important",
+      color: "#fff"
     },
-    '& .header-bg': { 
-      fontWeight: "bold", 
-      backgroundColor: "#376a7d !important", 
-      color: "#fff" 
+    '& .header-bg': {
+      fontWeight: "bold",
+      backgroundColor: "#376a7d !important",
+      color: "#fff"
     },
   }}>
     <GridIndex
@@ -266,7 +295,7 @@ function VendorMasterIndex() {
       isRowSelectable={(params) => !params.row.isLastRow}
       onRowClick={(params) => {
         if (params?.row?.isLastRow) return;
-        navigate('/Accounts-ledger-monthly-detail', { 
+        navigate('/Accounts-ledger-monthly-detail', {
           state: {
             ...values,
             schoolId: params.row.school_id,

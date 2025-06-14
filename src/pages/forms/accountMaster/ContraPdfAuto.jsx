@@ -12,6 +12,7 @@ import {
   TableBody,
   TableRow,
   TableHead,
+  Breadcrumbs,
 } from "@mui/material";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -19,15 +20,34 @@ import logo from "../../../assets/acc.png";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import numberToWords from "number-to-words";
 import useAlert from "../../../hooks/useAlert";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { makeStyles } from "@mui/styles";
+
+const useStyles = makeStyles((theme) => ({
+   breadcrumbsContainer: {
+        position: "relative",
+        marginBottom: 10,
+        width: "fit-content",
+        zIndex: theme.zIndex.drawer - 1,
+        marginLeft: '-130px'
+    },
+    link: {
+        color: '#4A57A9',
+        textDecoration: "none",
+        cursor: "pointer",
+        "&:hover": { textDecoration: "underline" },
+    },
+}));
 
 const ContraReceipt = lazy(() => import("./ContraReceipt"));
 
 const ContraPdfAuto = () => {
   const [voucherData, setVoucherData] = useState([]);
   const [hideButtons, setHideButtons] = useState(false);
+  const [breadCrumb, setBreadCrumb] = useState([])
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -36,9 +56,15 @@ const ContraPdfAuto = () => {
   const grnPdfStatus = location?.state?.grnPdfStatus;
   const directPdfStatus = location?.state?.directPdfStatus;
   const advancePdfStatus = location?.state?.advancePdfStatus;
+   const queryValues = location?.state?.query
 
   useEffect(() => {
     getPaymentVoucherData();
+      if(queryValues?.date){
+      setCrumbs([])
+      setBreadCrumb([
+        { name: "Payment Tracker", link: "/Accounts-ledger-day-credit-transaction", state: queryValues }]);
+    }else{
     if (grnPdfStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/journalmaster/grn" }]);
     } else if (directPdfStatus) {
@@ -50,6 +76,7 @@ const ContraPdfAuto = () => {
     } else {
       setCrumbs([{ name: "Payment Tracker", link: "/VoucherMaster/Payment" }]);
     }
+  }
   }, []);
 
   const getPaymentVoucherData = async () => {
@@ -151,6 +178,9 @@ const ContraPdfAuto = () => {
 
   return (
     <Container>
+       {queryValues?.date ? (
+           <CustomBreadCrumbs crumbs={breadCrumb} />
+        ): <></>}
       <Paper
         id="staticVoucher"
         elevation={3}
@@ -491,3 +521,32 @@ const ContraPdfAuto = () => {
 };
 
 export default ContraPdfAuto;
+
+const CustomBreadCrumbs = ({ crumbs = [] }) => {
+    const navigate = useNavigate()
+    const classes = useStyles()
+    if (crumbs.length <= 0) return null
+
+    return (
+        <Box className={classes.breadcrumbsContainer}>
+            <Breadcrumbs
+                style={{ fontSize: "1.15rem" }}
+                separator={<NavigateNextIcon fontSize="small" />}
+            >
+                {crumbs?.map((crumb, index) => {
+                    return (
+                        <span key={index}>
+                                <Typography
+                                    onClick={() => navigate(crumb.link, { state: crumb.state })}
+                                    className={classes.link}
+                                    fontSize="inherit"
+                                >
+                                    {crumb.name}
+                                </Typography>
+                        </span>
+                    );
+                })}
+            </Breadcrumbs>
+        </Box>
+    )
+}

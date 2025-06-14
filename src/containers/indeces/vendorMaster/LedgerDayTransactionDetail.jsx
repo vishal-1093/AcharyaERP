@@ -66,8 +66,8 @@ function LedgerDayWiseTransactionDetail() {
      setBreadCrumbs([
             { name: "Ledger", link: "/Accounts-ledger", state: queryValues },
             { name: "Monthly Transaction", link: "/Accounts-ledger-monthly-detail", state: queryValues },
-            {name: `${queryValues?.month_name}`, link: "/Accounts-ledger-day-transaction", state: queryValues},
-            {name: `${queryValues?.selectedDate}`},
+            {name: 'Daily Summary', link: "/Accounts-ledger-day-transaction", state: queryValues},
+            {name: 'Detailed Data'},
         ])
         setCrumbs([])
   }, []);
@@ -256,7 +256,6 @@ function LedgerDayWiseTransactionDetail() {
       <Box sx={{ position: "relative" }}>
          <CustomBreadCrumbs crumbs={breadCrumbs} />
         <Box sx={{ position: "absolute", width: "100%", marginTop: "10px" }}>
-          <Box sx={{ position: "relative" }}>
             <GridIndex
               rows={rows}
               columns={columns}
@@ -266,7 +265,6 @@ function LedgerDayWiseTransactionDetail() {
               getRowId={(row, index) => row?.id}
             />
           </Box>
-        </Box>
       </Box>
   );
 }
