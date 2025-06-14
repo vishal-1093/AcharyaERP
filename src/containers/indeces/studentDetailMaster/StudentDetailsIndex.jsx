@@ -155,7 +155,7 @@ function StudentDetailsIndex() {
     audit_status: false,
     laptop_status: false,
     feeTemplateRemaks: false,
-    upload: false
+    // upload: false
   });
 
   const { setAlertMessage, setAlertOpen } = useAlert();

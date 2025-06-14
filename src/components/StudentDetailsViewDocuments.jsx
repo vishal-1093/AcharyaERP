@@ -31,6 +31,7 @@ import useBreadcrumbs from "../hooks/useBreadcrumbs";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ModalWrapper from "./ModalWrapper";
 import DOCView from "./DOCView";
+import InsertPhotoIcon from "@mui/icons-material/InsertPhoto";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -404,6 +405,13 @@ const StudentDetailsViewDocuments = ({
     setTemplateWrapperOpen(true)
     setAttachment(params.attachments_file_path)
   };
+  const isImage = (fileName) => {
+    return /\.(jpg|jpeg|png)$/i.test(fileName);
+  };
+
+  const isPDF = (fileName) => {
+    return /\.pdf$/i.test(fileName);
+  };
 
   return (
     <>
@@ -691,6 +699,7 @@ const StudentDetailsViewDocuments = ({
                   )}
                 </Card>
               </Grid> */}
+
               <Grid item xs={12}>
                 <Card>
                   <CardHeader
@@ -706,56 +715,80 @@ const StudentDetailsViewDocuments = ({
                   {personalFile.length > 0 ? (
                     <CardContent>
                       <Grid container spacing={1.5}>
-                        {personalFile.map((file, i) => (
-                          <Grid item xs={12} sm={6} md={3} key={i}>
-                            <Box
-                              sx={{
-                                border: "1px solid #e0e0e0",
-                                borderRadius: 2,
-                                p: 1.5,
-                                backgroundColor: "#fcfcfc",
-                                height: "100%",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "space-between",
-                                transition: "0.2s",
-                                "&:hover": {
-                                  boxShadow: 2,
-                                  backgroundColor: "#fff",
-                                },
-                              }}
-                            >
-                              <Box display="flex" alignItems="center" gap={1} mb={1}>
-                                <PictureAsPdfIcon sx={{ color: "#d32f2f", fontSize: 28 }} />
-                                <Box>
-                                  <Typography variant="body2" fontWeight={500} noWrap>
-                                    {file.attachments_subcategory_name}
-                                  </Typography>
-                                  <Chip
-                                    label={file.attachments_category_name_short}
-                                    size="small"
-                                    sx={{
-                                      mt: 0.5,
-                                      backgroundColor: "#e3f2fd",
-                                      color: "#1976d2",
-                                      fontSize: "0.7rem",
-                                      height: 20,
-                                    }}
-                                  />
-                                </Box>
-                              </Box>
-                              <Button
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ fontSize: "0.75rem", textTransform: "none" }}
-                                onClick={() => handleView(file)}
+                        {personalFile.map((file, i) => {
+                          const isImg = isImage(file.attachments_file_path);
+                          const isPdf = isPDF(file.attachments_file_path);
+
+                          return (
+                            <Grid item xs={12} sm={6} md={3} key={i}>
+                              <Box
+                                sx={{
+                                  border: "1px solid #e0e0e0",
+                                  borderRadius: 2,
+                                  p: 1.5,
+                                  backgroundColor: "#fcfcfc",
+                                  height: "100%",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "space-between",
+                                  transition: "0.2s",
+                                  "&:hover": {
+                                    boxShadow: 2,
+                                    backgroundColor: "#fff",
+                                  },
+                                }}
                               >
-                                View PDF
-                              </Button>
-                            </Box>
-                          </Grid>
-                        ))}
+                                <Box display="flex" alignItems="center" gap={1} mb={1}>
+                                  {isPdf ? (
+                                    <PictureAsPdfIcon sx={{ color: "#d32f2f", fontSize: 28 }} />
+                                  ) 
+                                  // : isImg ? (
+                                  //   <Box
+                                  //     component="img"
+                                  //     src={file?.attachments_file_path}
+                                  //     alt="thumbnail"
+                                  //     sx={{
+                                  //       width: 32,
+                                  //       height: 32,
+                                  //       objectFit: "cover",
+                                  //       borderRadius: 1,
+                                  //       border: "1px solid #ccc",
+                                  //     }}
+                                  //   />
+                                  // ) 
+                                  : (
+                                    <InsertPhotoIcon sx={{ color: "#1976d2", fontSize: 28 }} />
+                                  )}
+                                  <Box>
+                                    <Typography variant="body2" fontWeight={500} noWrap>
+                                      {file.attachments_subcategory_name}
+                                    </Typography>
+                                    <Chip
+                                      label={file.attachments_category_name_short}
+                                      size="small"
+                                      sx={{
+                                        mt: 0.5,
+                                        backgroundColor: "#e3f2fd",
+                                        color: "#1976d2",
+                                        fontSize: "0.7rem",
+                                        height: 20,
+                                      }}
+                                    />
+                                  </Box>
+                                </Box>
+                                <Button
+                                  variant="outlined"
+                                  size="small"
+                                  fullWidth
+                                  sx={{ fontSize: "0.75rem", textTransform: "none" }}
+                                  onClick={() => handleView(file)}
+                                >
+                                  {isPdf ? "View PDF" : "View Image"}
+                                </Button>
+                              </Box>
+                            </Grid>
+                          );
+                        })}
                       </Grid>
                     </CardContent>
                   ) : (
@@ -767,6 +800,7 @@ const StudentDetailsViewDocuments = ({
                   )}
                 </Card>
               </Grid>
+
 
             </>
           )}
