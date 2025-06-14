@@ -453,9 +453,9 @@ function CandidateWalkinIndex() {
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
         ) : params.row.feeTemplateStatus === false ||
-          params.row.application_status === false ? (
+          params.row.approved_status === false ? (
           <CustomTooltip
-            title={`Fee Template Id-${params.row.fee_template_id} inactive, contact admin`}
+            title={`Fee Template Id-${params.row.fee_template_id} inactive or not approved , contact admin`}
           >
             <IconButton color="error">
               <NotInterestedIcon />
