@@ -1,16 +1,18 @@
 import { useState, useEffect, lazy } from "react";
 import {
   Box, Grid,
-  IconButton,
   Tooltip,
   styled,
   tooltipClasses,
+  FormControlLabel,
+  FormGroup,
+  Stack,
+  Typography,
 } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs.js";
 import useAlert from "../../hooks/useAlert.js";
 import axios from "../../services/Api.js";
-import CustomToggle from "../../components/Inputs/CustomToggle";
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { IOSSwitch } from "../forms/chartsDashboard/IOSSwitch.js";
 const GridIndex = lazy(() => import("../../components/GridIndex.jsx"));
 const CustomAutocomplete = lazy(() =>
   import("../../components/Inputs/CustomAutocomplete.jsx")
@@ -34,6 +36,7 @@ const reportTypeList = [
   { value: "earnedSalary", label: "Earned Salary" },
   { value: "earnedCTC", label: "Earned CTC" },
   { value: "masterSalary", label: "Master Salary" },
+  { value: "regConsultantCtc", label: "CTC" },
 ];
 
 const employeeTypeList = [
@@ -59,6 +62,7 @@ const SalaryReport = () => {
   const [isSchoolCount, setIsSchoolCount] = useState(false);
   const [isSchool, setIsSchool] = useState(false);
   const [rowDetailData, setRowDetailData] = useState(null);
+  const [rowRegConsultDetailData, setRowRegConsultDetailData] = useState(null);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
@@ -74,18 +78,31 @@ const SalaryReport = () => {
     (fcYearId && reportType == "masterSalary") && getMasterData(fcYearId);
     (fcYearId && reportType == "earnedCTC" && employeeType == "regular") && getEarnedCtcData(fcYearId);
     (fcYearId && reportType == "earnedCTC" && employeeType == "consultant") && getEarnedCtcConsultantData(fcYearId);
+    (fcYearId && reportType == "regConsultantCtc") && getCtcRegConsultantData(fcYearId);
   }, [reportType, fcYearId, showCount, employeeType]);
 
   useEffect(() => {
-    (rowDetailData && isSchool) && getSchoolWiseData(rowDetailData)
+    (rowDetailData && isSchool && reportType == "earnedCTC") && getSchoolWiseData(rowDetailData);
+    (rowRegConsultDetailData && isSchool && reportType == "regConsultantCtc") && getRegConsultantSchoolWiseData(rowRegConsultDetailData)
   }, [isSchoolCount]);
 
   useEffect(() => {
     (isSchool && rowDetailData) ? setCrumbs([{ name: "Earned CTC", link: () => setIsSchool(false) },
     { name: rowDetailData?.month },
-    { name: `${rowDetailData?.grossAmount}`},
-    { name: `${rowDetailData?.netAmount}`}
-    ]) : setCrumbs([]);
+    { name: `${rowDetailData?.grossAmount}` },
+    { name: `${rowDetailData?.netAmount}` }
+    ]) :
+      (isSchool && rowRegConsultDetailData) ? setCrumbs([{ name: "CTC", link: () => setIsSchool(false) },
+      {
+        name: rowRegConsultDetailData?.month == 1 ? "JANUARY" : rowRegConsultDetailData?.month == 2 ? "FEBRUARY" : rowRegConsultDetailData?.month == 3 ? "MARCH" :
+          rowRegConsultDetailData?.month == 4 ? "APRIL" : rowRegConsultDetailData?.month == 5 ? "MAY" : rowRegConsultDetailData?.month == 6 ? "JUNE" : rowRegConsultDetailData?.month == 7 ? "JULY" :
+            rowRegConsultDetailData?.month == 8 ? "AUGUST" : rowRegConsultDetailData?.month == 9 ? "SEPTEMBER" : rowRegConsultDetailData?.month == 10 ? "OCTOBER" : rowRegConsultDetailData?.month == 11 ? "NOVEMBER" :
+              rowRegConsultDetailData?.month == 12 ? "DECEMBER" : ""
+      },
+      { name: `${rowRegConsultDetailData?.regularCtc}` },
+      { name: `${rowRegConsultDetailData?.consultantCtc}` }
+      ])
+        : setCrumbs([]);
   }, [isSchool]);
 
   const countColumn = [
@@ -99,35 +116,35 @@ const SalaryReport = () => {
       field: "APRILCOUNT",
       headerName: "Apr",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "MAYCOUNT",
       headerName: "May",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "JUNECOUNT",
       headerName: "Jun",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "JULYCOUNT",
       headerName: "Jul",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "AUGUSTCOUNT",
       headerName: "Aug",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
 
@@ -135,49 +152,49 @@ const SalaryReport = () => {
       field: "SEPTEMBERCOUNT",
       headerName: "Sept",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "OCTOBERCOUNT",
       headerName: "Oct",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "NOVEMBERCOUNT",
       headerName: "Nov",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "DECEMBERCOUNT",
       headerName: "Dec",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "JANUARYCOUNT",
       headerName: "Jan",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "FEBRUARYCOUNT",
       headerName: "Feb",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "MARCHCOUNT",
       headerName: "Mar",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
 
@@ -194,35 +211,35 @@ const SalaryReport = () => {
       field: "APRIL",
       headerName: "Apr",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "MAY",
       headerName: "May",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "JUNE",
       headerName: "Jun",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "JULY",
       headerName: "Jul",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "AUGUST",
       headerName: "Aug",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
 
@@ -230,49 +247,49 @@ const SalaryReport = () => {
       field: "SEPTEMBER",
       headerName: "Sept",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "OCTOBER",
       headerName: "Oct",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "NOVEMBER",
       headerName: "Nov",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "DECEMBER",
       headerName: "Dec",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "JANUARY",
       headerName: "Jan",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "FEBRUARY",
       headerName: "Feb",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "MARCH",
       headerName: "Mar",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
   ];
@@ -288,35 +305,50 @@ const SalaryReport = () => {
       field: "grossAmount",
       headerName: "Gross",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
+      renderCell: (params) => {
+        if (params.id === rows[rows.length - 1].id) {
+          return (
+            (<Typography color="#ffff" variant="subtitle2">{params.row.grossAmount}</Typography>)
+          )
+        } else {
+          return (
+            (<HtmlTooltip title="View Schools Detail">
+              <Typography
+                color="primary"
+                variant="subtitle2"
+                sx={{ cursor: "pointer" }}
+                onClick={() => getSchoolWiseData(params.row)}>{params.row.grossAmount}</Typography>
+            </HtmlTooltip>
+            )
+          )
+        }
+      }
     },
     {
       field: "netAmount",
       headerName: "Net",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
-    },
-    {
-      field: "detail",
-      headerName: "Detail",
-      flex: 1,
-      headerClassName: 'row-header',
-      type: "actions",
-      getActions: (params) => {
+      renderCell: (params) => {
         if (params.id === rows[rows.length - 1].id) {
-          return [];
+          return (
+            (<Typography color="#ffff" variant="subtitle2">{params.row.netAmount}</Typography>)
+          )
+        } else {
+          return (
+            (<HtmlTooltip title="View Schools Detail">
+              <Typography
+                color="primary"
+                variant="subtitle2"
+                sx={{ cursor: "pointer" }}
+                onClick={() => getSchoolWiseData(params.row)}>{params.row.netAmount}</Typography>
+            </HtmlTooltip>
+            )
+          )
         }
-        return [
-          <HtmlTooltip title="View Schools Detail">
-            <IconButton
-              onClick={() => getSchoolWiseData(params.row)}
-            >
-              <OpenInNewIcon color="primary" />
-            </IconButton>
-          </HtmlTooltip>
-        ]
       }
     },
   ];
@@ -332,35 +364,154 @@ const SalaryReport = () => {
       field: "grossCount",
       headerName: "Gross",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
+      renderCell: (params) => {
+        if (params.id === rows[rows.length - 1].id) {
+          return (
+            (<Typography color="#ffff" variant="subtitle2">{params.row.grossCount}</Typography>)
+          )
+        } else {
+          return (
+            (<HtmlTooltip title="View Schools Detail">
+              <Typography
+                color="primary"
+                variant="subtitle2"
+                sx={{ cursor: "pointer" }}
+                onClick={() => getSchoolWiseData(params.row)}>{params.row.grossCount}</Typography>
+            </HtmlTooltip>
+            )
+          )
+        }
+      }
     },
     {
       field: "netCount",
       headerName: "Net",
       flex: 1,
-      type: "number",
+      align: "center",
+      headerClassName: 'row-header',
+      renderCell: (params) => {
+        if (params.id === rows[rows.length - 1].id) {
+          return (
+            (<Typography color="#ffff" variant="subtitle2">{params.row.netCount}</Typography>)
+          )
+        } else {
+          return (
+            (<HtmlTooltip title="View Schools Detail">
+              <Typography
+                color="primary"
+                variant="subtitle2"
+                sx={{ cursor: "pointer" }}
+                onClick={() => getSchoolWiseData(params.row)}>{params.row.netCount}</Typography>
+            </HtmlTooltip>
+            )
+          )
+        }
+      }
+    },
+  ];
+
+  const ctcRegConsultantColumn = [
+    {
+      field: "month",
+      headerName: "Month",
+      flex: 1,
+      headerClassName: 'row-header',
+      valueGetter: (value, row) => (row.month == 1 ? "JANUARY" : row.month == 2 ? "FEBRUARY" : row.month == 3 ? "MARCH" :
+        row.month == 4 ? "APRIL" : row.month == 5 ? "MAY" : row.month == 6 ? "JUNE" : row.month == 7 ? "JULY" :
+          row.month == 8 ? "AUGUST" : row.month == 9 ? "SEPTEMBER" : row.month == 10 ? "OCTOBER" : row.month == 11 ? "NOVEMBER" :
+            row.month == 12 ? "DECEMBER" : "")
+    },
+    {
+      field: "regularCtc",
+      headerName: "Regular",
+      flex: 1,
+      align: "center",
+      headerClassName: 'row-header'
+    },
+    {
+      field: "consultantCtc",
+      headerName: "Consultant",
+      flex: 1,
+      align: "center",
       headerClassName: 'row-header',
     },
     {
-      field: "detail",
-      headerName: "Detail",
+      field: "total",
+      headerName: "Total",
+      flex: 1,
+      align: "center",
+      headerClassName: 'row-header',
+      renderCell: (params) => {
+        if (params.id === rows[rows.length - 1].id) {
+          return (
+            (<Typography color="#ffff" variant="subtitle2">{params.row.total}</Typography>)
+          )
+        } else {
+          return (
+            (<HtmlTooltip title="View Schools Detail">
+              <Typography
+                color="primary"
+                variant="subtitle2"
+                sx={{ cursor: "pointer" }}
+                onClick={() => getRegConsultantSchoolWiseData(params.row)}>{(+params.row.consultantCtc) + (+params.row.regularCtc)}</Typography>
+            </HtmlTooltip>
+            )
+          )
+        }
+      }
+    },
+  ];
+
+  const ctcCountRegConsultantColumn = [
+    {
+      field: "month",
+      headerName: "Month",
       flex: 1,
       headerClassName: 'row-header',
-      type: "actions",
-      getActions: (params) => {
+      valueGetter: (value, row) => (row.month == 1 ? "JANUARY" : row.month == 2 ? "FEBRUARY" : row.month == 3 ? "MARCH" :
+        row.month == 4 ? "APRIL" : row.month == 5 ? "MAY" : row.month == 6 ? "JUNE" : row.month == 7 ? "JULY" :
+          row.month == 8 ? "AUGUST" : row.month == 9 ? "SEPTEMBER" : row.month == 10 ? "OCTOBER" : row.month == 11 ? "NOVEMBER" :
+            row.month == 12 ? "DECEMBER" : "")
+    },
+    {
+      field: "regularCount",
+      headerName: "Regular",
+      flex: 1,
+      align: "center",
+      headerClassName: 'row-header'
+    },
+    {
+      field: "consultantCount",
+      headerName: "Consultant",
+      flex: 1,
+      align: "center",
+      headerClassName: 'row-header'
+    },
+    {
+      field: "total",
+      headerName: "Total",
+      flex: 1,
+      align: "center",
+      headerClassName: 'row-header',
+      renderCell: (params) => {
         if (params.id === rows[rows.length - 1].id) {
-          return [];
+          return (
+            (<Typography color="#ffff" variant="subtitle2">{(+params.row.regularCount) + (+params.row.consultantCount)}</Typography>)
+          )
+        } else {
+          return (
+            (<HtmlTooltip title="View Schools Detail">
+              <Typography
+                color="primary"
+                variant="subtitle2"
+                sx={{ cursor: "pointer" }}
+                onClick={() => getRegConsultantSchoolWiseData(params.row)}>{(+params.row.regularCount) + (+params.row.consultantCount)}</Typography>
+            </HtmlTooltip>
+            )
+          )
         }
-        return [
-          <HtmlTooltip title="View School Wise Data">
-            <IconButton
-              onClick={() => getSchoolWiseData(params.row)}
-            >
-              <OpenInNewIcon color="primary" />
-            </IconButton>
-          </HtmlTooltip>
-        ]
       }
     },
   ];
@@ -376,14 +527,14 @@ const SalaryReport = () => {
       field: "grossAmount",
       headerName: "Gross",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "netPay",
       headerName: "Net",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
   ];
@@ -399,14 +550,60 @@ const SalaryReport = () => {
       field: "grossCount",
       headerName: "Gross",
       flex: 1,
-      type: "number",
+      align: "center",
       headerClassName: 'row-header',
     },
     {
       field: "netCount",
       headerName: "Net",
       flex: 1,
-      type: "number",
+      align: "center",
+      headerClassName: 'row-header',
+    }
+  ];
+
+  const regConsultantSchoolColumn = [
+    {
+      field: "school",
+      headerName: "Inst",
+      flex: 1,
+      headerClassName: 'row-header',
+    },
+    {
+      field: "regularCtc",
+      headerName: "Regular",
+      flex: 1,
+      align: "center",
+      headerClassName: 'row-header',
+    },
+    {
+      field: "consultantCtc",
+      headerName: "Consultant",
+      flex: 1,
+      align: "center",
+      headerClassName: 'row-header',
+    },
+  ];
+
+  const regConsultantSchoolCountColumn = [
+    {
+      field: "school",
+      headerName: "Inst",
+      flex: 1,
+      headerClassName: 'row-header',
+    },
+    {
+      field: "regularCount",
+      headerName: "Regular",
+      flex: 1,
+      align: "center",
+      headerClassName: 'row-header',
+    },
+    {
+      field: "consultantCount",
+      headerName: "Consultant",
+      flex: 1,
+      align: "center",
       headerClassName: 'row-header',
     }
   ];
@@ -687,9 +884,47 @@ const SalaryReport = () => {
     }
   };
 
+  const getCtcRegConsultantData = async (fcyearId = null) => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`/api/consoliation/getRegularAndConsultantCTC?fcYearID=${fcyearId}`);
+      if (res.status == 200 || res.status == 201) {
+        const list = res.data.data.map((li) => ({ ...li, regularCount: li.regularCount, consultantCount: li.consultantCount }));
+        const totalSalaryRows = {
+          "month": "Total",
+          "total": "" + (list.reduce((acc, curr) => (acc + (curr.regularCtc ? Number(curr.regularCtc) : 0)), 0) +
+            list.reduce((acc, curr) => (acc + (curr.consultantCtc ? Number(curr.consultantCtc) : 0)), 0)),
+          "regularCtc": "" + list.reduce((acc, curr) => (acc + (curr.regularCtc ? Number(curr.regularCtc) : 0)), 0),
+          "consultantCtc": "" + list.reduce((acc, curr) => (acc + (curr.consultantCtc ? Number(curr.consultantCtc) : 0)), 0),
+        };
+        const totalCountRows = {
+          "month": "Total",
+          "total": "" + (list.reduce((acc, curr) => (acc + (curr.regularCount ? Number(curr.regularCount) : 0)), 0) +
+            list.reduce((acc, curr) => (acc + (curr.consultantCount ? Number(curr.consultantCount) : 0)), 0)),
+          "regularCount": "" + list.reduce((acc, curr) => (acc + (curr.regularCount ? Number(curr.regularCount) : 0)), 0),
+          "consultantCount": "" + list.reduce((acc, curr) => (acc + (curr.consultantCount ? Number(curr.consultantCount) : 0)), 0),
+        };
+        showCount ? list.push(totalCountRows) : list.push(totalSalaryRows);
+        setState((prevState) => ({
+          ...prevState,
+          rows: list.map((ele, index) => ({ ...ele, id: index + 1 })),
+          loading: false
+        }));
+      }
+    } catch (error) {
+      setLoading(false)
+      setAlertMessage({
+        severity: "error",
+        message: "An error occured",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const getSchoolWiseData = async (rowData) => {
     try {
       setRowDetailData(rowData);
+      setRowRegConsultDetailData(null);
       setIsSchool(true);
       setLoading(true);
       const monthNo = rowData.month == "APRIL" ? 4 : rowData.month == "MAY" ? 5 : rowData.month == "JUNE" ? 6 : rowData.month == "JULY" ? 7 :
@@ -726,6 +961,42 @@ const SalaryReport = () => {
     }
   };
 
+  const getRegConsultantSchoolWiseData = async (rowData) => {
+    try {
+      setRowRegConsultDetailData(rowData);
+      setRowDetailData(null)
+      setIsSchool(true);
+      setLoading(true);
+      const res = await axios.get(`api/consoliation/getMonthWiseRegularAndConsultantCTC?month=${rowData.month}&year=${rowData.year}`);
+      const list = res.data.data.map((li) => ({ ...li, regularCount: li.regularCount, consultantCount: li.consultantCount }));
+      const totalSalaryRows = {
+        "school": "Total",
+        "regularCtc": "" + list.reduce((acc, curr) => (acc + (curr.regularCtc ? Number(curr.regularCtc) : 0)), 0),
+        "consultantCtc": "" + list.reduce((acc, curr) => (acc + (curr.consultantCtc ? Number(curr.consultantCtc) : 0)), 0),
+      };
+      const totalCountRows = {
+        "school": "Total",
+        "regularCount": "" + list.reduce((acc, curr) => (acc + (curr.regularCount ? Number(curr.regularCount) : 0)), 0),
+        "consultantCount": "" + list.reduce((acc, curr) => (acc + (curr.consultantCount ? Number(curr.consultantCount) : 0)), 0),
+      };
+      isSchoolCount ? list.push(totalCountRows) : list.push(totalSalaryRows);
+      if (res.status == 200 || res.status == 201) {
+        setLoading(false);
+        setState((prevState) => ({
+          ...prevState,
+          schoolRows: list.map((li, index) => ({ ...li, id: index + 1 }))
+        }))
+      }
+    } catch (error) {
+      setLoading(false)
+      setAlertMessage({
+        severity: "error",
+        message: "An error occured",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -743,7 +1014,7 @@ const SalaryReport = () => {
             required
           />
         </Grid>
-        {reportType !== "masterSalary" && <Grid item xs={12} md={2}>
+        {reportType !== "masterSalary" && reportType !== "regConsultantCtc" && <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="employeeType"
             value={employeeType}
@@ -755,11 +1026,23 @@ const SalaryReport = () => {
         </Grid>}
 
         <Grid item xs={12} md={2} align="center">
-          <CustomToggle
-            isVisible={showCount}
-            onToggle={() => setShowCount(!showCount)}
-            label="Count"
-          />
+          <FormGroup>
+            <Box>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography>Salary</Typography>
+                <FormControlLabel
+                  control={
+                    <IOSSwitch
+                      sx={{ m: 1 }}
+                      checked={showCount}
+                      handlechange={() => setShowCount(!showCount)}
+                    />
+                  }
+                />
+                <Typography>Count</Typography>
+              </Stack>
+            </Box>
+          </FormGroup>
         </Grid>
         <Grid item xs={12} md={2}>
           <CustomAutocomplete
@@ -774,11 +1057,23 @@ const SalaryReport = () => {
       </Grid>}
       {isSchool && <Grid container sx={{ marginTop: { xs: 1, md: -6 }, justifyContent: "flex-end" }}>
         <Grid item xs={12} md={2} align="center">
-          <CustomToggle
-            isVisible={isSchoolCount}
-            onToggle={() => setIsSchoolCount(!isSchoolCount)}
-            label="Count"
-          />
+          <FormGroup>
+            <Box>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography>Salary</Typography>
+                <FormControlLabel
+                  control={
+                    <IOSSwitch
+                      sx={{ m: 1 }}
+                      checked={isSchoolCount}
+                      handlechange={() => setIsSchoolCount(!isSchoolCount)}
+                    />
+                  }
+                />
+                <Typography>Count</Typography>
+              </Stack>
+            </Box>
+          </FormGroup>
         </Grid>
       </Grid>}
       <Box mt={2} sx={{
@@ -802,8 +1097,9 @@ const SalaryReport = () => {
         }}>
           {!isSchool && <GridIndex
             rows={rows}
-            columns={reportType !== "earnedCTC" ? (showCount ? countColumns : salaryColumns) :
-              (reportType == "earnedCTC") ? (showCount ? ctcCountColumn : ctcColumn) : []
+            columns={(reportType == "earnedSalary" || reportType == "masterSalary") ? (showCount ? countColumns : salaryColumns) :
+              (reportType == "earnedCTC") ? (showCount ? ctcCountColumn : ctcColumn) :
+                (reportType == "regConsultantCtc") ? (showCount ? ctcCountRegConsultantColumn : ctcRegConsultantColumn) : []
             }
             loading={loading}
             columnVisibilityModel={columnVisibilityModel}
@@ -816,7 +1112,8 @@ const SalaryReport = () => {
           />}
           {isSchool && <GridIndex
             rows={schoolRows}
-            columns={isSchoolCount ? schoolCountColumn : schoolColumn}
+            columns={reportType == "earnedCTC" ? (isSchoolCount ? schoolCountColumn : schoolColumn) :
+              (isSchoolCount ? regConsultantSchoolCountColumn : regConsultantSchoolColumn)}
             loading={loading}
             columnVisibilityModel={columnVisibilityModel}
             setColumnVisibilityModel={setColumnVisibilityModel}

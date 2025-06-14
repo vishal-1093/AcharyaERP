@@ -1168,11 +1168,32 @@ const AdmissionPage = () => {
 		];
 		acYears.forEach((year) => {
 			columns.push({
-				field: year,
-				headerName: year,
+				field: `${year}`,
+				headerName: `${year}`,
 				flex: 1,
 				align: "center",
 				headerClassName: "header-bg",
+				renderCell: (params) => {
+					if (params.row.id === "last_row_of_table") {
+						return (
+							<Typography color="#fff" variant="subtitle2">{params.row[year] || 0}</Typography>
+						);
+					} else if (year == 2025 && params.row[year] == 0) {
+						return (
+							<Typography color="primary" variant="subtitle2">{params.row[year] || 0}</Typography>
+						);
+					} else if (year == 2025 && params.row[year] != 0) {
+						return (
+							<HtmlTooltip title="View Students Detail">
+								<IconButton
+									onClick={() => getGeoLocationWiseDetailData(params.row, data, year)}
+								>
+									<Typography color="primary" variant="subtitle2">{params.row[year] || 0}</Typography>
+								</IconButton>
+							</HtmlTooltip>
+						)
+					}
+				},
 			});
 		});
 		columns.push({
@@ -1181,37 +1202,25 @@ const AdmissionPage = () => {
 			flex: 1,
 			headerClassName: "header-bg",
 			cellClassName: "last-column",
-			align: "center",
-			renderCell: (params) => {
-				if (params.row.id === "last_row_of_table") {
-					return (
-						<Typography color="#fff" variant="subtitle2">{params.row.Total}</Typography>
-					);
-				}
-				return (
-					<HtmlTooltip title="View Students Detail">
-						<IconButton
-							onClick={() => getGeoLocationWiseDetailData(params.row, data)}
-						>
-							<Typography color="primary" variant="subtitle2">{params.row.Total}</Typography>
-						</IconButton>
-					</HtmlTooltip>
-				)
-			},
+			align: "center"
 		});
 
-		const getGeoLocationWiseDetailData = async (rowData, details) => {
+		const getGeoLocationWiseDetailData = async (rowData, details, year) => {
 			try {
 				const country_id = details.find((ele) => ele.name == rowData.country)?.id;
 				const state_id = details.find((ele) => ele.name == rowData.state)?.states_id;
 				const city_id = details.find((ele) => ele.name == rowData.city)?.cityId;
+				const acYear_id_countryWise = details.find((ele) => ele.name == rowData.country && ele.academicYear == year)?.academicYearId;
+				const acYear_id_stateWise = details.find((ele) => ele.name == rowData.state && ele.academicYear == year)?.academicYearId;
+				const acYear_id_cityWise = details.find((ele) => ele.name == rowData.city && ele.academicYear == year)?.academicYearId;
 				setLoading(true);
 				const params = new URLSearchParams();
 				const paramsObj = {
 					schoolId: selectedInstitute,
 					countryId: selectedCountry || country_id,
 					stateId: selectedState || state_id,
-					cityId: selectedCity || city_id
+					cityId: selectedCity || city_id,
+					acYearId: acYear_id_countryWise || acYear_id_stateWise || acYear_id_cityWise
 				};
 				Object.entries(paramsObj).forEach(([key, value]) => {
 					if (value != null) {
@@ -1347,7 +1356,6 @@ const AdmissionPage = () => {
 			.sort((a, b) => a - b); // Sort the years in ascending order
 
 		handleGeoLocationColumnAndRowData(data, acYears, "city", "City");
-
 		const allCities = [...new Map(data.map((obj) => [obj.cityId, obj])).values()];
 
 		setCityList(
@@ -1624,7 +1632,12 @@ const AdmissionPage = () => {
 				renderCell: (params) => {
 					if (params.row.id === "last_row_of_table") {
 						return (
-							<Typography color="#fff" variant="subtitle2">{params.row.intake}</Typography>
+							<Typography
+								sx={{ cursor: "pointer" }}
+								color="#fff"
+								variant="subtitle2"
+								onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
+							>{params.row.intake}</Typography>
 						);
 					} else {
 						return (
@@ -1650,7 +1663,12 @@ const AdmissionPage = () => {
 				renderCell: (params) => {
 					if (params.row.id === "last_row_of_table") {
 						return (
-							<Typography color="#fff" variant="subtitle2">{params.row.admitted}</Typography>
+							<Typography
+								sx={{ cursor: "pointer" }}
+								color="#fff"
+								variant="subtitle2"
+								onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
+							>{params.row.admitted}</Typography>
 						);
 					} else {
 						return (
@@ -1676,7 +1694,12 @@ const AdmissionPage = () => {
 				renderCell: (params) => {
 					if (params.row.id === "last_row_of_table") {
 						return (
-							<Typography color="#fff" variant="subtitle2">{params.row.vacant}</Typography>
+							<Typography
+								sx={{ cursor: "pointer" }}
+								color="#fff"
+								variant="subtitle2"
+								onClick={() => getAdmissionReports(params.row, "Admission Category Report")}
+							>{params.row.vacant}</Typography>
 						);
 					} else {
 						return (
@@ -2362,14 +2385,15 @@ const AdmissionPage = () => {
 		const filteredData = data.filter((item) => item.ac_year >= "2023-2024");
 
 		// Get unique combinations of program and specialization names
-		const programmeSpecializations = [
-			...new Set(
-				filteredData.map(
-					(item) =>
-						`${item.program_short_name} (${item.program_specialization_short_name})`
-				)
-			),
-		];
+		const programmeSpecializations = filteredData.map((item) => ({
+			"programme": item.program_short_name,
+			"specialization": item.program_specialization_short_name,
+			"programmeId": item.program_id,
+			"specializationId": item.program_specialization_id
+		})
+		).filter(
+			(item, index, self) =>
+				index === self.findIndex((obj) => JSON.stringify(obj) === JSON.stringify(item)))
 
 		// Get academic years >= 2023-2024
 		const academicYears = [
@@ -2377,25 +2401,25 @@ const AdmissionPage = () => {
 		].sort();
 
 		// Create the grouped structure
-		const result = filteredData.map((programmeSpec, i) => {
-			// const [programme, specialization] = programmeSpec.split(" ("); // Separate program and specialization
+		const result = programmeSpecializations.map((programmeSpec, i) => {
+			const { programme, specialization, programmeId, specializationId } = programmeSpec; // Separate program and specialization
+
 			const row = {
-				programmeName: programmeSpec.program_short_name,
-				specialization: programmeSpec.program_specialization_short_name,
-				programmeId: programmeSpec.program_id,
-				specializationId: programmeSpec.program_specialization_id,
+				programmeName: programme,
+				specialization: specialization,
+				programmeId: programmeId,
+				specializationId: specializationId,
 			};
 
 			academicYears.forEach((year) => {
 				const entry = filteredData.find(
 					(item) =>
-						item.program_short_name == programmeSpec.program_short_name && item.program_specialization_short_name === programmeSpec.program_specialization_short_name
+						item.program_short_name == programme && item.program_specialization_short_name === specialization
 						&& item.ac_year === year
 				);
 				row[year] = entry ? entry.studentCount : 0;
-
 			});
-			row.id = `${programmeSpec.program_short_name}__${programmeSpec.program_specialization_short_name}__${i}`;
+			row.id = `${programme}__${specialization}__${i}`;
 			row.schoolId = selectedInstitute;
 			return row;
 		});
@@ -2832,7 +2856,7 @@ const AdmissionPage = () => {
 													control={
 														<IOSSwitch
 															sx={{ m: 1 }}
-															ischecked={isTableView}
+															checked={isTableView}
 															handlechange={() => setIsTableView(!isTableView)}
 															disabled={selectedGraph === "Datewise Statistics" || isGroupColumnTable}
 														/>
@@ -2850,6 +2874,7 @@ const AdmissionPage = () => {
 
 				<Grid container spacing={2}>
 					<Grid item xs={12}>
+						<Box mt={1} mb={1} sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5px" }}><b>Note: </b><Typography color="error" variant="subtitle2">Data shown up to 2024–25 is migrated data and includes only active Count. For complete and accurate records, please refer to the old ERP software.</Typography></Box>
 						<Grid container sx={{ justifyContent: "center" }}>
 							{isTableView ? (
 								<Grid
