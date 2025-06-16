@@ -187,14 +187,15 @@ const AdmissionPage = () => {
 	const [data, setData] = useState([]);
 	const [detailsRows, setDetailsRows] = useState([]);
 	const [isDetails, setIsDetails] = useState(false);
+	const [isAdmissionRowClick, setIsAdmissionRowClick] = useState(false);
 	const { setAlertMessage, setAlertOpen } = useAlert();
 	const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
 
 	useEffect(() => {
-		setCrumbs([
-			isDetails ? { name: [selectedGraph], link: () => setIsDetails(false) } :
-				{ name: "Charts Dashboard", link: "/charts-dashboard/" }
-		]);
+		isDetails ? setCrumbs([
+			{ name: [selectedGraph], link: () => setIsDetails(false) }
+		]) :
+			setCrumbs([]);
 	}, [selectedGraph, isDetails]);
 
 	useEffect(() => {
@@ -1376,6 +1377,7 @@ const AdmissionPage = () => {
 	};
 
 	const getAdmissionReports = (data, type) => {
+		setIsAdmissionRowClick(!isAdmissionRowClick);
 		if (
 			data?.id !== "last_row_of_table" &&
 			type === "Admission Category Report"
@@ -1395,7 +1397,7 @@ const AdmissionPage = () => {
 					},
 				},
 				{ name: data?.feeAdmissionType },
-			]);
+			])
 		}
 		if (
 			data?.id === "last_row_of_table" &&
@@ -1721,9 +1723,9 @@ const AdmissionPage = () => {
 
 		setTableColumns(columns);
 		setTableRows(rowsToShow);
-		setCrumbs([
-			{ name: "Charts Dashboard", link: "/charts-dashboard/" },
-		]);
+		// setCrumbs([
+		// 	{ name: "Charts Dashboard", link: "/charts-dashboard/" },
+		// ]);
 		const datasets = [
 			{
 				id: 0,
@@ -2723,17 +2725,17 @@ const AdmissionPage = () => {
 						</ChartContainer>
 					</ChartSection>
 				)}
-				<Grid item xs={2}></Grid>
-				{!isDetails && <Grid item xs={10} sx={{ marginTop: { xs: 1, md: -5 } }}>
+				{isAdmissionRowClick && <Grid item xs={2} sx={{ marginTop: { xs: 1, md: 1 } }}></Grid>}
+				{!isDetails && <Grid item xs={isAdmissionRowClick ? 10 : 12} sx={{ marginTop: { xs: 1, md: isAdmissionRowClick ? -5 : 1 } }}>
 					<Grid container>
 						<Grid item xs={12}>
-							<Grid container sx={{ display: "flex", justifyContent: "flex-end", gap: "15px" }}>
+							<Grid container sx={{ display: "flex", justifyContent: isAdmissionRowClick ? "flex-end" : "flex-start", gap: "15px", flexWrap: "nowrap" }}>
 								<Grid item xs={12} md={2}>
 									<CustomAutocomplete
 										name="graph"
 										value={selectedGraph}
 										label="Graph By"
-										handleChangeAdvance={(name, newValue) => setSelectedGraph(newValue)}
+										handleChangeAdvance={(name, newValue) => (setSelectedGraph(newValue), setIsAdmissionRowClick(false))}
 										options={GraphOptions || []}
 										required
 									/>
