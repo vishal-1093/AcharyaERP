@@ -26,6 +26,7 @@ const initialValues = {
   ifscCode: "",
   bankGroup: null,
   swiftCode: "",
+  openingBalance:""
 };
 
 const requiredFields = [
@@ -145,6 +146,7 @@ function BankForm() {
           accNumber: res.data.data.account_number,
           bankGroup: res.data.data.bank_group_id,
           swiftCode: res.data.data.swift_code,
+          openingBalance: res.data.data.opening_balance
         });
 
         setBankId(res.data.data.bank_id);
@@ -215,7 +217,8 @@ function BankForm() {
       temp.voucher_head_new_id = values.bankName;
       temp.swift_code = values.swiftCode;
       temp.bank_name = voucherHeadSelected.label;
-      temp.bank_balance= values.bankBalance
+      temp.bank_balance = values.bankBalance;
+      temp.opening_balance= values.openingBalance
 
       await axios
         .post(`/api/finance/Bank`, temp)
@@ -273,6 +276,7 @@ function BankForm() {
       temp.bank_group_id = values.bankGroup;
       temp.swift_code = values.swiftCode;
       temp.bank_name = voucherHeadSelected.label;
+      temp.opening_balance= values.openingBalance
 
       await axios
         .put(`/api/finance/Bank/${id}`, temp)
@@ -415,7 +419,15 @@ function BankForm() {
               //  required
              />
            </Grid>
-          ):<></>}  
+          ):<></>} 
+           <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="openingBalance"
+              label="Opening Balance"
+              value={values.openingBalance}
+              handleChange={handleChange}
+            />
+          </Grid> 
 
           <Grid item xs={12} md={4} mt={1}>
             <CustomAutocomplete

@@ -21,6 +21,7 @@ function StudentExamFee() {
   const [alert, setAlert] = useState("");
   const [studentData, setStudentData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ function StudentExamFee() {
   }, []);
 
   const getVoucherData = async () => {
+    setMessage(true);
     try {
       const studentData = await axios.get(
         `/api/student/studentDetailsByAuid/${username}`
@@ -103,6 +105,8 @@ function StudentExamFee() {
         message: "NO DATA FOUND!!!",
       });
       setAlertOpen(true);
+    } finally {
+      setMessage(false);
     }
   };
 
@@ -425,7 +429,7 @@ function StudentExamFee() {
                 <>
                   <Grid item xs={12} align="center">
                     <Typography variant="subtitle2" color="error">
-                      NO DATA FOUND!!!
+                      {message ? "PLEASE WAIT !!!" : "NO DATA FOUND!!!"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} mt={1} md={12} align="center">

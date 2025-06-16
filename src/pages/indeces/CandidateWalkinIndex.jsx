@@ -27,6 +27,7 @@ import PauseCircleFilledIcon from "@mui/icons-material/PauseCircleFilled";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
+import NotInterestedIcon from "@mui/icons-material/NotInterested";
 import AddLinkIcon from "@mui/icons-material/AddLink";
 import npfStatusList from "../../utils/npfStatusList";
 
@@ -54,6 +55,21 @@ const StyledTooltip = styled(({ className, ...props }) => (
     fontSize: 9,
     boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
     padding: "10px",
+  },
+}));
+
+const CustomTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} arrow classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "#333",
+    color: "#fff",
+    fontSize: "14px",
+    borderRadius: "8px",
+    padding: "8px 12px",
+  },
+  [`& .${tooltipClasses.arrow}`]: {
+    color: "#333",
   },
 }));
 
@@ -172,8 +188,8 @@ function CandidateWalkinIndex() {
             npf_status === 3
               ? "Offer Accepted"
               : npf_status === 4
-                ? "Registration Fee Paid"
-                : ""
+              ? "Registration Fee Paid"
+              : ""
           }
           onClick={() => navigate(`/admissions/offer-view/${id}/admin`)}
         >
@@ -195,7 +211,7 @@ function CandidateWalkinIndex() {
           color: "primary",
           func: () => handleDeleteOffer(id, scholarship),
         },
-        { name: "No", color: "primary", func: () => { } },
+        { name: "No", color: "primary", func: () => {} },
       ],
     });
     setConfirmOpen(true);
@@ -425,7 +441,9 @@ function CandidateWalkinIndex() {
         ((params.row.fee_admission_category_id === 2 &&
           params.row.npf_status >= 3) ||
           params.row.npf_status === 4 ||
-          params.row.counselor_status === 1) && (
+          params.row.counselor_status === 1) &&
+        params.row.feeTemplateStatus &&
+        params.row.approved_status ? (
           <IconButton
             title="Create AUID"
             onClick={() =>
@@ -434,6 +452,17 @@ function CandidateWalkinIndex() {
           >
             <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
           </IconButton>
+        ) : params.row.feeTemplateStatus === false ||
+          params.row.approved_status === false ? (
+          <CustomTooltip
+            title={`Fee Template Id-${params.row.fee_template_id} inactive or not approved , contact admin`}
+          >
+            <IconButton color="error">
+              <NotInterestedIcon />
+            </IconButton>
+          </CustomTooltip>
+        ) : (
+          ""
         ),
     },
   ];
