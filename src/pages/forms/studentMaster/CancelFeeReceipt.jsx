@@ -213,7 +213,9 @@ function CancelFeeReceipt() {
         setTableData(dataByVoucher);
 
         setReceiptType(res.data.data.student_details[0].receipt_type);
-        if (res.data.data.student_details[0].receipt_type === "Bulk") {
+        if (res.data.data.student_details[0].receipt_type === "Bulk" ||
+          res.data.data.student_details[0].receipt_type === "Bulk Fee"
+        ) {
           if (
             res.data.data.Voucher_Head_Wise_Amount.length > 0 ||
             res.data.data.student_details.length > 0
@@ -412,7 +414,7 @@ function CancelFeeReceipt() {
           </Grid>
           <Grid item xs={12} md={12}>
             {(bulkReceiptData.length > 0 || studentData.length > 0) &&
-            receiptType === "Bulk" ? (
+            receiptType === "Bulk" || receiptType == "Bulk Fee" ? (
               <CancelBulkReceipt
                 bulkReceiptData={bulkReceiptData}
                 studentData={studentData}
