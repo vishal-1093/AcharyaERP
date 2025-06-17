@@ -112,7 +112,6 @@ function NiniskillupForm() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const [auidOpen, setAuidOpen] = useState(false);
-  const [minimumAmountValidation, setMinimumAmountValidation] = useState(false);
   const [data, setData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
   const [year, setYear] = useState("");
@@ -154,8 +153,6 @@ function NiniskillupForm() {
           );
 
           if (niniskillUpResponse.status === 200) {
-            console.log(niniskillUpResponse);
-
             const years = [];
 
             if (
@@ -260,7 +257,7 @@ function NiniskillupForm() {
           school_id: studentData?.school_id,
           paid_year: obj.key,
           receipt_type: "Add On Fee",
-          financial_year_id: obj.financialYearId,
+          financial_year_id: values.financialYearId,
           total_amount: noOfYears.reduce(
             (total, sum) => Number(total) + Number(sum.payingAmount),
             0

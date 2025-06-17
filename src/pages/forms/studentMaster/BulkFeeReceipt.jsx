@@ -206,7 +206,10 @@ function BulkFeeReceipt() {
       .get(`/api/institute/school`)
       .then((res) => {
         const schoolData = [];
-        res.data.data.forEach((obj) => {
+        const filterSchool = res.data.data.filter(
+          (ele) => ele.school_name_short !== "HOS"
+        );
+        filterSchool.forEach((obj) => {
           schoolData.push({
             label: obj.school_name,
             value: obj.school_id,

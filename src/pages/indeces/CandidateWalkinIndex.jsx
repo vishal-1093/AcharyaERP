@@ -2,6 +2,9 @@ import { lazy, useEffect, useState } from "react";
 import axios from "../../services/Api";
 import domainUrl from "../../services/Constants";
 import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   Alert,
   Backdrop,
   Box,
@@ -13,6 +16,12 @@ import {
   Tooltip,
   tooltipClasses,
   Typography,
+  TableContainer,
+  Paper,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
 } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
@@ -28,8 +37,10 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import NotInterestedIcon from "@mui/icons-material/NotInterested";
+import ArticleIcon from "@mui/icons-material/Article";
 import AddLinkIcon from "@mui/icons-material/AddLink";
 import npfStatusList from "../../utils/npfStatusList";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const CounselorStatusForm = lazy(() =>
@@ -77,6 +88,8 @@ const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
 
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
+
 function CandidateWalkinIndex() {
   const [rows, setRows] = useState([]);
   const [confirmContent, setConfirmContent] = useState({
@@ -93,6 +106,8 @@ function CandidateWalkinIndex() {
   const [swapOpen, setSwapOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [logsOpen, setLogsOpen] = useState(false);
+  const [logsData, setLogsData] = useState([]);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -120,6 +135,10 @@ function CandidateWalkinIndex() {
       setLoading(false);
     }
   };
+
+  function formatKey(key) {
+    return key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()); // Title Case
+  }
 
   const handleOffer = (params) => {
     const {
@@ -283,6 +302,20 @@ function CandidateWalkinIndex() {
   const handleApplicantDetails = (data) => {
     setRowData(data);
     setDetailsOpen(true);
+  };
+
+  const handleLogs = async (data) => {
+    setLogsOpen(true);
+    setLogsData([]);
+    try {
+      const getResponse = await axios.get(
+        `/api/student/getLsqLogData?candidate_id=${data.id}`
+      );
+
+      setLogsData(getResponse.data.data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const columns = [
@@ -455,7 +488,7 @@ function CandidateWalkinIndex() {
         ) : params.row.feeTemplateStatus === false ||
           params.row.approved_status === false ? (
           <CustomTooltip
-            title={`Fee Template Id-${params.row.fee_template_id} inactive or not approved , contact admin`}
+            title={`Fee Template Id-${params.row.fee_template_id} inactive or not approved!! contact admin!!`}
           >
             <IconButton color="error">
               <NotInterestedIcon />
@@ -488,6 +521,21 @@ function CandidateWalkinIndex() {
     });
   }
 
+  if (roleId === 1 || roleId === 9 || roleId === 11) {
+    columns.push({
+      field: "logs",
+      headerName: "Logs",
+      renderCell: (params) => (
+        <IconButton
+          title="Extend Pay Link"
+          onClick={() => handleLogs(params.row)}
+        >
+          <ArticleIcon color="primary" sx={{ fontSize: 24 }} />
+        </IconButton>
+      ),
+    });
+  }
+
   return (
     <>
       <CustomModal
@@ -497,7 +545,6 @@ function CandidateWalkinIndex() {
         message={confirmContent.message}
         buttons={confirmContent.buttons}
       />
-
       <Snackbar
         open={copied}
         autoHideDuration={2000}
@@ -522,14 +569,12 @@ function CandidateWalkinIndex() {
           </Alert>
         </Box>
       </Snackbar>
-
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={backDropOpen}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-
       <ModalWrapper
         open={modalOpen}
         setOpen={setModalOpen}
@@ -544,7 +589,6 @@ function CandidateWalkinIndex() {
           setAlertOpen={setAlertOpen}
         />
       </ModalWrapper>
-
       <ModalWrapper
         open={linkOpen}
         setOpen={setLinkOpen}
@@ -559,7 +603,6 @@ function CandidateWalkinIndex() {
           setAlertOpen={setAlertOpen}
         />
       </ModalWrapper>
-
       <ModalWrapper
         open={swapOpen}
         setOpen={setSwapOpen}
@@ -574,7 +617,6 @@ function CandidateWalkinIndex() {
           setAlertOpen={setAlertOpen}
         />
       </ModalWrapper>
-
       <ModalWrapper
         open={detailsOpen}
         setOpen={setDetailsOpen}
@@ -584,6 +626,84 @@ function CandidateWalkinIndex() {
         <ApplicantDetails id={rowData?.id} />
       </ModalWrapper>
 
+      <ModalWrapper
+        title={`Logs`}
+        maxWidth={800}
+        open={logsOpen}
+        setOpen={setLogsOpen}
+      >
+        <Box>
+          {logsData && logsData.length > 0 ? (
+            logsData.map((item, index) => (
+              <Accordion
+                key={index}
+                sx={{ mb: 2, borderRadius: 2, boxShadow: 3 }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{
+                    backgroundColor: "#f5f5f5",
+                    borderBottom: "1px solid #ddd",
+                    borderRadius: "8px 8px 0 0",
+                    minHeight: 64,
+                  }}
+                >
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {item.candidate_name || "Unnamed Candidate"}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "text.secondary" }}
+                    >
+                      <strong>Lead ID :</strong> {item.lead_id || "No Lead ID"}{" "}
+                      | {moment(item.created_at).format("DD-MM-YYYY hh:mm A")}
+                    </Typography>
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails sx={{ backgroundColor: "#fafafa" }}>
+                  <Paper variant="outlined" sx={{ overflowX: "auto" }}>
+                    <Table size="small">
+                      <TableBody>
+                        {Object.entries(item).map(([key, value], i) => (
+                          <TableRow
+                            key={key}
+                            sx={{
+                              backgroundColor: i % 2 === 0 ? "#fff" : "#f9f9f9",
+                            }}
+                          >
+                            <TableCell sx={{ fontWeight: 500, width: "40%" }}>
+                              {formatKey(key)}
+                            </TableCell>
+                            <TableCell>
+                              {value !== null &&
+                              value !== undefined &&
+                              value !== ""
+                                ? value.toString()
+                                : "—"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Paper>
+                </AccordionDetails>
+              </Accordion>
+            ))
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                height: "300px",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress size={48} thickness={4} />
+            </Box>
+          )}
+        </Box>
+      </ModalWrapper>
       <Box sx={{ position: "relative", mt: 3 }}>
         <GridIndex rows={rows} columns={columns} loading={loading} />
       </Box>

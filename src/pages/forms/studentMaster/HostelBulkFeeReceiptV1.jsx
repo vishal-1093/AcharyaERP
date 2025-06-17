@@ -187,6 +187,13 @@ const HostelBulkFeeReceiptV1 = () => {
             align="center"
             sx={{ fontSize: "12px", fontWeight: "600", ...bookmanFont }}
           >
+            ACHARYA HOSTEL
+          </Typography>
+          <Typography
+            variant="h6"
+            align="center"
+            sx={{ fontSize: "12px", fontWeight: "600", ...bookmanFont }}
+          >
             FEE RECEIPT
           </Typography>
 
