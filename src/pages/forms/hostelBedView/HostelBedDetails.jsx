@@ -157,23 +157,32 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
       setLoading(true);
       const containsAlphabetic = /[a-zA-Z]/.test(debouncedAuid);
       const baseUrl = "/api/student/getStudentDetailsBasedOnAuidAndStrudentId";
-      const url = `${baseUrl}?${
-        containsAlphabetic ? "auid" : "student_id"
-      }=${debouncedAuid}`;
+      const url = `${baseUrl}?${containsAlphabetic ? "auid" : "student_id"
+        }=${debouncedAuid}`;
       const response = await axios.get(url);
-      setStudentDetails(response?.data?.data[0]);
-      const checkBed = await axios.get(
-        `/api/hostel/isHostelBedAssignedByAcademicYearAndStudentId/${selectedValues?.acYearId}/${response?.data?.data[0]?.id}`
-      );
-      if (checkBed?.data?.data === true) {
-        setAlertMessage({
-          severity: "error",
-          message: "The bed has already been assigned to this student",
-        });
-        setAlertOpen(true);
-        setIsBedAssign(checkBed?.data?.data);
-      }else{
-      setIsBedAssign(false);
+      const studentData = response?.data?.data?.[0];
+
+      if (studentData) {
+        setStudentDetails(studentData);
+
+        if (selectedValues?.acYearId && studentData?.id) {
+          const checkBed = await axios.get(
+            `/api/hostel/isHostelBedAssignedByAcademicYearAndStudentId/${selectedValues.acYearId}/${studentData.id}`
+          );
+          if (checkBed?.data?.data === true) {
+            setAlertMessage({
+              severity: "error",
+              message: "The bed has already been assigned to this student",
+            });
+            setAlertOpen(true);
+            setIsBedAssign(true);
+          } else {
+            setIsBedAssign(false);
+          }
+        }
+      } else {
+        setStudentDetails(null);
+        setIsBedAssign(false);
       }
     } catch (err) {
       console.error(err);
@@ -182,6 +191,7 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     if (debouncedAuid) {
@@ -527,26 +537,26 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
                             title={
                               <React.Fragment>
                                 {bedGroup.map((bed, i) => (
-                                   bed.BlockedDate && ( <div key={i}>
+                                  bed.BlockedDate && (<div key={i}>
                                     <Typography color="inherit">
                                       Name: {bed.studentName}
                                     </Typography>
                                     <Typography color="inherit">
                                       AUID: {bed.auid}
                                     </Typography>
-                                   
-                                      <Typography color="inherit">
-                                        Blocked Date:{" "}
-                                        {moment(
-                                          new Date(
-                                            bed.BlockedDate
-                                          ).toLocaleDateString()
-                                        ).format("DD/MM/YYYY")}
-                                      </Typography>
+
+                                    <Typography color="inherit">
+                                      Blocked Date:{" "}
+                                      {moment(
+                                        new Date(
+                                          bed.BlockedDate
+                                        ).toLocaleDateString()
+                                      ).format("DD/MM/YYYY")}
+                                    </Typography>
                                     {i < bedGroup.length - 1 && <hr />}{" "}
                                     {/* Divider between students */}
                                   </div>
-                                )
+                                  )
                                 ))}
                               </React.Fragment>
                             }

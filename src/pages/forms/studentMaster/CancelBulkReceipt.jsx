@@ -134,7 +134,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
       />
 
       <Grid container alignItems="center" justifyContent="center" marginTop={4}>
-        {studentData[0].auid === null ? (
+        {studentData[0]?.auid === null ? (
           <Grid item xs={12} md={12}>
             <Paper elevation={2}>
               <Grid
@@ -152,7 +152,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={5}>
                   <Typography variant="body2" color="textSecondary">
-                    {bulkReceiptData?.[0]?.fee_receipt}
+                    {bulkReceiptData?.fee_receipt}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={2}>
@@ -160,7 +160,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Typography variant="body2" color="textSecondary">
-                    {moment(bulkReceiptData?.[0]?.receipt_date).format(
+                    {moment(bulkReceiptData?.receipt_date).format(
                       "DD-MM-YYYY"
                     )}
                   </Typography>
@@ -170,7 +170,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={5}>
                   <Typography variant="body2" color="textSecondary">
-                    {bulkReceiptData?.[0]?.from_name}
+                    {bulkReceiptData?.from_name}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={2}>
@@ -178,7 +178,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Typography variant="body2" color="textSecondary">
-                    {bulkReceiptData?.[0]?.cashier}
+                    {bulkReceiptData?.cashier}
                   </Typography>
                 </Grid>
               </Grid>
@@ -202,7 +202,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={5}>
                   <Typography variant="body2" color="textSecondary">
-                    {studentData?.[0]?.auid}
+                    {studentData[0]?.auid}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={2}>
@@ -210,7 +210,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Typography variant="body2" color="textSecondary">
-                    {studentData?.[0]?.school_name_short}
+                    {studentData[0]?.school_name_short}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={2}>
@@ -218,7 +218,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={5}>
                   <Typography variant="body2" color="textSecondary">
-                    {studentData?.[0]?.student_name}
+                    {studentData[0]?.student_name}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={2}>
@@ -226,7 +226,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Typography variant="body2" color="textSecondary">
-                    {studentData?.[0]?.program_name || "-"}
+                    {studentData[0]?.program_name || "-"}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={2}>
@@ -234,7 +234,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={5}>
                   <Typography variant="body2" color="textSecondary">
-                    {moment(studentData?.[0]?.date_of_admission).format(
+                    {moment(studentData[0]?.date_of_admission).format(
                       "DD-MM-YYYY"
                     )}
                   </Typography>
@@ -245,7 +245,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Typography variant="body2" color="textSecondary">
-                  {studentData.current_year ? studentData.current_year:"-"}/{studentData.current_sem ? studentData.current_sem:"-"}
+                  {studentData[0].current_year ? studentData[0].current_year:"-"}/{studentData[0].current_sem ? studentData[0].current_sem:"-"}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={2}>
@@ -253,7 +253,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={5}>
                   <Typography variant="body2" color="textSecondary">
-                    {studentData?.[0]?.fee_template_name}
+                    {studentData[0]?.fee_template_name}
                   </Typography>
                 </Grid>
 
@@ -262,7 +262,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Typography variant="body2" color="textSecondary">
-                    {studentData?.[0]?.mobile}
+                    {studentData[0]?.mobile}
                   </Typography>
                 </Grid>
               </Grid>
@@ -297,7 +297,7 @@ function CancelBulkReceipt({ bulkReceiptData, studentData, data }) {
                           {obj.voucher_head}
                         </StyledTableCell>
                         <StyledTableCell sx={{ textAlign: "right" }}>
-                          {obj.amount_in_som}
+                          {obj.amount}
                         </StyledTableCell>
                       </TableRow>
                     );

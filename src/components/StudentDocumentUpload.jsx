@@ -7,18 +7,18 @@ import {
   Chip,
   Paper,
   IconButton,
-  Divider,
   CircularProgress,
   Tooltip,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import ModalWrapper from "./ModalWrapper";
 import axios from "../services/Api";
 import useAlert from "../hooks/useAlert";
 
-const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
+const Id = sessionStorage.getItem("empId");
+
+const StudentDocumentUpload = () => {
   const [mainCategories, setMainCategories] = useState([]);
   const [selectedMainCategory, setSelectedMainCategory] = useState(null);
   const [subCategoriesMap, setSubCategoriesMap] = useState({});
@@ -50,7 +50,7 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
   useEffect(() => {
     setSelectedSubCategories({});
     setMappedFiles({});
-  }, [rowData?.id]);
+  }, [Id]);
 
   const fetchSubCategories = async (mainId) => {
     try {
@@ -78,30 +78,40 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
 
     if (selectedSubCategories[name]) {
       const updated = { ...mappedFiles };
+      const removed = updated[name];
+      if (removed?.preview) URL.revokeObjectURL(removed.preview);
       delete updated[name];
       setMappedFiles(updated);
     }
   };
 
   const handleFilesForSubcategory = (subcatName, files) => {
-    const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
-    const validFiles = Array.from(files).filter((f) => allowedTypes.includes(f.type));
+    const validTypes = ["application/pdf", "image/jpeg", "image/png"];
+    const validFile = Array.from(files).find((f) => validTypes.includes(f.type));
 
-    if (!validFiles.length) {
-      setAlertMessage({ severity: "error", message: "Only PDF, JPEG or PNG files are allowed" });
+    if (!validFile) {
+      setAlertMessage({ severity: "error", message: "Only PDF, JPEG, and PNG files allowed" });
       setAlertOpen(true);
       return;
     }
 
+    const previewUrl = validFile.type.startsWith("image/") ? URL.createObjectURL(validFile) : null;
+
     setMappedFiles((prev) => ({
       ...prev,
-      [subcatName]: [validFiles[0]],
+      [subcatName]: { file: validFile, preview: previewUrl },
     }));
   };
 
   const deleteFile = (e, sub) => {
     e.preventDefault();
     e.stopPropagation();
+
+    const removed = mappedFiles[sub];
+    if (removed?.preview) {
+      URL.revokeObjectURL(removed.preview);
+    }
+
     const newMap = { ...mappedFiles };
     delete newMap[sub];
     setMappedFiles(newMap);
@@ -116,19 +126,20 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
     if (!selectedMainCategory || Object.keys(mappedFiles).length === 0) {
       setAlertMessage({ severity: "error", message: "Category & files required" });
       setAlertOpen(true);
+      setLoading(false);
       return;
     }
 
     const formData = new FormData();
     formData.append("attachments_category_id", selectedMainCategory.attachments_category_id);
-    formData.append("student_id", rowData?.id);
+    formData.append("student_id", Id);
 
     const subcats = subCategoriesMap[selectedMainCategory.attachments_category_id] || [];
     subcats.forEach((sub) => {
       const name = sub.attachments_subcategory_name;
       const short = sub.attachments_subcategory_name_short;
-      if (mappedFiles[name]?.[0]) {
-        formData.append(short, mappedFiles[name][0]);
+      if (mappedFiles[name]?.file) {
+        formData.append(short, mappedFiles[name].file);
       }
     });
 
@@ -138,7 +149,8 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
       });
       setAlertMessage({ severity: "success", message: "Upload successful" });
       setAlertOpen(true);
-      setImageUploadOpen(false);
+      setSelectedSubCategories({});
+      setMappedFiles({});
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -151,11 +163,16 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
   };
 
   return (
-    <ModalWrapper maxWidth={1200} open={imageOpen} setOpen={setImageUploadOpen} title="Upload File">
+    <Paper elevation={3} sx={{ p: 3 }}>
+      <Typography variant="h5" fontWeight="bold" gutterBottom>
+        Documents Upload
+      </Typography>
       <Grid container spacing={2}>
         <Grid item xs={12} md={3}>
-          <Paper elevation={3} sx={{ p: 2, height: "100%" }}>
-            <Typography fontWeight={600} mb={1}>Main Categories</Typography>
+          <Paper elevation={2} sx={{ p: 2, height: "100%" }}>
+            <Typography fontWeight={600} mb={1}>
+              Main Categories
+            </Typography>
             {mainCategories.map((cat) => (
               <Chip
                 key={cat.attachments_category_id}
@@ -174,7 +191,7 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
         </Grid>
 
         <Grid item xs={12} md={9}>
-          <Paper elevation={3} sx={{ p: 3 }}>
+          <Paper elevation={2} sx={{ p: 3 }}>
             {selectedMainCategory ? (
               <>
                 <Typography variant="h6" fontWeight={600} mb={2}>
@@ -186,7 +203,9 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
                       key={sub.id}
                       label={sub.attachments_subcategory_name}
                       onClick={() => handleSubCategoryToggle(sub.attachments_subcategory_name)}
-                      variant={selectedSubCategories[sub.attachments_subcategory_name] ? "filled" : "outlined"}
+                      variant={
+                        selectedSubCategories[sub.attachments_subcategory_name] ? "filled" : "outlined"
+                      }
                       color="secondary"
                       clickable
                     />
@@ -214,7 +233,7 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
                             border: "2px dashed #90caf9",
                             borderRadius: "12px",
                             p: 3,
-                            minHeight: "230px",
+                            height: "230px",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "center",
@@ -247,17 +266,17 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
                           </Typography>
                           <CloudUploadIcon fontSize="large" sx={{ color: "#3f51b5" }} />
                           <Typography variant="body2" mt={1}>
-                            Click or Drag PDF, JPEG, PNG
+                            Click or Drag JPEG, PNG, OR PDF
                           </Typography>
 
                           {mappedFiles[subcatName] && (
                             <Box mt={2} display="flex" alignItems="center" gap={1}>
-                              {mappedFiles[subcatName][0]?.type === "application/pdf" ? (
+                              {mappedFiles[subcatName].file.type === "application/pdf" ? (
                                 <PictureAsPdfIcon color="error" fontSize="medium" />
                               ) : (
                                 <Box
                                   component="img"
-                                  src={URL.createObjectURL(mappedFiles[subcatName][0])}
+                                  src={mappedFiles[subcatName].preview}
                                   alt="preview"
                                   sx={{
                                     width: 40,
@@ -276,13 +295,13 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
                                 />
                               )}
                               <Box display="flex" alignItems="center" gap={0.5} maxWidth={130}>
-                                <Tooltip title={mappedFiles[subcatName][0]?.name || ""}>
+                                <Tooltip title={mappedFiles[subcatName].file.name}>
                                   <Typography
                                     variant="body2"
                                     noWrap
                                     sx={{ maxWidth: "100%" }}
                                   >
-                                    {mappedFiles[subcatName][0]?.name}
+                                    {mappedFiles[subcatName].file.name}
                                   </Typography>
                                 </Tooltip>
                                 <IconButton size="small" onClick={(e) => deleteFile(e, subcatName)}>
@@ -295,7 +314,6 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
                       </Grid>
                     ))}
                 </Grid>
-
               </>
             ) : (
               <Typography>Select a main category to begin.</Typography>
@@ -312,14 +330,15 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
             loading ||
             !selectedMainCategory ||
             Object.keys(mappedFiles).length === 0 ||
-            Object.entries(selectedSubCategories).filter(([_, checked]) => checked).length !== Object.keys(mappedFiles).length
+            Object.entries(selectedSubCategories).filter(([_, checked]) => checked).length !==
+            Object.keys(mappedFiles).length
           }
         >
           {loading ? <CircularProgress size={25} color="primary" /> : "Upload Files"}
         </Button>
       </Box>
-    </ModalWrapper>
+    </Paper>
   );
 };
 
-export default PdfUploadModal;
+export default StudentDocumentUpload;

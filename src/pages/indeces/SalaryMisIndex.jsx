@@ -7,7 +7,8 @@ import {
   TableHead,
   TableRow,
   tableCellClasses, styled,
-  CircularProgress
+  CircularProgress,
+  Typography
 } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs.js";
 import useAlert from "../../hooks/useAlert.js";
@@ -145,7 +146,10 @@ const SalaryMisIndex = () => {
     contract_empcode: false,
     date_of_joining: false,
     departmentShortName: false,
-    designationShortName: false
+    designationShortName: false,
+    empcode:false,
+    schoolShortName:false,
+    dateofbirth:false
   });
   const classes = useStyles();
 
@@ -194,7 +198,7 @@ const SalaryMisIndex = () => {
         if (res.status == 200 || res.status == 201) {
           const epfList = res.data.data?.map((ep, index) => ({
             id: index + 1,
-            grossWages: ep.pf_earnings,
+            grossWages: ep.total_earning,
             edliWages: ep.pf_earnings,
             epfWages: ep.pf_earnings,
             epsWages: ep.pf_earnings,
@@ -494,6 +498,7 @@ const SalaryMisIndex = () => {
     { field: "empcode", headerName: "Emp Code", flex: 1, hide: false },
     { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1, hide: true },
     { field: "employee_name", headerName: "Name", flex: 2, hide: false },
+    { field: "dateofbirth", headerName: "DOB", flex: 2, hide: true,valueGetter:(value,row)=>(moment(row.dateofbirth).format("DD-MM-YYYY"))},
     { field: "date_of_joining", headerName: "DOJ", flex: 1, hide: true },
     {
       field: "schoolShortName",
