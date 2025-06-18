@@ -161,7 +161,7 @@ function PaidAtBoardStdList() {
           ac_year_id: rowData?.acYearId,
           fc_year_id: 4,
           // course_branch_assignment_id: 1,
-          fee_template_id: rowData?.feeTemplateId,
+          fee_template_id: obj?.fee_template_id,
           board_id: rowData?.boardId,
           board_receivable_id: rowData?.id,
           to_pay_from_board: obj.eachPay,
@@ -308,7 +308,7 @@ function PaidAtBoardStdList() {
               color="primary"
               onClick={() =>
                 navigate(`/paid-at-board-receipt`, {
-                  state: { rowData: rowData },
+                  state: { rowData: rowData, studentId: params.row.student_id },
                 })
               }
             >
