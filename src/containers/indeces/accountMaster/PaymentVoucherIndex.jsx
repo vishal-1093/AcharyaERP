@@ -70,12 +70,14 @@ const filterLists = [
   { label: "Today", value: "today" },
   { label: "1 Week", value: "week" },
   { label: "1 Month", value: "month" },
+  { label: "6 Months", value: "6month"},
+  { label: "Current Year", value: "year" },
   { label: "Custom Date", value: "custom" },
 ];
 
 const initialValues = {
   filterList: filterLists,
-  filter: filterLists[1].value,
+  filter: filterLists[3].value,
   startDate: "",
   endDate: "",
   schoolList: [],
@@ -124,7 +126,7 @@ function PaymentVoucherIndex() {
 
   useEffect(() => {
     getSchoolDetails();
-    getData(values.filterList[1].value);
+    getData(values.filterList[3].value);
     setCrumbs([{ name: "" }]);
   }, []);
 
@@ -585,6 +587,7 @@ function PaymentVoucherIndex() {
           <GridIndex
             rows={rows}
             columns={columns}
+            loading={loading}
             columnVisibilityModel={columnVisibilityModel}
             setColumnVisibilityModel={setColumnVisibilityModel}
             getRowClassName={getRowClassName}
