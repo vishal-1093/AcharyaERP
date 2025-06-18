@@ -26,6 +26,8 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import PrintIcon from '@mui/icons-material/Print';
 import moment from 'moment';
+import { BlobProvider } from '@react-pdf/renderer';
+import LedgerMonthlyTransactionPdf from './LedgerMonthlyTransactionPdf';
 
 const HeadTableCell = styled(TableCell)(({ theme }) => ({
   borderBottom: '2px solid #e0e0e0',
@@ -77,10 +79,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const columns = [
+  { field: 'month', headerName: 'Month', width: '20%' },
+  { field: 'openingBalance', headerName: 'Opening Balance', width: '20%' },
+  { field: 'debit', headerName: 'Debit', width: '20%' },
+  { field: 'credit', headerName: 'Credit', width: '20%' },
+  { field: 'closingBalance', headerName: 'Closing Balance', width: '20%' }
+]
+
 const VendorMonthlyDetails = () => {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
-  const [breadCrumbs, setBreadCrumbs] = useState()
+  const [breadCrumbs, setBreadCrumbs] = useState([])
   const [isPrint, setIsPrint] = useState(false)
   const location = useLocation()
   const queryValues = location.state;
@@ -90,6 +100,11 @@ const VendorMonthlyDetails = () => {
     fcYearId: queryValues?.fcYearId,
     fcYear: queryValues?.fcYear
   })
+  const filters = {
+    voucherHeadName: queryValues?.voucherHeadName || "Yes Bank",
+    fcYear: currFcYear?.fcYear || "2025-2026",
+    asOnDate: moment().format('DD-MM-YYYY')
+  };
 
   useEffect(() => {
     setBreadCrumbs([
@@ -196,11 +211,6 @@ const VendorMonthlyDetails = () => {
     }
   };
 
-  const handleMonthClick = (row) => {
-    const { month, month_name } = row
-    const query = { ...queryValues, fcYear: currFcYear?.fcYear, fcYearId: currFcYear?.fcYearId, month, month_name }
-    navigate('/Accounts-ledger-day-transaction', { state: query })
-  }
 
   const getFormattedMonthYear = (monthNumber, fcYear) => {
     const monthMap = {
@@ -258,21 +268,29 @@ const VendorMonthlyDetails = () => {
   };
 
   const formatCurrency = (value, decimals = 2) => {
-    // Handle null/undefined/empty values
     if (value === null || value === undefined || value === '') return `0.00`;
+    if (typeof value === 'string' && (value.includes('Cr') || value.includes('Dr'))) {
+      const parts = value.split(' ');
+      const numValue = parseFloat(parts[0]);
+      const suffix = parts[1] || '';
 
-    // Convert string numbers to actual numbers
+      if (isNaN(numValue)) return `0.00`;
+
+      return `${numValue.toLocaleString('en-IN', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      })} ${suffix}`;
+    }
+
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
-
-    // Handle NaN cases after conversion
     if (isNaN(numValue)) return `0.00`;
 
-    // Format with Indian number style (1,23,45,678.90) without currency symbol
     return numValue.toLocaleString('en-IN', {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals
     });
   };
+
 
   return (
     <Paper elevation={0} sx={{
@@ -293,19 +311,66 @@ const VendorMonthlyDetails = () => {
         width: '100%'
       }}>
         <CustomBreadCrumbs crumbs={breadCrumbs} />
-        <Button
-          variant="contained"
-          onClick={handleDownloadPdf}
-          startIcon={<PrintIcon />}
-          sx={{
-            textTransform: 'none',
-            borderRadius: 1,
-            boxShadow: 'none'
-          }}
-        >
-          Print
-        </Button>
-      </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'end' }}>
+          <Button
+            variant="outlined"
+            startIcon={<ArrowBackIcon />}
+            onClick={handlePreviousOpeningBalance}
+            disabled={currFcYear?.fcYearId === queryValues?.fcYearOpt[queryValues?.fcYearOpt?.length - 1]?.value}
+            sx={{
+              backgroundColor: '#f5f5f5',
+              '&:hover': {
+                backgroundColor: '#e0e0e0',
+              },
+              fontWeight: 500,
+              color: '#424242',
+            }}
+          >
+            Prev
+          </Button>
+          <Button
+            variant="outlined"
+            endIcon={<ArrowForwardIcon />}
+            onClick={handleNextOpeningBalance}
+            disabled={currFcYear?.fcYearId === queryValues?.fcYearOpt[0]?.value}
+            sx={{
+              backgroundColor: '#e3f2fd',
+              '&:hover': {
+                backgroundColor: '#bbdefb',
+              },
+              fontWeight: 500,
+              color: '#1976d2',
+            }}
+          >
+            Next
+          </Button>
+          {/* <BlobProvider
+            document={
+              <LedgerMonthlyTransactionPdf
+                rows={rows}
+                currFcYear={currFcYear}
+                queryValues={queryValues}
+              />
+            }
+          >
+            {({ url, loading }) => (
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={rows?.length === 0}
+                onClick={() => {
+                  if (url) {
+                    window.open(url, '_blank');
+                  }
+                }}
+              >
+                {loading ? 'Preparing PDF...' : 'Print PDF'}
+              </Button>
+            )}
+          </BlobProvider> */}
+
+        </Box>
+      </Box >
       <Box sx={{ width: '70%', mb: 1 }}>
         <TableContainer>
           <Table size="small">
@@ -327,8 +392,6 @@ const VendorMonthlyDetails = () => {
       </Box>
       <Box sx={{
         width: '70%',
-        display: 'flex',
-        justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: 2,
@@ -337,44 +400,15 @@ const VendorMonthlyDetails = () => {
         backgroundColor: '#f9f9f9',
         borderRadius: 1
       }}>
-        <Box>
-          <Typography variant="body1" sx={{ fontWeight: 500 }}>
-            Bank: <span style={{ fontWeight: 400 }}>{rows?.bankName || 'Yes Bank'}</span>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            As reported on {moment().format('DD MMM YYYY')}
-          </Typography>
-        </Box>
-
-        {/* Year Navigation */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant="body1" sx={{ fontWeight: 500, mr: 1 }}>
-            Financial Year:
-          </Typography>
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={<ArrowBackIcon />}
-            onClick={handlePreviousOpeningBalance}
-            disabled={currFcYear?.fcYearId === queryValues?.fcYearOpt[queryValues?.fcYearOpt?.length - 1]?.value}
-            sx={{ minWidth: 100 }}
-          >
-            Prev
-          </Button>
-          <Typography variant="body1" sx={{ px: 1.5, fontWeight: 500 }}>
-            {currFcYear?.fcYear}
-          </Typography>
-          <Button
-            size="small"
-            variant="outlined"
-            endIcon={<ArrowForwardIcon />}
-            onClick={handleNextOpeningBalance}
-            disabled={currFcYear?.fcYearId === queryValues?.fcYearOpt[0]?.value}
-            sx={{ minWidth: 100 }}
-          >
-            Next
-          </Button>
-        </Box>
+        <Typography variant="body1"
+          sx={{
+            fontWeight: 500,
+            color: '#376a7d',
+            fontSize: '14px',
+            textAlign: 'center'
+          }}>
+          {`${queryValues?.voucherHeadName} Ledger for FY ${currFcYear?.fcYear} as on ${moment().format('DD-MM-YYYY')}`}
+        </Typography>
       </Box>
       <Box sx={{
         width: '70%',
@@ -392,10 +426,10 @@ const VendorMonthlyDetails = () => {
               <TableHead>
                 <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
                   <TableCell align="center" sx={{ width: '20%' }}>Month</TableCell>
-                  <TableCell align="center" sx={{ width: '20%' }}>Opening Balance</TableCell>
-                  <TableCell align="center" sx={{ width: '20%' }}>Debit</TableCell>
-                  <TableCell align="center" sx={{ width: '20%' }}>Credit</TableCell>
-                  <TableCell align="center" sx={{ width: '20%' }}>Closing Balance</TableCell>
+                  <TableCell align="right" sx={{ width: '20%' }}>Opening Balance</TableCell>
+                  <TableCell align="right" sx={{ width: '20%' }}>Debit</TableCell>
+                  <TableCell align="right" sx={{ width: '20%' }}>Credit</TableCell>
+                  <TableCell align="right" sx={{ width: '20%' }}>Closing Balance</TableCell>
                 </TableRow>
               </TableHead>
               {rows?.vendorDetails?.length > 0 ? (
@@ -422,19 +456,17 @@ const VendorMonthlyDetails = () => {
                       </TableRow>
                     ))}
                   </TableBody>
-
-                  {/* Footer */}
                   <TableFooter>
                     <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                      <TableCell align='center' sx={{ width: '20%', fontWeight: 'bold', fontSize:'12px' }}>Total</TableCell>
-                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize:'12px' }}></TableCell>
-                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize:'12px' }}>
+                      <TableCell align='center' sx={{ width: '20%', fontWeight: 'bold', fontSize: '12px' }}>Total</TableCell>
+                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize: '12px' }}></TableCell>
+                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize: '12px' }}>
                         {formatCurrency(rows?.totalDebit)}
                       </TableCell>
-                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize:'12px' }}>
+                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize: '12px' }}>
                         {formatCurrency(rows?.totalCredit)}
                       </TableCell>
-                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize:'12px'}}>
+                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize: '12px' }}>
                         {/* {formatCurrency(rows?.closingBalance)} */}
                       </TableCell>
                     </TableRow>
@@ -453,7 +485,7 @@ const VendorMonthlyDetails = () => {
           </TableContainer>
         )}
       </Box>
-    </Paper>
+    </Paper >
   );
 };
 

@@ -6,10 +6,9 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
 
-const LedgerCreditPaymentDetail = lazy(() => import("./LedgerCreditPaymentDetails"));
-const StudentCancelledFeereceiptIndex = lazy(() =>
-  import("../studentMaster/CancelReceiptIndex")
-);
+const LedgerDebitReceiptDetail = lazy(() => import("./LedgerDebitReceiptTransaction"));
+const LedgerDebitContraDetail = lazy(() => import("./LedgerDebitContraDetails"));
+const LedgerDebitFundTransferDetail = lazy(() => import("./LedgerDebitFundTransferDetails"));
 
 const breadcrumbStyles = makeStyles((theme) => ({
     breadcrumbsContainer: {
@@ -27,36 +26,37 @@ const breadcrumbStyles = makeStyles((theme) => ({
 }));
 
 const tabsData = [
-    { label: "Payment", value: "payment", component: LedgerCreditPaymentDetail },
-     { label: "Void Receipt", value: "voidReceipt", component: StudentCancelledFeereceiptIndex },
+    { label: "Receipt", value: "receipt", component: LedgerDebitReceiptDetail },
+    { label: "Contra", value: "contra", component: LedgerDebitContraDetail },
+    { label: "Fund Transfer", value: "fundTransfer", component: LedgerDebitFundTransferDetail }
 ];
 
-const LedgerCreditDayTransaction = () => {
+const LedgerDebitDayTransaction = () => {
     const [breadCrumbs, setBreadCrumbs] = useState([])
     const setCrumbs = useBreadcrumbs();
     const navigate = useNavigate();
     const { pathname, state: queryValues } = useLocation();
 
     const initialTab =
-        tabsData.find((tab) => pathname.includes(tab.value))?.value || "payment";
+        tabsData.find((tab) => pathname.includes(tab.value))?.value || "receipt";
     const [tab, setTab] = useState(initialTab);
 
     useEffect(() => {
         setTab(
-            tabsData.find((tab) => pathname.includes(tab.value))?.value || "payment"
+            tabsData.find((tab) => pathname.includes(tab.value))?.value || "receipt"
         );
         setBreadCrumbs([
             { name: "Ledger", link: "/Accounts-ledger", state: queryValues },
             { name: "Monthly Transaction", link: "/Accounts-ledger-monthly-detail", state: queryValues },
             { name: 'Daily Summary', link: "/Accounts-ledger-day-transaction", state: queryValues },
-            { name: `${queryValues?.voucherHeadName || ""} FY ${queryValues?.fcYear} as on ${moment().format('DD-MMMM-YYYY')}` },
+            { name: `${queryValues?.voucherHeadName || ""} FY ${queryValues?.fcYear} as on ${moment().format('DD-MMMM-YYYY')}`},
         ])
         setCrumbs([]);
     }, [pathname || tab]);
 
     const handleChange = (event, newValue) => {
         setTab(newValue);
-        navigate(`/Accounts-ledger-day-credit-transaction`, { state: queryValues });
+        navigate(`/Accounts-ledger-day-transaction-debit`, { state: queryValues });
     };
 
     return (
@@ -80,7 +80,7 @@ const LedgerCreditDayTransaction = () => {
     );
 }
 
-export default LedgerCreditDayTransaction;
+export default LedgerDebitDayTransaction;
 
 const CustomBreadCrumbs = ({ crumbs = [] }) => {
     const navigate = useNavigate()
@@ -117,4 +117,3 @@ const CustomBreadCrumbs = ({ crumbs = [] }) => {
         </Box>
     )
 }
-

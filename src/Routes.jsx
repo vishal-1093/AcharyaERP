@@ -47,9 +47,10 @@ import ProctorStudentAssignmentFormInst from "./pages/forms/mentorMaster/Proctor
 import GRNCreationForm from "./pages/forms/inventoryMaster/GRNCreationForm.jsx";
 import RazorPayPendingSettlementDetail from "./containers/indeces/razorpaySettlementMaster/razorpayPendingSettlement.jsx";
 import NewAdmissionsDueReport from "./pages/forms/studentDueReport/newAdmissionsDueReport.jsx";
-import LedgerDayCreditTransaction from "./containers/indeces/vendorMaster/LedgerDayTransaction-credit.jsx";
-import BankGroupBankBalanceMaster from "./pages/masters/BankGroupBankBalanceMaster.jsx";
 import InstituteBankBalance from "./containers/indeces/bankGroupBankBalanceMaster/InstituteBankBalance.jsx";
+import BRSTransactionDetail from "./containers/indeces/bankGroupBankBalanceMaster/BRSTransactionDetails.jsx";
+import BRSChqNotIssuedDebitedDetail from "./containers/indeces/bankGroupBankBalanceMaster/BRSChqIssuedNotDebitedDetails.jsx";
+
 
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
@@ -1853,7 +1854,7 @@ const StudentOnlineClass = lazy(() =>
 );
 
 const LedgerDayWiseTransactionDetail = lazy(()=>
-import("./containers/indeces/vendorMaster/LedgerDayTransactionDetail.jsx")
+import("./containers/indeces/vendorMaster/LedgerDebitReceiptTransaction.jsx")
 ) 
 
 const LedgerDayTransaction = lazy(()=>
@@ -2006,6 +2007,15 @@ const CounterSummaryIndex = lazy(() =>
   import("./containers/indeces/counterSummary/Index.jsx")
 );
 
+const LedgerDebitDayTransaction = lazy(() =>
+  import("./containers/indeces/vendorMaster/LedgerDayTransaction-debit.jsx")
+);
+const LedgerDayCreditTransaction = lazy(() =>
+  import("./containers/indeces/vendorMaster/LedgerDayTransaction-credit.jsx")
+);
+const BankGroupBankBalanceMaster = lazy(() =>
+  import("./pages/masters/BankGroupBankBalanceMaster.jsx")
+);
 const PettyCashPayment = lazy(() =>
   import("./pages/indeces/PettyCashPayment.jsx")
 );
@@ -10293,10 +10303,10 @@ function RouteConfig() {
           />
           <Route
             exact
-            path={"/Accounts-ledger-day-transaction-detail"}
+            path={"/Accounts-ledger-day-transaction-debit"}
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <LedgerDayWiseTransactionDetail />
+                <LedgerDebitDayTransaction />
               </Suspense>
             }
           />
@@ -10311,7 +10321,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path={"/bank-group-bank-balance"}
+            path={"/bank-balance"}
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <BankGroupBankBalanceMaster />
@@ -10324,6 +10334,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InstituteBankBalance />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path={"/institute-brs-transaction"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BRSTransactionDetail />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/brs-chq-issued-not-debited"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BRSChqNotIssuedDebitedDetail />
               </Suspense>
             }
           />
