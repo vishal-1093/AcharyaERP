@@ -21,7 +21,7 @@ const PaidAtBoardReceipt = () => {
   const [hideButtons, setHideButtons] = useState(false);
 
   const location = useLocation();
-  const { rowData } = location?.state;
+  const { rowData, studentId } = location?.state;
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
@@ -29,11 +29,11 @@ const PaidAtBoardReceipt = () => {
     setCrumbs([{ name: "Paid at board index", link: "/paid-at-board-index" }]);
   }, []);
 
-  const y = 1;
-
   const getData = async () => {
     const response = await axios
-      .get(`/api/finance/tagReceiptOfStudent?studentId=2701&yearSem=1`)
+      .get(
+        `/api/finance/tagReceiptOfStudent?studentId=${studentId}&yearSem=${rowData?.yearSem}`
+      )
       .then((res) => {
         const total = res.data.data.feeTemplate.reduce(
           (total, sum) => Number(total) + Number(sum.fixedAmount),
@@ -398,8 +398,8 @@ const PaidAtBoardReceipt = () => {
                   >
                     Particulars
                   </th>
-                  {y
-                    .toString()
+                  {rowData?.yearSem
+                    ?.toString()
                     ?.split("")
                     ?.map((year, i) => (
                       <th
