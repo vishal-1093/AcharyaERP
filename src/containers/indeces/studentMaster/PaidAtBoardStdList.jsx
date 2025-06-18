@@ -66,6 +66,7 @@ function PaidAtBoardStdList() {
   const [checkedLength, setCheckedLength] = useState(0);
   const [disable, setDisable] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [gridLoading, setGridLoading] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -103,6 +104,7 @@ function PaidAtBoardStdList() {
   };
 
   const getStudentsList = async () => {
+    setGridLoading(true);
     let url;
 
     url = `/api/student/studentDetailsByFeeTemplate/${rowData?.feeTemplateId}/${rowData?.receivedYear}`;
@@ -120,6 +122,8 @@ function PaidAtBoardStdList() {
       setRows(rowId);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setGridLoading(false);
     }
   };
 
@@ -157,7 +161,7 @@ function PaidAtBoardStdList() {
           ac_year_id: rowData?.acYearId,
           fc_year_id: 4,
           // course_branch_assignment_id: 1,
-          fee_template_id: rowData?.feeTemplateId,
+          fee_template_id: obj?.fee_template_id,
           board_id: rowData?.boardId,
           board_receivable_id: rowData?.id,
           to_pay_from_board: obj.eachPay,
@@ -304,7 +308,7 @@ function PaidAtBoardStdList() {
               color="primary"
               onClick={() =>
                 navigate(`/paid-at-board-receipt`, {
-                  state: { rowData: rowData },
+                  state: { rowData: rowData, studentId: params.row.student_id },
                 })
               }
             >
@@ -442,7 +446,7 @@ function PaidAtBoardStdList() {
             </Button>
           </Grid>
           <Grid item xs={12}>
-            <GridIndex rows={rows} columns={columns} />
+            <GridIndex rows={rows} columns={columns} loading={gridLoading} />
           </Grid>
         </Grid>
       </Box>

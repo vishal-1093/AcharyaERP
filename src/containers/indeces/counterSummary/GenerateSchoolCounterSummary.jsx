@@ -110,7 +110,16 @@ export const GenerateSchoolCounterSummary = (
             customWidth={3}
             labelType="text"
           />
-
+          <DisplayCells
+            label="Receipt_Total"
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            type="h"
+            align="center"
+            customWidth={3}
+            labelType="text"
+          />
           <DisplayCells
             label="DD"
             style="Times-Bold"
@@ -206,6 +215,17 @@ export const GenerateSchoolCounterSummary = (
               />
               <DisplayCells
                 key={i}
+                label={Number((obj.INRDD % 1 !== 0 || (obj.INRONLINE % 1 !== 0) || 
+                (obj.INRCASH % 1 !== 0) || (obj.USDCASH % 1 !== 0)) ? (obj.INRDD + obj.INRONLINE + obj.INRCASH + obj.USDCASH)?.toFixed(2) : (obj.INRDD + obj.INRONLINE + obj.INRCASH + obj.USDCASH) || 0)}
+                style="Times-Roman"
+                right={1}
+                bottom={1}
+                align="left"
+                customWidth={3}
+                labelType="text"
+              />
+              <DisplayCells
+                key={i}
                 label={Number((obj.INRDD % 1 !== 0) ? (obj.INRDD)?.toFixed(2) : (obj.INRDD) || 0)}
                 style="Times-Roman"
                 right={1}
@@ -291,7 +311,7 @@ export const GenerateSchoolCounterSummary = (
             labelType="text"
           />
           <DisplayCells
-            label={"TOTAL"}
+            label={"Grand TOTAL"}
             style="Times-Bold"
             right={1}
             bottom={1}
@@ -299,7 +319,16 @@ export const GenerateSchoolCounterSummary = (
             customWidth={3}
             labelType="text"
           />
-
+          <DisplayCells
+            label={Number((ddTotal% 1 !== 0 || (onlineTotal % 1 !== 0) || 
+                (cashTotal % 1 !== 0) || (usdCashTotal % 1 !== 0)) ? (ddTotal+ onlineTotal + cashTotal + usdCashTotal)?.toFixed(2) : (ddTotal + onlineTotal + cashTotal + usdCashTotal) || 0)}
+            style="Times-Bold"
+            right={1}
+            bottom={1}
+            align="left"
+            customWidth={3}
+            labelType="text"
+          />
           <DisplayCells
             label={Number(ddTotal % 1 !== 0 ? ddTotal?.toFixed(2) : ddTotal) || 0}
             style="Times-Bold"

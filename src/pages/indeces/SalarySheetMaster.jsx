@@ -70,9 +70,11 @@ function SalarySheetMaster() {
   const [employeeList, setEmployeeList] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [pdfUrl, setPdfUrl] = useState("");
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
 
   const columns = [
     {
@@ -80,7 +82,6 @@ function SalarySheetMaster() {
       headerName: "Sl No",
       flex: 1,
       hideable: false,
-      renderCell: (params) => params.api.getRowIndex(params.id) + 1,
     },
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
@@ -246,13 +247,14 @@ function SalarySheetMaster() {
   ];
 
   useEffect(() => {
-    setCrumbs([{ name: "Salary Sheet Master" }]);
+    setCrumbs([]);
     getSchoolDetails();
     getSalarySheetMasterData();
   }, []);
 
   const getSalarySheetMasterData = async () => {
     try {
+      setLoading(true);
       let params = "";
       if (!!values.month && !values.schoolId && !values.dept) {
         params = `month=${moment(values.month).format("MM")}&year=${moment(
@@ -279,6 +281,7 @@ function SalarySheetMaster() {
           `api/employee/getEmployeeMasterSalary?page=0&page_size=100000&${params}`
         );
         if (res.status == 200 || res.status == 201) {
+          setLoading(false);
           setEmployeeList(
             res.data.data.content?.length > 0 ? res.data.data.content : []
           );
@@ -288,12 +291,14 @@ function SalarySheetMaster() {
           `api/employee/getEmployeeMasterSalary?page=0&page_size=100000`
         );
         if (res.status == 200 || res.status == 201) {
+          setLoading(false);
           setEmployeeList(
             res.data.data.content?.length > 0 ? res.data.data.content : []
           );
         }
       }
     } catch (error) {
+      setLoading(false);
       console.error(error);
     }
   };
@@ -783,7 +788,14 @@ function SalarySheetMaster() {
           </Button>
         </Grid>
       </ModalWrapper>
-      <GridIndex rows={employeeList} columns={columns} />
+      <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: "absolute", width: "100%" }}>
+          <GridIndex rows={employeeList.map((ele, index) => ({ ...ele, slNo: index + 1 }))} columns={columns}
+            loading={loading}
+            columnVisibilityModel={columnVisibilityModel}
+            setColumnVisibilityModel={setColumnVisibilityModel} />
+        </Box>
+      </Box>
     </Box>
   );
 }

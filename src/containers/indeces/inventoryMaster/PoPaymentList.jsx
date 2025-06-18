@@ -1,21 +1,15 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
-import { HighlightOff, Visibility } from "@mui/icons-material";
 import axios from "../../../services/Api";
 import moment from "moment";
-import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
-import PrintIcon from "@mui/icons-material/Print";
 import CustomModal from "../../../components/CustomModal";
 import useAlert from "../../../hooks/useAlert";
-import { validateDate } from "@mui/x-date-pickers/internals";
 import ModalWrapper from "../../../components/ModalWrapper";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import BeenhereIcon from '@mui/icons-material/Beenhere';
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const { userId, roleShortName } = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
@@ -35,13 +29,15 @@ const filterLists = [
   { label: "Today", value: "TODAY" },
   { label: "1 Week", value: "WEEK" },
   { label: "1 Month", value: "MONTH" },
+  { label: "6 Months", value: "6MONTHS"},
+  { label: "Current Year", value: "1YEAR"},
   { label: "Custom Date", value: "custom" },
 ];
 
 const initialValues = {
   paymentType: null,
   filterList: filterLists,
-  filter: filterLists[2].value,
+  filter: filterLists[3].value,
   startDate: "",
   endDate: "",
   school_Id: "",
@@ -342,7 +338,7 @@ function PoPaymentList() {
 
   useEffect(() => {
     setCrumbs([{}]);
-    getData(values.filterList[0].value);
+    getData(values.filterList[3].value);
     getSchoolData()
   }, []);
 

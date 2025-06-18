@@ -6,6 +6,7 @@ import logo from "../../../assets/mba.png";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation } from "react-router-dom";
 import numberToWords from "number-to-words";
+import moment from "moment";
 
 const bookmanFont = {
   fontFamily: "Bookman Old Style, serif",
@@ -126,14 +127,14 @@ const UniformReceiptPdf = () => {
             align="center"
             sx={{ fontSize: "12px", fontWeight: "600", ...bookmanFont }}
           >
-            Achit Nagar,Soldevanahalli,Bangalore-560090
+            Soldevanahalli, Bangalore 560107
           </Typography>
           <Typography
             variant="subtitle2"
             align="center"
             sx={{ fontSize: "10px", fontWeight: "600", ...bookmanFont }}
           >
-            GSTIN:29AFNPA5533Q1ZV
+            GSTIN: 29AFNPA5533Q1ZV
           </Typography>
           <Typography
             variant="h6"
@@ -146,7 +147,7 @@ const UniformReceiptPdf = () => {
           <Box sx={{ mt: 3, mb: 3 }}>
             <table
               style={{
-                width: "80%",
+                width: "65%",
                 margin: "auto",
                 border: "1px solid black",
                 borderCollapse: "collapse",
@@ -158,17 +159,17 @@ const UniformReceiptPdf = () => {
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
                     }}
                   >
-                    Receipt No.
+                    Order No.
                   </th>
 
                   <td
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
                     }}
                   >
                     {rowData?.receiptNo}
@@ -179,28 +180,51 @@ const UniformReceiptPdf = () => {
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
                     }}
                   >
-                    Receipt Date
+                    Order Date
                   </th>
 
                   <td
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
                     }}
                   >
-                    {rowData?.receiptDate}
+                    {moment(rowData?.receiptDate).format("DD-MM-YYYY")}
                   </td>
                 </tr>
+
                 <tr style={{ textAlign: "center" }}>
                   <th
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
+                    }}
+                  >
+                    Order Amount
+                  </th>
+
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "3px 5px",
+                      lineHeight: "1.8",
+                    }}
+                  >
+                    {rowData?.amount}
+                  </td>
+                </tr>
+
+                <tr style={{ textAlign: "center" }}>
+                  <th
+                    style={{
+                      border: "1px solid black",
+                      padding: "3px 5px",
+                      lineHeight: "1.8",
                     }}
                   >
                     AUID
@@ -210,7 +234,7 @@ const UniformReceiptPdf = () => {
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
                     }}
                   >
                     {rowData?.auid}
@@ -221,7 +245,7 @@ const UniformReceiptPdf = () => {
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
                     }}
                   >
                     Student Name
@@ -231,7 +255,7 @@ const UniformReceiptPdf = () => {
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
                     }}
                   >
                     {rowData?.studentName}
@@ -242,7 +266,7 @@ const UniformReceiptPdf = () => {
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
                     }}
                   >
                     College
@@ -252,7 +276,7 @@ const UniformReceiptPdf = () => {
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
                     }}
                   >
                     {rowData?.college}
@@ -264,7 +288,7 @@ const UniformReceiptPdf = () => {
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
                     }}
                   >
                     Course
@@ -274,7 +298,7 @@ const UniformReceiptPdf = () => {
                     style={{
                       border: "1px solid black",
                       padding: "3px 5px",
-                      lineHeight: "1.6",
+                      lineHeight: "1.8",
                     }}
                   >
                     {rowData?.course}

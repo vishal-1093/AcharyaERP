@@ -7,14 +7,17 @@ import {
   TableHead,
   TableRow,
   tableCellClasses, styled,
-  CircularProgress
+  CircularProgress,
+  Typography
 } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs.js";
+import { CSVLink } from "react-csv";
 import useAlert from "../../hooks/useAlert.js";
 import { makeStyles } from "@mui/styles";
 import axios from "../../services/Api.js";
 import moment from "moment";
 import PrintIcon from "@mui/icons-material/Print";
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { GenerateSalaryMisReport } from "./GenerateSalaryMisReport.jsx";
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const CustomAutocomplete = lazy(() =>
@@ -145,7 +148,10 @@ const SalaryMisIndex = () => {
     contract_empcode: false,
     date_of_joining: false,
     departmentShortName: false,
-    designationShortName: false
+    designationShortName: false,
+    empcode:false,
+    schoolShortName:false,
+    dateofbirth:false
   });
   const classes = useStyles();
 
@@ -192,9 +198,19 @@ const SalaryMisIndex = () => {
             (schoolId && !bank && date) ? `${apiUrl}?schoolId=${schoolId}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` :
               (!schoolId && bank && date) ? `${apiUrl}?bankId=${bank}&month=${moment(date).format("MM")}&year=${moment(date).format("YYYY")}` : "");
         if (res.status == 200 || res.status == 201) {
+          
           const epfList = res.data.data?.map((ep, index) => ({
             id: index + 1,
-            grossWages: ep.pf_earnings,
+            uan_no: `\t${ep.uan_no}`,
+            empcode: ep.empcode,
+            contract_empcode: ep.contract_empcode,
+            employee_name: ep.employee_name,
+            dateofbirth: ep.dateofbirth,
+            date_of_joining: ep.date_of_joining,
+            schoolShortName: ep.schoolShortName,
+            departmentShortName:ep.departmentShortName,
+            designationShortName:ep.designationShortName,
+            grossWages: ep.total_earning,
             edliWages: ep.pf_earnings,
             epfWages: ep.pf_earnings,
             epsWages: ep.pf_earnings,
@@ -202,18 +218,16 @@ const SalaryMisIndex = () => {
             epfContriRemitted: ep.pf,
             epfEpsDiffRemitted: ep.epf_difference,
             ncpDays: 0,
-            refundOfAdvances: 0,
-            ...ep
-          }))?.filter((li) => li.pf_earnings !== 0 || li.pension_fund !== 0 || li.pf !== 0 || li.epf_difference !== 0);
+            refundOfAdvances: 0
+          }));
+
           setState((prevState) => ({
             ...prevState,
             rows: type == "bank" ? res.data.data?.filter((ele) => ele.netpay !== 0) :
               type == "lic" ? res.data.data?.filter((ele) => ele.lic !== 0) :
                 type == "esi" ? res.data.data?.filter((ele) => ele.esi !== 0) :
                   type == "advance" ? res.data.data?.filter((ele) => ele.advance !== 0) :
-                    type == "tds" ? res.data.data?.filter((ele) => ele.tds !== null && ele.tds !== 0) :
-                      type == "pt" ? res.data.data?.filter((ele) => ele.pt !== 0) :
-                        res.data.data,
+                    type == "tds" ? res.data.data?.filter((ele) => ele.tds !== null && ele.tds !== 0) : res.data.data,
             loading: false,
             bankTotalNetPay: res.data.data?.filter((ele) => ele.netpay !== 0)?.reduce((acc, curr) => acc + curr.netpay, 0),
             licTotal: res.data.data?.filter((ele) => ele.lic !== 0)?.reduce((acc, curr) => acc + curr.lic, 0),
@@ -494,6 +508,7 @@ const SalaryMisIndex = () => {
     { field: "empcode", headerName: "Emp Code", flex: 1, hide: false },
     { field: "contract_empcode", headerName: "Contract EmpCode", flex: 1, hide: true },
     { field: "employee_name", headerName: "Name", flex: 2, hide: false },
+    { field: "dateofbirth", headerName: "DOB", flex: 2, hide: true,valueGetter:(value,row)=>(moment(row.dateofbirth).format("DD-MM-YYYY"))},
     { field: "date_of_joining", headerName: "DOJ", flex: 1, hide: true },
     {
       field: "schoolShortName",
@@ -732,7 +747,7 @@ const SalaryMisIndex = () => {
             required
           />
         </Grid>
-        <Grid item xs={12} md={1}>
+        {salaryReportType !=="epf"  ? <Grid item xs={12} md={1}>
           <Button
             variant="contained"
             disableElevation
@@ -742,7 +757,26 @@ const SalaryMisIndex = () => {
           >
             Print
           </Button>
+        </Grid>:
+        <Grid item xs={12} md={2} align="right">
+          <Button
+            variant="contained"
+            disableElevation
+            startIcon={<FileDownloadIcon />}
+            disabled={loading || (rows?.length == 0 && salaryReportType !== "summary" && salaryReportType !== "school")}
+          >            
+            <CSVLink
+              data={epfRows.map((row) => ({
+                ...row
+              }))}
+              filename={`EPF Report For the month of ${moment(date).format("MM-YYYY")}`}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+               Csv Export
+            </CSVLink>
+          </Button>
         </Grid>
+        }
       </Grid>
       {!(salaryReportType == "summary" || salaryReportType == "school") ? <Box mt={1} sx={{ position: "absolute", width: "100%" }}>
         <GridIndex rows={salaryReportType == "epf" ? epfRows : rows}

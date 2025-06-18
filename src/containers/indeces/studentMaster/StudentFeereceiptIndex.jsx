@@ -14,6 +14,7 @@ import {
   TableRow,
   tableCellClasses,
   tooltipClasses,
+  CircularProgress,Backdrop 
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
@@ -593,6 +594,9 @@ function StudentFeereceiptIndex() {
 
   return (
     <Box>
+      {loading && <Backdrop open={true} style={{ zIndex: 1300 }}>
+        <CircularProgress color="primary" />
+      </Backdrop>}
       <Grid
         container
         sx={{
@@ -652,7 +656,6 @@ function StudentFeereceiptIndex() {
               getRowClassName={getRowClassName}
               rows={rows}
               columns={columns}
-              loading={loading}
               columnVisibilityModel={columnVisibilityModel}
               setColumnVisibilityModel={setColumnVisibilityModel}
             />
