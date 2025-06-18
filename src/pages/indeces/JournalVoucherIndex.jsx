@@ -44,12 +44,14 @@ const filterLists = [
   { label: "Today", value: "today" },
   { label: "1 Week", value: "week" },
   { label: "1 Month", value: "month" },
+  { label: "6 Months", value: "6month"},
+  { label: "Current Year", value: "year" },
   { label: "Custom Date", value: "custom" },
 ];
 
 const initialValues = {
   filterList: filterLists,
-  filter: filterLists[1].value,
+  filter: filterLists[4].value,
   startDate: "",
   endDate: "",
   schoolList: [],
@@ -94,7 +96,7 @@ function JournalVoucherIndex() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getData(values.filterList[1].value);
+    getData(values.filterList[4].value);
     setCrumbs([{ name: "Journal Vouchers" }]);
   }, []);
 
