@@ -64,7 +64,7 @@ const PaysliplockIndex = () => {
     rows: [],
     loading: false,
     page: 0,
-    pageSize: 50,
+    pageSize: 100000000,
     total: 0,
   });
   const [modalContent, setModalContent] = useState({

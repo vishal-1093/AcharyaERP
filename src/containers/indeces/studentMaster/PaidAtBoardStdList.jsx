@@ -66,6 +66,7 @@ function PaidAtBoardStdList() {
   const [checkedLength, setCheckedLength] = useState(0);
   const [disable, setDisable] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [gridLoading, setGridLoading] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -103,6 +104,7 @@ function PaidAtBoardStdList() {
   };
 
   const getStudentsList = async () => {
+    setGridLoading(true);
     let url;
 
     url = `/api/student/studentDetailsByFeeTemplate/${rowData?.feeTemplateId}/${rowData?.receivedYear}`;
@@ -120,6 +122,8 @@ function PaidAtBoardStdList() {
       setRows(rowId);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setGridLoading(false);
     }
   };
 
@@ -442,7 +446,7 @@ function PaidAtBoardStdList() {
             </Button>
           </Grid>
           <Grid item xs={12}>
-            <GridIndex rows={rows} columns={columns} />
+            <GridIndex rows={rows} columns={columns} loading={gridLoading} />
           </Grid>
         </Grid>
       </Box>

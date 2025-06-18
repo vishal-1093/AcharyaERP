@@ -81,10 +81,16 @@ const FacultyFeedbackReportByCourse = lazy(() =>
 const EmpDocumentCollection = lazy(() =>
   import("./components/EmpDocumentCollectionPdf")
 );
-
+const StudentDocumentUpload = lazy(() =>
+  import("./components/StudentDocumentUpload")
+);
+const StudentDocument = lazy(() =>
+  import("./components/StudentDocument")
+);
 const PoPaymentList = lazy(() =>
   import("./containers/indeces/inventoryMaster/PoPaymentList.jsx")
 );
+
 // Student Feedback Master Forms
 const StudentDetailsSearch = lazy(() =>
   import("./pages/indeces/StudentDetailsSearch")
@@ -2585,6 +2591,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmpDocumentCollection />
+              </Suspense>
+            }
+          />
+            <Route
+            exact
+            path="/StudentDocumentUpload"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDocumentUpload />
+              </Suspense>
+            }
+          />
+              <Route
+            exact
+            path="/StudentDocument"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDocument />
               </Suspense>
             }
           />
