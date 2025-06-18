@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   Grid,
   IconButton,
   Paper,
@@ -11,7 +13,11 @@ import useAlert from "../hooks/useAlert";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
 import GridIndex from "../components/GridIndex";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
+import { unzipSync, zipSync } from "fflate";
 
+const { school_id } = JSON.parse(sessionStorage.getItem("userData"));
+
+const roleShortName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleShortName;
 
 const initialValues = {
   acyearId: null,
@@ -64,7 +70,15 @@ const StudentDocument = () => {
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     dateofJoining: false,
   });
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
+    if (roleShortName !== "SAA") {
+      setValues((prvVal) => ({
+        ...prvVal,
+        schoolId: school_id || null,
+      }))
+    }
     getData();
     getAcademicYears();
     getSchoolDetails();
@@ -93,11 +107,12 @@ const StudentDocument = () => {
   }, [values.acyearId, values.subCategoryId, values.categoryId, values.mainCategoryId]);
 
   const getData = async () => {
+    if (!values?.acyearId) return
     const { acyearId, schoolId, programId, categoryId, mainCategoryId, subCategoryId } = values;
     try {
       let params = {
         ac_year_id: acyearId,
-        ...(schoolId && { school_id: schoolId }),
+        ...((schoolId || school_id) && { school_id: roleShortName !== "SAA" ? school_id : schoolId }),
         ...(mainCategoryId && { attachments_category_id: mainCategoryId }),
         ...(subCategoryId && { attachments_subcategory_id: subCategoryId }),
         ...(categoryId && { fee_admission_category_id: categoryId }),
@@ -200,10 +215,10 @@ const StudentDocument = () => {
 
   const getProgram = async () => {
     const { schoolId } = values;
-    if (!schoolId) return;
+    if (!schoolId || !school_id) return;
 
     try {
-      const { data: response } = await axios.get(`/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`);
+      const { data: response } = await axios.get(`/api/academic/fetchAllProgramsWithSpecialization/${roleShortName !== "SAA" ? school_id : schoolId}`);
       const optionData = response.data.map(obj => ({
         value: obj.program_specialization_id,
         label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
@@ -247,103 +262,107 @@ const StudentDocument = () => {
     }));
   };
 
-  // const handleDownload = async (path, fileNamePrefix) => {
-  //   try {
-  //     const response = await axios.get(`/api/student/downloadMultipleFiles?fileNames=${path}`, {
-  //       responseType: "blob",
-  //     });
+  const handleDownloadAndRenameZip = async (path, fileNamePrefix) => {
+    try {
+      setLoading(true)
+      const response = await axios.get(`/api/student/downloadMultipleFiles?fileNames=${path}`, {
+        responseType: "arraybuffer",
+      });
 
-  //     const contentType = response.headers["content-type"]; // e.g., application/zip
-  //     const extension = contentType?.includes("zip") ? "zip" : path?.split(".").pop() || "file";
-  //     const fileName = `${fileNamePrefix}.${extension}`;
+      const originalZip = new Uint8Array(response.data);
+      const unzipped = unzipSync(originalZip);
 
-  //     const blob = new Blob([response.data], { type: contentType });
-  //     const url = URL.createObjectURL(blob);
+      const renamed = {};
+      Object.keys(unzipped).forEach((oldName, index) => {
+        const ext = oldName.split(".").pop();
+        const newName = `${fileNamePrefix}_${index + 1}.${ext}`;
+        renamed[newName] = unzipped[oldName];
+      });
 
-  //     const a = document.createElement("a");
-  //     a.href = url;
-  //     a.download = fileName;
-  //     document.body.appendChild(a);
-  //     a.click();
-  //     document.body.removeChild(a);
-  //     URL.revokeObjectURL(url);
-  //   } catch (err) {
-  //     console.error("Download error:", err);
-  //   }
-  // };
-  const handleDownload = async (path, fileNamePrefix) => {
-    await axios
-      .get(`/api/student/downloadMultipleFiles?fileNames=${path}`, {
-        responseType: "blob",
-      })
-      .then((res) => {
-        const url = URL.createObjectURL(res.data);
-        window.open(url);
-      })
-      .catch((err) => console.error(err));
+      const newZip = zipSync(renamed);
+      const blob = new Blob([newZip], { type: "application/zip" });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${fileNamePrefix}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setLoading(false)
+
+    } catch (err) {
+      console.error("Download error:", err);
+      setLoading(false)
+
+    }
   };
+
 
   const columns = [
     {
       field: "student_name",
       headerName: "Student Name",
       flex: 1,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "auid",
       headerName: "AUID",
       flex: 1,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "program_short_name",
       headerName: "Program",
       flex: 1,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "program_specialization_name",
       headerName: "Specialization",
       flex: 1.5,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "fee_template_name",
       headerName: "Fee Template",
       flex: 1.2,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "attachments_category_name",
       headerName: "Category",
       flex: 1.5,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "attachments_subcategory_name",
       headerName: "Subcategory",
       flex: 1.5,
+      headerAlign: "center",
+      align: "center",
     },
-    // {
-    //   field: "attachments_file_name",
-    //   headerName: "Document",
-    //   flex: 2,
-    //   renderCell: (params) => (
-    //     <a
-    //       href={params.value}
-    //       target="_blank"
-    //       rel="noopener noreferrer"
-    //       style={{ color: "#1a73e8", textDecoration: "underline" }}
-    //     >
-    //       View Document
-    //     </a>
-    //   ),
-    // },
-
     {
       field: "download",
       headerName: "Download",
       flex: 1,
+      headerAlign: "center",
+      align: "center",
       sortable: false,
       filterable: false,
       renderCell: (params) => {
@@ -358,8 +377,8 @@ const StudentDocument = () => {
         return (
           <IconButton
             onClick={(e) => {
-              e.stopPropagation(); // prevents row click selection
-              handleDownload(attachments_file_path, fileNamePrefix);
+              e.stopPropagation();
+              handleDownloadAndRenameZip(attachments_file_path, fileNamePrefix);
             }}
             color="primary"
             size="small"
@@ -369,13 +388,9 @@ const StudentDocument = () => {
           </IconButton>
         );
       },
-    }
-
-
-
-
-
+    },
   ];
+
 
 
   const onSelectionModelChange = (ids) => {
@@ -386,45 +401,85 @@ const StudentDocument = () => {
       }))
     );
   };
-  const handleBulkDownload = async () => {
-    // if (incrementCreationIds.length === 0) return;
-
-    // // Collect file paths of selected documents
-    // const selectedFilePaths = incrementCreationIds
-    //   .map(({ id }) => {
-    //     const row = rows.find((r) => r.id === id);
-    //     return row?.attachments_file_path;
-    //   })
-    //   .filter(Boolean); // remove nulls
-
-    // if (selectedFilePaths.length === 0) return;
-
-    // try {
-    //   const query = selectedFilePaths
-    //     .map((file) => `fileNames=${encodeURIComponent(file)}`)
-    //     .join("&");
-
-    //   const res = await axios.get(`/api/student/downloadMultipleFiles?${query}`, {
-    //     responseType: "blob",
-    //   });
-
-    //   // Create a blob and download (assuming the backend returns a zip or single file)
-    //   const blob = new Blob([res.data]);
-    //   const url = window.URL.createObjectURL(blob);
-    //   const a = document.createElement("a");
-    //   a.href = url;
-    //   a.download = "StudentDocuments.zip"; // Change name as needed
-    //   a.click();
-    //   window.URL.revokeObjectURL(url);
-    // } catch (err) {
-    //   console.error("Download failed:", err);
-    //   setAlertMessage({
-    //     severity: "error",
-    //     message: "Failed to download documents",
-    //   });
-    //   setAlertOpen(true);
-    // }
+  const getLabelByValue = (options, value) => {
+    const found = options.find((opt) => opt.value === value);
+    return found?.label || "";
   };
+
+  const handleBulkDownload = async () => {
+    if (incrementCreationIds.length === 0) return;
+
+    const selectedRows = incrementCreationIds
+      .map(({ id }) => rows.find((r) => r.id === id))
+      .filter(Boolean);
+
+    const selectedFilePaths = selectedRows
+      .map((row) => row.attachments_file_path)
+      .filter(Boolean);
+
+    if (selectedFilePaths.length === 0) return;
+
+    try {
+      setLoading(true)
+      const query = selectedFilePaths
+        .map((file) => `fileNames=${encodeURIComponent(file)}`)
+        .join("&");
+
+      const res = await axios.get(`/api/student/downloadMultipleFiles?${query}`, {
+        responseType: "arraybuffer",
+      });
+
+      const originalZip = new Uint8Array(res.data);
+      const unzipped = unzipSync(originalZip);
+
+      const renamedFiles = {};
+      let index = 0;
+
+      for (const [originalName, fileData] of Object.entries(unzipped)) {
+        const row = selectedRows[index];
+        const ext = originalName.split(".").pop();
+        const newName = `${row.auid}_${row.attachments_subcategory_name || "Document"}.${ext}`;
+        renamedFiles[newName] = fileData;
+        index++;
+      }
+
+      const newZip = zipSync(renamedFiles);
+      const blob = new Blob([newZip], { type: "application/zip" });
+
+      const acyearLabel = getLabelByValue(academicYearOptions, values.acyearId);
+      const schoolLabel = getLabelByValue(schoolOptions, values.schoolId);
+      const programLabel = getLabelByValue(programOptions, values.programId);
+      const categoryLabel = getLabelByValue(categoryOptions, values.categoryId);
+      const subCategoryLabel = getLabelByValue(subCategoriesMap, values.subCategoryId);
+
+      const sanitize = (str) => (str || "").replace(/[^a-zA-Z0-9-_]/g, "_");
+
+      const fileNamePrefix = `StudentDocuments_${sanitize(acyearLabel)}_${sanitize(
+        schoolLabel
+      )}_${sanitize(programLabel)}_${sanitize(categoryLabel)}_${sanitize(subCategoryLabel)}`;
+
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${fileNamePrefix}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setLoading(false)
+    } catch (err) {
+      console.error("Download failed:", err);
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to download documents",
+      });
+      setAlertOpen(true);
+      setLoading(false)
+
+    }
+  };
+
 
 
   return (
@@ -446,12 +501,17 @@ const StudentDocument = () => {
               <CustomAutocomplete
                 name="schoolId"
                 label="School"
-                value={values.schoolId}
+                value={
+                  roleShortName !== "SAA" ? school_id : values.schoolId
+                }
                 options={schoolOptions}
                 handleChangeAdvance={handleChangeAdvance}
-                disabled={!values.acyearId}
+                disabled={
+                  !values.acyearId || roleShortName !== "SAA"
+                }
               />
             </Grid>
+
             <Grid item xs={12} md={2}>
               <CustomAutocomplete
                 name="programId"
@@ -524,7 +584,12 @@ const StudentDocument = () => {
           setColumnVisibilityModel={setColumnVisibilityModel}
         />
       </Box>
-
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </>
   );
 };
