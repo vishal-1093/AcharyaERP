@@ -34,13 +34,15 @@ const filterLists = [
   { label: "Today", value: "TODAY" },
   { label: "1 Week", value: "WEEK" },
   { label: "1 Month", value: "MONTH" },
+  { label: "6 Months", value: "6MONTHS"},
+  { label: "Current Year", value: "1YEAR" },
   { label: "Custom Date", value: "custom" },
 ];
 
 const initialValues = {
   requestType: null,
   filterList: filterLists,
-  filter: filterLists[2].value,
+  filter: filterLists[4].value,
   startDate: "",
   endDate: "",
   school_Id: "",
@@ -276,7 +278,7 @@ function AllPoList() {
   ];
 
   useEffect(() => {
-    getData(values.filterList[0].value);
+    getData(values.filterList[4].value);
     getSchoolData()
   }, []);
 

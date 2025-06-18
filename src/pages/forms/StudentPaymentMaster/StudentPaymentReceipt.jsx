@@ -102,9 +102,39 @@ function StudentPaymentReceipt() {
             (obj) => obj.receiptNo
           );
 
-          console.log("filter", filteredArray);
-          // If the response is successful, append its data to the updatedArray
           updatedArray = [...filteredArray]; // Default to empty array if no data
+        } catch (error) {
+          console.error("Error in fetching fee receipt details:", error);
+          // Handle error - response will be undefined or fail gracefully
+          // You can either leave updatedArray as it is (empty array) or provide fallback data
+        }
+
+        try {
+          // Fetch fee receipt details (first request)
+          const response = await axios.get(
+            `/api/getUniformCmaReceipt/${studentDataResponse.data?.data?.[0]?.student_id}`
+          );
+
+          const data = [];
+
+          response.data.data.forEach((ele) => {
+            data.push({
+              studentName: ele.studentName,
+              college: ele.college,
+              totalAmount: null,
+              receiptType:
+                ele.receiptType === "cma" ? "Add on fee" : "Uniform fee",
+              receiptDate: ele.createdDate,
+              receiptNo: ele.receiptNo,
+              amount: ele.amount,
+              auid: ele.auid,
+              fcYear: ele.fcYear,
+              course: ele.course,
+            });
+          });
+
+          // If the response is successful, append its data to the updatedArray
+          updatedArray = [...updatedArray, ...data]; // Default to empty array if no data
         } catch (error) {
           console.error("Error in fetching fee receipt details:", error);
           // Handle error - response will be undefined or fail gracefully
@@ -154,6 +184,8 @@ function StudentPaymentReceipt() {
   const handleDownload = (viewlink) => {
     window.open(viewlink, "_blank", "noopener,noreferrer");
   };
+
+  console.log(transactionData);
 
   return (
     <>
@@ -228,13 +260,12 @@ function StudentPaymentReceipt() {
                           if (search === "") {
                             return val;
                           } else if (
-                            val?.amount?.toString().includes(search) ||
+                            val?.amount?.toString()?.includes(search) ||
                             val?.orderId?.includes(search) ||
                             val?.year?.includes(search) ||
                             val?.receiptType
                               ?.toLowerCase()
-                              .includes(search.toLowerCase()) ||
-                            val?.receiptNo?.includes(search)
+                              .includes(search.toLowerCase())
                           ) {
                             return val;
                           }
@@ -342,6 +373,22 @@ function StudentPaymentReceipt() {
                                         <Download fontSize="small" />
                                       </IconButton>
                                     ) : obj.receiptType.toLowerCase() ===
+                                      "hos" ? (
+                                      <IconButton
+                                        onClick={() =>
+                                          navigate(`/HostelFeePdfV1`, {
+                                            state: {
+                                              feeReceiptId: obj.fee_receipt_id,
+                                              studentStatus: true,
+                                            },
+                                          })
+                                        }
+                                        color="primary"
+                                        sx={{ cursor: "pointer" }}
+                                      >
+                                        <Download fontSize="small" />
+                                      </IconButton>
+                                    ) : obj.receiptType.toLowerCase() ===
                                         "exam" ||
                                       obj.receiptType.toLowerCase() ===
                                         "exam fee" ? (
@@ -351,6 +398,36 @@ function StudentPaymentReceipt() {
                                             state: {
                                               feeReceiptId: obj.fee_receipt_id,
                                               studentStatus: true,
+                                            },
+                                          })
+                                        }
+                                        color="primary"
+                                        sx={{ cursor: "pointer" }}
+                                      >
+                                        <Download fontSize="small" />
+                                      </IconButton>
+                                    ) : obj.receiptType.toLowerCase() ===
+                                      "add on fee" ? (
+                                      <IconButton
+                                        onClick={() =>
+                                          navigate(`/NiniskillPdf`, {
+                                            state: {
+                                              rowData: obj,
+                                            },
+                                          })
+                                        }
+                                        color="primary"
+                                        sx={{ cursor: "pointer" }}
+                                      >
+                                        <Download fontSize="small" />
+                                      </IconButton>
+                                    ) : obj.receiptType.toLowerCase() ===
+                                      "uniform fee" ? (
+                                      <IconButton
+                                        onClick={() =>
+                                          navigate(`/UniformReceiptPdf`, {
+                                            state: {
+                                              rowData: obj,
                                             },
                                           })
                                         }

@@ -140,7 +140,7 @@ const CancelBed = ({ rowDetails, getData }) => {
     temp.fromDate = rowDetails?.fromDate;
     temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
     temp.bedStatus = rowDetails?.bedStatus;
-    temp.active = true;
+    temp.active = false;
     temp.toDate = rowDetails?.toDate;
      temp.foodStatus = rowDetails?.foodStatus;
     temp.vacateBy = 1;

@@ -163,11 +163,11 @@ function NavigationLayout() {
   }, [location, modules, accesiblePaths]);
 
   // useEffect(() => {
-  //   // const allowedPaths = ["/internals"];
+  //   const allowedPaths = ["/Dashboard", "/", "/Login"];
   //   // If the current path is in allowedPaths, skip the referrer check
-  //   // if (allowedPaths.includes(location.pathname)) {
-  //   //   return;
-  //   // }
+  //   if (allowedPaths.includes(location.pathname)) {
+  //     return;
+  //   }
   //   const referrer = document.referrer;
   //   if (!referrer) {
   //     sessionStorage.setItem("AcharyaErpUser", null);
@@ -175,7 +175,7 @@ function NavigationLayout() {
   //     sessionStorage.setItem("usertype", null);
   //     navigate("/Login");
   //   }
-  // }, [navigate]);
+  // }, [navigate, location.pathname]);
 
   const getSubMenuFromUser = () => {
     return new Promise(async (resolve, reject) => {

@@ -12,6 +12,7 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
+import PrintIcon from "@mui/icons-material/Print";
 import { Check, HighlightOff } from "@mui/icons-material";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
@@ -65,6 +66,7 @@ function PaidAtBoardStdList() {
   const [checkedLength, setCheckedLength] = useState(0);
   const [disable, setDisable] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [gridLoading, setGridLoading] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -102,6 +104,7 @@ function PaidAtBoardStdList() {
   };
 
   const getStudentsList = async () => {
+    setGridLoading(true);
     let url;
 
     url = `/api/student/studentDetailsByFeeTemplate/${rowData?.feeTemplateId}/${rowData?.receivedYear}`;
@@ -119,14 +122,9 @@ function PaidAtBoardStdList() {
       setRows(rowId);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setGridLoading(false);
     }
-  };
-
-  const handleChangeAdvance = async (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
   };
 
   const handleChange = (e) => {
@@ -163,7 +161,7 @@ function PaidAtBoardStdList() {
           ac_year_id: rowData?.acYearId,
           fc_year_id: 4,
           // course_branch_assignment_id: 1,
-          fee_template_id: rowData?.feeTemplateId,
+          fee_template_id: obj?.fee_template_id,
           board_id: rowData?.boardId,
           board_receivable_id: rowData?.id,
           to_pay_from_board: obj.eachPay,
@@ -180,6 +178,10 @@ function PaidAtBoardStdList() {
     payload.boardTagAmountDtoList = boardTagAmountDtoList;
     setLoading(true);
 
+    const checkStdPaying = rows
+      ?.filter((ele) => ele.checked)
+      ?.every((ele) => Number(ele.eachPay) <= Number(ele.BalanceAmount));
+
     try {
       if (values.amountPerHead * checkedLength > rowData.remainingBalance) {
         setAlertMessage({
@@ -187,6 +189,17 @@ function PaidAtBoardStdList() {
           message: "Paying now cannot be greater than balance",
         });
         setAlertOpen(true);
+        setLoading(false);
+        return;
+      }
+
+      if (!checkStdPaying) {
+        setAlertMessage({
+          severity: "error",
+          message: "Paying now of student should be less than balance amount",
+        });
+        setAlertOpen(true);
+        setLoading(false);
         return;
       }
 
@@ -281,6 +294,29 @@ function PaidAtBoardStdList() {
       headerName: "Paying now",
       flex: 1,
       align: "right",
+    },
+
+    {
+      field: "print",
+      headerName: "Print",
+      flex: 1,
+      align: "center",
+      renderCell: (params) => {
+        if (params.row.BalanceAmount <= 0) {
+          return (
+            <IconButton
+              color="primary"
+              onClick={() =>
+                navigate(`/paid-at-board-receipt`, {
+                  state: { rowData: rowData, studentId: params.row.student_id },
+                })
+              }
+            >
+              <PrintIcon fontSize="small" />
+            </IconButton>
+          );
+        }
+      },
     },
   ];
 
@@ -410,7 +446,7 @@ function PaidAtBoardStdList() {
             </Button>
           </Grid>
           <Grid item xs={12}>
-            <GridIndex rows={rows} columns={columns} />
+            <GridIndex rows={rows} columns={columns} loading={gridLoading} />
           </Grid>
         </Grid>
       </Box>

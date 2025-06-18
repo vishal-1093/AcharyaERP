@@ -30,6 +30,7 @@ function StudentFee() {
   const [lateFeeObj, setLateFeeObj] = useState({});
   const [uniformObj, setUniformObj] = useState({});
   const [checkedAmount, setCheckedAmount] = useState();
+  const [message, setMessage] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -103,6 +104,7 @@ function StudentFee() {
   }, [totalPay]);
 
   const getStudentDues = async () => {
+    setMessage(true);
     try {
       const studentDataResponse = await axios.get(
         `/api/student/studentDetailsByAuid/${username}`
@@ -112,6 +114,7 @@ function StudentFee() {
         const studentDueResponse = await axios.get(
           `/api/student/getStudentDetailsForTransaction?studentId=${studentDataResponse.data.data[0].student_id}`
         );
+
         setStudentData(studentDueResponse.data.data);
 
         const allsems = [];
@@ -241,6 +244,8 @@ function StudentFee() {
       });
       setAlertOpen(true);
       setLoading(false);
+    } finally {
+      setMessage(false);
     }
   };
 
@@ -787,7 +792,7 @@ function StudentFee() {
                 <>
                   <Grid item xs={12} align="center">
                     <Typography variant="subtitle2" color="error">
-                      NO DATA FOUND!!!
+                      {message ? "PLEASE WAIT !!!" : "NO DATA FOUND!!!"}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} mt={1} md={12} align="center">
