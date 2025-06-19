@@ -192,16 +192,19 @@ function CounterSummarySchoolIndex() {
       renderCell: (params) => {
         if (params.row.id === "last-row") {
           return (
-            <Typography color="#fff" variant="subtitle2" sx={{textAlign:"center",width:"100%"}}>{Number(params.row.INRDD) + Number(params.row.INRONLINE) + Number(params.row.INRCASH) + Number(params.row.USDCASH) }</Typography>
+            <Typography color="#fff" variant="subtitle2" sx={{textAlign:"center",width:"100%"}}>{Number((params.row.INRDD % 1 !== 0 || (params.row.INRONLINE % 1 !== 0) || 
+                (params.row.INRCASH % 1 !== 0) || (params.row.USDCASH % 1 !== 0)) ? (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH)?.toFixed(2) : (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH) || 0)}</Typography>
           );
         } else if (params.row.schoolName !== "HOS") {
           return (
-            <Typography variant="p" sx={{textAlign:"center",width:"100%" }}>{Number(params.row.INRDD) + Number(params.row.INRONLINE) + Number(params.row.INRCASH) + Number(params.row.USDCASH) }</Typography>
+            <Typography variant="p" sx={{textAlign:"center",width:"100%" }}>{Number((params.row.INRDD % 1 !== 0 || (params.row.INRONLINE % 1 !== 0) || 
+                (params.row.INRCASH % 1 !== 0) || (params.row.USDCASH % 1 !== 0)) ? (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH)?.toFixed(2) : (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH) || 0)}</Typography>
           );
         } else {
           return (
             <HtmlTooltip title="View Hostel School's Detail">
-              <Typography color="primary" variant="subtitle2" sx={{textAlign:"center",width:"100%", cursor: "pointer" }} onClick={handleHostelRow}>{Number(params.row.INRDD) + Number(params.row.INRONLINE) + Number(params.row.INRCASH) + Number(params.row.USDCASH) }</Typography>
+              <Typography color="primary" variant="subtitle2" sx={{textAlign:"center",width:"100%", cursor: "pointer" }} onClick={handleHostelRow}>{Number((params.row.INRDD % 1 !== 0 || (params.row.INRONLINE % 1 !== 0) || 
+                (params.row.INRCASH % 1 !== 0) || (params.row.USDCASH % 1 !== 0)) ? (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH)?.toFixed(2) : (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH) || 0)}</Typography>
             </HtmlTooltip>
           )
         }
