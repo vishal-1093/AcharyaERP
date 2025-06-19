@@ -388,9 +388,10 @@ function GrnPdf() {
             <Text style={styles.thStyleHead}>
               PO Date :{" "}
               {moment(data?.grnListDTO?.[0]?.approvedDate).isValid()
-                ? moment(data[0]?.approvedDate).format("DD-MM-YYYY")
-                : null}
+                ? moment(data?.grnListDTO?.[0]?.approvedDate).format("DD-MM-YYYY")
+                : "N/A"}
             </Text>
+
 
           </View>
         </View>

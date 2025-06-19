@@ -41,7 +41,7 @@ function CustomAutocomplete({
       onChange={(e, val) => {
         if (disabled) return;
         if (val === null) handleChangeAdvance(name, null);
-        else handleChangeAdvance(name, val.value);
+        else handleChangeAdvance(name, val?.value, val?.label);
         setShowError(false);
       }}
       onBlur={() =>
