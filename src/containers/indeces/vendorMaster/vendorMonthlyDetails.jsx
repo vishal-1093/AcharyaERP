@@ -24,6 +24,10 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { makeStyles } from "@mui/styles";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import PrintIcon from '@mui/icons-material/Print';
+import moment from 'moment';
+import { BlobProvider } from '@react-pdf/renderer';
+import LedgerMonthlyTransactionPdf from './LedgerMonthlyTransactionPdf';
 
 const HeadTableCell = styled(TableCell)(({ theme }) => ({
   borderBottom: '2px solid #e0e0e0',
@@ -75,10 +79,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const columns = [
+  { field: 'month', headerName: 'Month', width: '20%' },
+  { field: 'openingBalance', headerName: 'Opening Balance', width: '20%' },
+  { field: 'debit', headerName: 'Debit', width: '20%' },
+  { field: 'credit', headerName: 'Credit', width: '20%' },
+  { field: 'closingBalance', headerName: 'Closing Balance', width: '20%' }
+]
+
 const VendorMonthlyDetails = () => {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
-  const [breadCrumbs, setBreadCrumbs] = useState()
+  const [breadCrumbs, setBreadCrumbs] = useState([])
   const [isPrint, setIsPrint] = useState(false)
   const location = useLocation()
   const queryValues = location.state;
@@ -88,6 +100,11 @@ const VendorMonthlyDetails = () => {
     fcYearId: queryValues?.fcYearId,
     fcYear: queryValues?.fcYear
   })
+  const filters = {
+    voucherHeadName: queryValues?.voucherHeadName || "Yes Bank",
+    fcYear: currFcYear?.fcYear || "2025-2026",
+    asOnDate: moment().format('DD-MM-YYYY')
+  };
 
   useEffect(() => {
     setBreadCrumbs([
@@ -117,13 +134,24 @@ const VendorMonthlyDetails = () => {
         const rowData = []
         data?.vendorDetails?.length > 0 && data?.vendorDetails?.forEach(el => {
           rowData.push({
-            closingBalance: el?.closingBalance < 0 ? `${el?.closingBalance} Cr` : el?.closingBalance === 0 ? 0 : `${el?.closingBalance} Dr`,
+            //  closingBalance: el?.closingBalance < 0 ? `${el?.closingBalance} Cr` : el?.closingBalance === 0 ? 0 : `${el?.closingBalance} Dr`,
             credit: el?.credit,
             debit: el?.debit,
             month_name: el?.month_name,
             school_id: el?.school_id,
             month: el?.month,
-            openingBalance: el?.openingBalance < 0 ? `${el?.openingBalance} Cr` : el?.openingBalance === 0 ? 0 : `${el?.openingBalance} Dr`
+            // openingBalance: el?.openingBalance < 0 ? `${el?.openingBalance} Cr` : el?.openingBalance === 0 ? 0 : `${el?.openingBalance} Dr`
+            openingBalance: el?.openingBalance < 0
+              ? `${Math.abs(el?.openingBalance)} Cr`
+              : el?.openingBalance === 0
+                ? 0
+                : `${el?.openingBalance} Dr`,
+
+            closingBalance: el?.closingBalance < 0
+              ? `${Math.abs(el?.closingBalance)} Cr`
+              : el?.closingBalance === 0
+                ? 0
+                : `${el?.closingBalance} Dr`,
           })
         });
         const financialYearOrder = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3];
@@ -147,8 +175,10 @@ const VendorMonthlyDetails = () => {
       });
   };
 
-  const handleBackClick = (row, type) => {
-    navigate('/Accounts-ledger', { state: queryValues })
+  const handleRowClick = (row) => {
+    const { month, month_name } = row
+    const query = { ...queryValues, fcYear: currFcYear?.fcYear, fcYearId: currFcYear?.fcYearId, month, month_name }
+    navigate('/Accounts-ledger-day-transaction', { state: query })
   };
 
   const handlePreviousOpeningBalance = () => {
@@ -181,11 +211,6 @@ const VendorMonthlyDetails = () => {
     }
   };
 
-  const handleMonthClick = (row) => {
-    const { month, month_name } = row
-    const query = { ...queryValues, fcYear: currFcYear?.fcYear, fcYearId: currFcYear?.fcYearId, month, month_name }
-    navigate('/Accounts-ledger-day-transaction', { state: query })
-  }
 
   const getFormattedMonthYear = (monthNumber, fcYear) => {
     const monthMap = {
@@ -206,7 +231,7 @@ const VendorMonthlyDetails = () => {
     const [startYear, endYear] = fcYear.split("-");
     const yearSuffix = monthNumber >= 4 ? startYear.slice(-2) : endYear.slice(-2);
 
-    return `${monthMap[monthNumber]}-${yearSuffix}`;
+    return `${monthMap[monthNumber]} ${yearSuffix}`;
   };
 
   const handleDownloadPdf = () => {
@@ -242,135 +267,225 @@ const VendorMonthlyDetails = () => {
 
   };
 
+  const formatCurrency = (value, decimals = 2) => {
+    if (value === null || value === undefined || value === '') return `0.00`;
+    if (typeof value === 'string' && (value.includes('Cr') || value.includes('Dr'))) {
+      const parts = value.split(' ');
+      const numValue = parseFloat(parts[0]);
+      const suffix = parts[1] || '';
+
+      if (isNaN(numValue)) return `0.00`;
+
+      return `${numValue.toLocaleString('en-IN', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      })} ${suffix}`;
+    }
+
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(numValue)) return `0.00`;
+
+    return numValue.toLocaleString('en-IN', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+  };
+
+
   return (
-    <Paper elevation={3} sx={{ p: 2, maxWidth: '100%', margin: 'auto', boxShadow: 'none', position: 'relative' }}>
+    <Paper elevation={0} sx={{
+      p: 1,
+      width: '100%',
+      borderRadius: 2,
+      backgroundColor: 'background.paper',
+      boxShadow: 'none',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center'
+    }}>
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 1,
+        width: '100%'
+      }}>
         <CustomBreadCrumbs crumbs={breadCrumbs} />
-        <Box sx={{position: "absolute", right:"150px", top:"20px"}}>
-           <Button
-          variant="contained"
-          color="primary"
-          onClick={handleDownloadPdf}
-        >
-          Print
-        </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'end' }}>
+          <Button
+            variant="outlined"
+            startIcon={<ArrowBackIcon />}
+            onClick={handlePreviousOpeningBalance}
+            disabled={currFcYear?.fcYearId === queryValues?.fcYearOpt[queryValues?.fcYearOpt?.length - 1]?.value}
+            sx={{
+              backgroundColor: '#f5f5f5',
+              '&:hover': {
+                backgroundColor: '#e0e0e0',
+              },
+              fontWeight: 500,
+              color: '#424242',
+            }}
+          >
+            Prev
+          </Button>
+          <Button
+            variant="outlined"
+            endIcon={<ArrowForwardIcon />}
+            onClick={handleNextOpeningBalance}
+            disabled={currFcYear?.fcYearId === queryValues?.fcYearOpt[0]?.value}
+            sx={{
+              backgroundColor: '#e3f2fd',
+              '&:hover': {
+                backgroundColor: '#bbdefb',
+              },
+              fontWeight: 500,
+              color: '#1976d2',
+            }}
+          >
+            Next
+          </Button>
+          {/* <BlobProvider
+            document={
+              <LedgerMonthlyTransactionPdf
+                rows={rows}
+                currFcYear={currFcYear}
+                queryValues={queryValues}
+              />
+            }
+          >
+            {({ url, loading }) => (
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={rows?.length === 0}
+                onClick={() => {
+                  if (url) {
+                    window.open(url, '_blank');
+                  }
+                }}
+              >
+                {loading ? 'Preparing PDF...' : 'Print PDF'}
+              </Button>
+            )}
+          </BlobProvider> */}
+
         </Box>
-      <Box sx={{ width: "80%", margin: "20px auto" }} id="ledger-monthly-transaction" className={isPrint ? 'ledger-print-enhanced' : ''}>
+      </Box >
+      <Box sx={{ width: '70%', mb: 1 }}>
+        <TableContainer>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell colSpan={5} sx={{
+                  fontSize: '18px !important',
+                  padding: '8px 10px !important',
+                  textAlign: 'center',
+                  backgroundColor: '#376a7d',
+                  color: '#fff'
+                }}>
+                  {rows?.schoolName}
+                </TableCell>
+              </TableRow>
+            </TableHead>
+          </Table>
+        </TableContainer>
+      </Box>
+      <Box sx={{
+        width: '70%',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: 2,
+        mb: 1,
+        p: 1,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 1
+      }}>
+        <Typography variant="body1"
+          sx={{
+            fontWeight: 500,
+            color: '#376a7d',
+            fontSize: '14px',
+            textAlign: 'center'
+          }}>
+          {`${queryValues?.voucherHeadName} Ledger for FY ${currFcYear?.fcYear} as on ${moment().format('DD-MM-YYYY')}`}
+        </Typography>
+      </Box>
+      <Box sx={{
+        width: '70%',
+        border: '1px solid #e0e0e0',
+        borderRadius: 1,
+        overflow: 'hidden'
+      }}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
             <CircularProgress />
           </Box>
         ) : (
-          <TableContainer>
+          <TableContainer id="ledger-monthly-transaction">
             <Table size="small">
               <TableHead>
-                <TableRow>
-                  <HeadTableCell colSpan={5} sx={{ fontSize: '18px !important', padding: '8px 10px !important', textAlign: 'center' }}>
-                    {rows?.schoolName}
-                  </HeadTableCell>
-                </TableRow>
-                <TableRow>
-                  <StyledTableCell colSpan={5}>
-                    <Box display="flex" alignItems="center" justifyContent="space-between" px={2}>
-                      <Box width="25%" />
-                      <Typography sx={{ fontWeight: 'bold', textAlign: 'center', flex: 1, fontSize: '15px !important', }}>
-                        {`Financial Year : ${currFcYear?.fcYear}`}
-                      </Typography>
-                      {!isPrint ? (
-                        <Box display="flex" gap={2}>
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            startIcon={<ArrowBackIcon />}
-                            onClick={handlePreviousOpeningBalance}
-                            sx={{
-                              backgroundColor: '#f5f5f5',
-                              '&:hover': {
-                                backgroundColor: '#e0e0e0',
-                              },
-                              fontWeight: 500,
-                              color: '#424242',
-                            }}
-                            disabled={currFcYear?.fcYearId === queryValues?.fcYearOpt[queryValues?.fcYearOpt?.length - 1]?.value}
-                          >
-                            Prev
-                          </Button>
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            endIcon={<ArrowForwardIcon />}
-                            onClick={handleNextOpeningBalance}
-                            sx={{
-                              backgroundColor: '#e3f2fd',
-                              '&:hover': {
-                                backgroundColor: '#bbdefb',
-                              },
-                              fontWeight: 500,
-                              color: '#1976d2',
-                            }}
-                            disabled={currFcYear?.fcYearId === queryValues?.fcYearOpt[0]?.value}
-                          >
-                            Next
-                          </Button>
-                        </Box>
-                      ) : <></>}
-                    </Box>
-                  </StyledTableCell>
-                </TableRow>
                 <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                  <StyledTableCell align="center">Month</StyledTableCell>
-                  <StyledTableCell align="center">Opening Balance</StyledTableCell>
-                  <StyledTableCell align="center">Debit</StyledTableCell>
-                  <StyledTableCell align="center">Credit</StyledTableCell>
-                  <StyledTableCell align="center">Closing Balance</StyledTableCell>
+                  <TableCell align="center" sx={{ width: '20%' }}>Month</TableCell>
+                  <TableCell align="right" sx={{ width: '20%' }}>Opening Balance</TableCell>
+                  <TableCell align="right" sx={{ width: '20%' }}>Debit</TableCell>
+                  <TableCell align="right" sx={{ width: '20%' }}>Credit</TableCell>
+                  <TableCell align="right" sx={{ width: '20%' }}>Closing Balance</TableCell>
                 </TableRow>
               </TableHead>
-              {rows?.vendorDetails?.length > 0 && rows?.vendorDetails[0]?.month ? (<>
-                <TableBody>
-                  {rows?.vendorDetails?.map((row, index) => {
-                    return <TableRow key={index}>
-                      <StyledTableCellBody align="left">
-                        <Typography onClick={() => handleMonthClick(row)} sx={{ fontWeight: '500', textAlign: "right", color: " #4A57A9", fontSize: "14px !important", textAlign: "center", cursor: 'pointer' }}>{getFormattedMonthYear(row?.month, currFcYear?.fcYear)}</Typography>
-                      </StyledTableCellBody>
-                      <StyledTableCellBody align="right">
-                        {row.openingBalance}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody align="right">
-                        {row.debit}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody align="right">
-                        {row?.credit}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody align="right">
-                        <Typography sx={{ fontWeight: '600', textAlign: "right", fontSize: "14px !important", fontFamily: "Bookman Old Style !important" }}>{row?.closingBalance}</Typography>
-                      </StyledTableCellBody>
+              {rows?.vendorDetails?.length > 0 ? (
+                <>
+                  <TableBody>
+                    {rows.vendorDetails.map((row, index) => (
+                      <TableRow
+                        key={index}
+                        hover
+                        onClick={() => handleRowClick(row)}
+                        sx={{ cursor: 'pointer' }}
+                      >
+                        <TableCell align="center" sx={{ width: '20%' }}>
+                          <Typography sx={{ color: '#4A57A9', fontWeight: 500 }}>
+                            {getFormattedMonthYear(row?.month, currFcYear?.fcYear)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right" sx={{ width: '20%' }}>{formatCurrency(row.openingBalance)}</TableCell>
+                        <TableCell align="right" sx={{ width: '20%' }}>{formatCurrency(row.debit)}</TableCell>
+                        <TableCell align="right" sx={{ width: '20%' }}>{formatCurrency(row.credit)}</TableCell>
+                        <TableCell align="right" sx={{ width: '20%', fontWeight: 600 }}>
+                          {formatCurrency(row.closingBalance)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                      <TableCell align='center' sx={{ width: '20%', fontWeight: 'bold', fontSize: '12px' }}>Total</TableCell>
+                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize: '12px' }}></TableCell>
+                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize: '12px' }}>
+                        {formatCurrency(rows?.totalDebit)}
+                      </TableCell>
+                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize: '12px' }}>
+                        {formatCurrency(rows?.totalCredit)}
+                      </TableCell>
+                      <TableCell align="right" sx={{ width: '20%', fontWeight: 'bold', fontSize: '12px' }}>
+                        {/* {formatCurrency(rows?.closingBalance)} */}
+                      </TableCell>
                     </TableRow>
-                  })}
-                </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <StyledTableCell sx={{ borderTop: '2px solid #e0e0e0', textAlign: "center" }}>Total</StyledTableCell>
-                    <StyledTableCell align="right" sx={{ borderTop: '2px solid #e0e0e0' }}></StyledTableCell>
-                    <StyledTableCell align="right" sx={{ borderTop: '2px solid #e0e0e0' }}>
-                      {rows?.totalDebit}
-                    </StyledTableCell>
-                    <StyledTableCell align="right" sx={{ borderTop: '2px solid #e0e0e0' }}>
-                      {rows?.totalCredit}
-                    </StyledTableCell>
-                    <StyledTableCell align="right" sx={{ borderTop: '2px solid #e0e0e0' }}>{rows?.closingBalance}</StyledTableCell>
-                  </TableRow>
-                </TableFooter>
-              </>) : (
+                  </TableFooter>
+                </>
+              ) : (
                 <TableRow>
-                  <StyledTableCell colSpan={5} align="center">
-                    <Typography variant="subtitle2">No Records Found</Typography>
-                  </StyledTableCell>
+                  <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                    <Typography variant="body1" color="text.secondary">
+                      No records found
+                    </Typography>
+                  </TableCell>
                 </TableRow>
               )}
             </Table>
           </TableContainer>
         )}
       </Box>
-    </Paper>
+    </Paper >
   );
 };
 

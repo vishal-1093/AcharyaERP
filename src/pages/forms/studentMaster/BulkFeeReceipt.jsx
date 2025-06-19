@@ -542,6 +542,7 @@ function BulkFeeReceipt() {
       tempTwo.transaction_type = values.transactionType;
       tempTwo.vendor_id = null;
       tempTwo.bank_transaction_history_id = values.bankImportedId;
+      tempTwo.bank_id = bankImportedDataById.deposited_bank_id;
 
       mainData.tr = tempOne;
       mainData.fr = tempTwo;

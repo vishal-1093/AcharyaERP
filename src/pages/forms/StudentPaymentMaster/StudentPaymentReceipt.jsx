@@ -124,7 +124,7 @@ function StudentPaymentReceipt() {
               totalAmount: null,
               receiptType:
                 ele.receiptType === "cma" ? "Add on fee" : "Uniform fee",
-              receiptDate: moment(ele.receiptDate).format("DD-MM-YYYY"),
+              receiptDate: ele.createdDate,
               receiptNo: ele.receiptNo,
               amount: ele.amount,
               auid: ele.auid,
@@ -184,8 +184,6 @@ function StudentPaymentReceipt() {
   const handleDownload = (viewlink) => {
     window.open(viewlink, "_blank", "noopener,noreferrer");
   };
-
-  console.log(transactionData);
 
   return (
     <>

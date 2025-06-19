@@ -10,7 +10,7 @@ import {
   Menu, MenuItem,
   Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "../../../services/Api";
 import moment from "moment";
 import AddIcon from "@mui/icons-material/Add";
@@ -53,13 +53,16 @@ function CancelReceiptIndex() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
    const [anchorEl, setAnchorEl] = useState(null);
+
+   const {pathname, state: queryValues} = useLocation()
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     transaction_type: false,
     bank_name: false,
     fee_template_name: false,
-    cheque_dd_no: false
+    cheque_dd_no: false,
+    date: pathname === '/Accounts-ledger-day-credit-transaction' ? false : true,
+    created_username: pathname === '/Accounts-ledger-day-credit-transaction' ? false : true,
   });
-  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,6 +72,11 @@ function CancelReceiptIndex() {
   const getData = async (filterKey, endDate) => {
     setLoading(true);
         let params = null;
+        if(pathname === '/Accounts-ledger-day-credit-transaction'){
+           params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&school_id=${queryValues?.schoolId}&bankId=${ queryValues?.bankId}&start_date=${moment(
+            queryValues?.date
+          ).format("YYYY-MM-DD")}&end_date=${moment(queryValues?.date).format("YYYY-MM-DD")}`;
+        }else{
         if (filterKey == "custom" && !!endDate && !!values.startDate) {
           params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=custom&start_date=${moment(
             values.startDate
@@ -76,6 +84,7 @@ function CancelReceiptIndex() {
         } else if(filterKey !== "custom") {
           params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}`;
         }
+      }
         if(params){
           await axios
             .get(
@@ -112,6 +121,7 @@ function CancelReceiptIndex() {
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
           : "",
+      align: pathname === '/Accounts-ledger-day-credit-transaction' ? 'center' : 'left'
     },
     {
       field: "transaction_type",
@@ -126,6 +136,7 @@ function CancelReceiptIndex() {
       flex: 1,
       hideable:false,
       valueGetter: (value, row) => (row.auid ? row.auid : "NA"),
+      align: pathname === '/Accounts-ledger-day-credit-transaction' ? 'center' : 'left'
     },
     {
       field: "student_name",
@@ -163,6 +174,7 @@ function CancelReceiptIndex() {
       align:"center",
       valueGetter: (value, row) =>
         row.amount ? row.amount : row.amount,
+      align: pathname === '/Accounts-ledger-day-credit-transaction' ? 'right' : 'left'
     },
 
     {
@@ -199,6 +211,7 @@ function CancelReceiptIndex() {
         row.transaction_date
           ? moment(row.transaction_date).format("DD-MM-YYYY")
           : "",
+      align: pathname === '/Accounts-ledger-day-credit-transaction' ? 'center' : 'left'
     },
     { field: "bank_name", headerName: "Bank", flex: 1, hide: true },
     {
@@ -228,6 +241,7 @@ function CancelReceiptIndex() {
         row.created_date
           ? moment(row.created_date).format("DD-MM-YYYY")
           : "",
+      align: pathname === '/Accounts-ledger-day-credit-transaction' ? 'center' : 'left'
     },
     { field: "created_username", headerName: "Cancelled By", flex: 1,hideable:false },
   ];
@@ -264,6 +278,7 @@ function CancelReceiptIndex() {
 
   return (
     <Box>
+      {pathname !== '/Accounts-ledger-day-credit-transaction' ?(
         <Grid
           container
           sx={{ display: "flex", justifyContent: "flex-end", gap: "10px",marginTop: { xs:2, md: -5 }}}
@@ -326,6 +341,7 @@ function CancelReceiptIndex() {
           </Menu>
           </Grid>
         </Grid>
+      ):<></>}
       <Box sx={{ position: "relative", marginTop: "10px" }}>
         <Box sx={{position:"absolute",width:"100%",}}>
           <GridIndex

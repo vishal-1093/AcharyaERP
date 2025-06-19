@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import {
+  Backdrop,
   Box,
   Button,
   CircularProgress,
@@ -47,7 +48,6 @@ function HostelBedViewIndex({ tab }) {
     message: "",
     buttons: [],
   });
-  const [isLoading, setLoading] = useState(false);
   const [foodTypeOpen, setFoodTypeOpen] = useState(false);
   const [occupiedTypeOpen, setOccupiedTypeOpen] = useState(false);
   const [vacateBedOpen, setVacateBedOpen] = useState(false);
@@ -60,6 +60,7 @@ function HostelBedViewIndex({ tab }) {
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [hostelBlocks, setHostelBlocks] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
@@ -385,6 +386,7 @@ function HostelBedViewIndex({ tab }) {
 
   const getData = async () => {
     try {
+      setLoading(true)
       const url = `/api/hostel/fetchAllHostelBedAssignment?page=0&pageSize=100000&sort=createdDate&active=true${values?.schoolId ? `&school_id=${values?.schoolId}` : ""
         }${values?.blockName ? `&blockId=${values?.blockName}` : ""}&acYearId=${values?.acyearId}&cancelledStatus=${tab === "Active Bed" ? "NOT CANCELLED" : "CANCELLED"
         }`;
@@ -393,8 +395,10 @@ function HostelBedViewIndex({ tab }) {
 
       onClosePopUp();
       setRows(response?.data?.data?.Paginated_data?.content || []);
+      setLoading(false)
     } catch (error) {
       console.error("Error fetching data:", error);
+      setLoading(false)
     }
   };
   const onClosePopUp = () => {
@@ -571,7 +575,7 @@ function HostelBedViewIndex({ tab }) {
               onClick={() => updateFoodType()}
               disabled={!values.foodType}
             >
-              {isLoading ? (
+              {loading ? (
                 <CircularProgress
                   size={25}
                   color="blue"
@@ -610,7 +614,7 @@ function HostelBedViewIndex({ tab }) {
               onClick={() => updateOccupiedDate()}
               disabled={!values.occupiedDate}
             >
-              {isLoading ? (
+              {loading ? (
                 <CircularProgress
                   size={25}
                   color="blue"
@@ -651,6 +655,12 @@ function HostelBedViewIndex({ tab }) {
           <CancelBed rowDetails={rowDetails} getData={getData} />
         </ModalWrapper>
       )}
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </>
   );
 }
