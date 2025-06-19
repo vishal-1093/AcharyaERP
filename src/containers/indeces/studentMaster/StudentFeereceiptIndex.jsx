@@ -67,6 +67,7 @@ const filterLists = [
   { label: "Today", value: "today" },
   { label: "1 Week", value: "week" },
   { label: "1 Month", value: "month" },
+  { label: "6 Months", value: "6month" },
   { label: "Custom Date", value: "custom" },
 ];
 
