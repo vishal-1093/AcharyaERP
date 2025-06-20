@@ -86,8 +86,8 @@ function LedgerDebitFundTransferDetail() {
           rows={rows}
           columns={columns}
           loading={loading}
-          columnVisibilityModel={columnVisibilityModel}
-          setColumnVisibilityModel={setColumnVisibilityModel}
+          // columnVisibilityModel={columnVisibilityModel}
+          // setColumnVisibilityModel={setColumnVisibilityModel}
           getRowId={(row, index) => row?.payment_voucher_id}
         />
       </Box>

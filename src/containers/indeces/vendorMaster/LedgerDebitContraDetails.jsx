@@ -17,7 +17,6 @@ function LedgerDebitContraDetail() {
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(false);
     const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-        created_date: false,
         created_by: false
     });
     const location = useLocation()
