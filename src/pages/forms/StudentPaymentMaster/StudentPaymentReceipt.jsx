@@ -185,8 +185,6 @@ function StudentPaymentReceipt() {
     window.open(viewlink, "_blank", "noopener,noreferrer");
   };
 
-  console.log(transactionData);
-
   return (
     <>
       <Paper sx={{ p: 3, mb: 3 }}>

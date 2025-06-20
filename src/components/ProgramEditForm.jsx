@@ -249,7 +249,7 @@ const ProgramEditForm = memo(
       <>
         <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1400}>
           <Box sx={{ padding: 1 }}>
-            <FeetemplateView id={feeTemplateId} />
+            <FeetemplateView id={programValues?.feeTemplateId} />
           </Box>
         </ModalWrapper>
 

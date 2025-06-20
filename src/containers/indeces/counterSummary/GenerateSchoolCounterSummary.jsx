@@ -63,7 +63,7 @@ export const GenerateSchoolCounterSummary = (
         borderBottomWidth: bottom,
         borderColor: "black",
         outline: "none",
-        padding: "6px",
+        padding: "2px",
         fontSize: 9,
         fontWeight: type == "h" ? "heavy" : "",
         fontFamily: type == "h" ? "Times-Bold" : "",

@@ -102,7 +102,7 @@ function LedgerCreditPaymentDetail() {
     const [columnVisibilityModel, setColumnVisibilityModel] = useState({
         approved_by: false,
         dept_name: false,
-        created_date: false,
+        // created_date: false,
         online: false,
         created_username: false,
         created_name: false
@@ -138,13 +138,14 @@ function LedgerCreditPaymentDetail() {
             start_date: queryValues?.date,
             end_date: queryValues?.date,
             school_id: queryValues?.schoolId,
-            bankId: queryValues?.bankId
+            bankId: queryValues?.bankId,
+            active:true
         };
         const baseUrl = '/api/finance/fetchAllPaymentVoucher'
         await axios
             .get(baseUrl, { params })
             .then((response) => {
-                const filteredData = response?.data?.data?.Paginated_data?.content?.filter((item)=> item.active === true)
+                const filteredData = response?.data?.data?.Paginated_data?.content
                 setRows(filteredData || []);
                 setLoading(false);
             })

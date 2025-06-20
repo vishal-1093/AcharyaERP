@@ -458,7 +458,7 @@ function ExamFeeReceipt() {
       const feeReceipt = {
         active: true,
         ac_year_id: studentData.ac_year_id,
-        bank_id: 1,
+        bank_id: bankImportedDataById.deposited_bank_id,
         bank_transaction_history_id: values.bankImportedId,
         receipt_type: "Exam",
         student_id: studentData.student_id,
