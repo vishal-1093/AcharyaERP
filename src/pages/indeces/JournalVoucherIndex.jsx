@@ -105,7 +105,7 @@ function JournalVoucherIndex() {
   const getRemainingCharacters = (field) => maxLength - values[field].length;
 
   const getData = async (filterKey, value) => {
-    // setLoading(true);
+    setLoading(true);
     let params = null;
     if (
       filterKey == "custom" &&
@@ -164,11 +164,11 @@ function JournalVoucherIndex() {
       await axios
         .get(`/api/finance/fetchAllJournalVoucher?${params}`)
         .then((response) => {
-          // setLoading(false);
+          setLoading(false);
           setRows(response.data.data.Paginated_data.content);
         })
         .catch((err) => {
-          // setLoading(false);
+          setLoading(false);
           console.error(err);
         });
     }
@@ -491,6 +491,7 @@ function JournalVoucherIndex() {
           <GridIndex
             rows={rows}
             columns={columns}
+            loading={loading}
             columnVisibilityModel={columnVisibilityModel}
             setColumnVisibilityModel={setColumnVisibilityModel}
             getRowClassName={getRowClassName}

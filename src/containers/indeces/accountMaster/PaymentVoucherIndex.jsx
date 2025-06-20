@@ -77,7 +77,7 @@ const filterLists = [
 
 const initialValues = {
   filterList: filterLists,
-  filter: filterLists[3].value,
+  filter: filterLists[4].value,
   startDate: "",
   endDate: "",
   schoolList: [],
@@ -126,9 +126,124 @@ function PaymentVoucherIndex() {
 
   useEffect(() => {
     getSchoolDetails();
-    getData(values.filterList[3].value);
+    getData(values.filterList[4].value);
     setCrumbs([{ name: "" }]);
   }, []);
+
+  const columns = [
+    {
+      field: "Print",
+      headerName: "Print",
+      renderCell: (params) =>
+        params.row.type === "FUND-TRANSFER" ? (
+          <IconButton
+            color="primary"
+            onClick={() => navigate(`/fund-transfer-pdf/${params.row.id}`)}
+          >
+            <PrintIcon sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : params.row.type === "INTER-COLLEGE" ? (
+          <IconButton
+            color="primary"
+            onClick={() =>
+              navigate(`/contra-voucher-pdf-auto/${params.row.id}`)
+            }
+          >
+            <PrintIcon sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : (
+          <IconButton
+            color="primary"
+            onClick={() => navigate(`/payment-voucher-pdf/${params.row.id}`)}
+          >
+            <PrintIcon sx={{ fontSize: 17 }} />
+          </IconButton>
+        ),
+    },
+
+    { field: "voucher_no", headerName: "Voucher No", flex: 1 },
+    {
+      field: "approved_date",
+      headerName: "Date",
+      flex: 1,
+      valueGetter: (value, row) =>row.approved_date ? moment(row.approved_date).format("DD-MM-YYYY"): "",
+    },
+    { field: "school_name_short", headerName: "School", flex: 1 },
+    {
+      field: "pay_to",
+      headerName: "Pay to",
+      flex: 1,
+      valueGetter: (row, value) => value.pay_to ?? value.school_name_short,
+    },
+    {
+      field: "debit_total",
+      headerName: "Amount",
+      flex: 0.8,
+      headerAlign: "right",
+      align: "right",
+    },
+    { field: "dept_name", headerName: "Dept", flex: 1, hide: true },
+    { field: "created_name", headerName: "Created By", flex: 1 },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      renderCell: (params) => moment(params.row.created_date).format("DD-MM-YYYY"),
+    },
+    { field: "created_username", headerName: "Approved By", flex: 1 },
+
+    {
+      field: "online",
+      headerName: "Online",
+      flex: 1,
+      valueGetter: (value, row) => (value == 1 ? "Online" : ""),
+    },
+    { field: "type", headerName: "Type", flex: 1 },
+    {
+      field: "envAttachment_path",
+      headerName: "Attachment",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params?.row?.envAttachment_path ? (
+          <IconButton
+            onClick={() => getUploadData(params.row?.envAttachment_path)}
+          >
+            <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : params?.row?.grnAttachment_path ? (
+          <IconButton
+            onClick={() => getUploadGrnData(params.row?.grnAttachment_path)}
+          >
+            <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : params?.row?.attachment_path ? (
+          <>
+            <IconButton onClick={() => handleAttachment(params.row)}>
+              <Visibility sx={{ fontSize: 17 }} color="primary" />
+            </IconButton>
+          </>
+        ) : (
+          <></>
+        ),
+      ],
+    },
+
+    {
+      field: "cancel",
+      headerName: "Cancel",
+      flex: 1,
+      renderCell: (params) =>
+        !params.row.cancel_voucher ? (
+          <IconButton onClick={() => handleRejectOpen(params.row)}>
+            <CancelOutlinedIcon color="error" sx={{ fontSize: 17 }} />
+          </IconButton>
+        ) : (
+          <Typography>{params.row.cancelled_remarks}</Typography>
+        ),
+    },
+    { field: "remarks", headerName: "Remarks", flex: 1 },
+  ];
 
   const getSchoolDetails = async () => {
     try {
@@ -159,6 +274,7 @@ function PaymentVoucherIndex() {
   };
 
   const getData = async (filterKey, value) => {
+    setRows([]);
     setLoading(true);
     let params = null;
     if (
@@ -358,121 +474,6 @@ function PaymentVoucherIndex() {
       setAlertOpen(true);
     }
   };
-
-  const columns = [
-    {
-      field: "Print",
-      headerName: "Print",
-      renderCell: (params) =>
-        params.row.type === "FUND-TRANSFER" ? (
-          <IconButton
-            color="primary"
-            onClick={() => navigate(`/fund-transfer-pdf/${params.row.id}`)}
-          >
-            <PrintIcon sx={{ fontSize: 17 }} />
-          </IconButton>
-        ) : params.row.type === "INTER-COLLEGE" ? (
-          <IconButton
-            color="primary"
-            onClick={() =>
-              navigate(`/contra-voucher-pdf-auto/${params.row.id}`)
-            }
-          >
-            <PrintIcon sx={{ fontSize: 17 }} />
-          </IconButton>
-        ) : (
-          <IconButton
-            color="primary"
-            onClick={() => navigate(`/payment-voucher-pdf/${params.row.id}`)}
-          >
-            <PrintIcon sx={{ fontSize: 17 }} />
-          </IconButton>
-        ),
-    },
-
-    { field: "voucher_no", headerName: "Voucher No", flex: 1 },
-    {
-      field: "created_date",
-      headerName: "Date",
-      flex: 1,
-      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
-    },
-    { field: "school_name_short", headerName: "School", flex: 1 },
-    {
-      field: "pay_to",
-      headerName: "Pay to",
-      flex: 1,
-      valueGetter: (row, value) => value.pay_to ?? value.school_name_short,
-    },
-    {
-      field: "debit_total",
-      headerName: "Amount",
-      flex: 0.8,
-      headerAlign: "right",
-      align: "right",
-    },
-    { field: "dept_name", headerName: "Dept", flex: 1, hide: true },
-    { field: "created_name", headerName: "Created By", flex: 1 },
-    {
-      field: "created_date",
-      headerName: "Created Date",
-      flex: 1,
-      valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
-    },
-    { field: "created_username", headerName: "Approved By", flex: 1 },
-
-    {
-      field: "online",
-      headerName: "Online",
-      flex: 1,
-      valueGetter: (value, row) => (value == 1 ? "Online" : ""),
-    },
-    { field: "type", headerName: "Type", flex: 1 },
-    {
-      field: "envAttachment_path",
-      headerName: "Attachment",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        params?.row?.envAttachment_path ? (
-          <IconButton
-            onClick={() => getUploadData(params.row?.envAttachment_path)}
-          >
-            <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
-          </IconButton>
-        ) : params?.row?.grnAttachment_path ? (
-          <IconButton
-            onClick={() => getUploadGrnData(params.row?.grnAttachment_path)}
-          >
-            <VisibilityIcon color="primary" sx={{ fontSize: 17 }} />
-          </IconButton>
-        ) : params?.row?.attachment_path ? (
-          <>
-            <IconButton onClick={() => handleAttachment(params.row)}>
-              <Visibility sx={{ fontSize: 17 }} color="primary" />
-            </IconButton>
-          </>
-        ) : (
-          <></>
-        ),
-      ],
-    },
-
-    {
-      field: "cancel",
-      headerName: "Cancel",
-      flex: 1,
-      renderCell: (params) =>
-        !params.row.cancel_voucher ? (
-          <IconButton onClick={() => handleRejectOpen(params.row)}>
-            <CancelOutlinedIcon color="error" sx={{ fontSize: 17 }} />
-          </IconButton>
-        ) : (
-          <Typography>{params.row.cancelled_remarks}</Typography>
-        ),
-    },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
-  ];
 
   const getUploadData = async (ddAttachment) => {
     await axios(
