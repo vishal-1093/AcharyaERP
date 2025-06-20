@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Grid, Typography } from "@mui/material";
+import {
+  Grid,
+  Typography,
+  Box,
+  Tooltip
+} from "@mui/material";
 import BedIcon from "@mui/icons-material/Hotel";
 import RoomIcon from "@mui/icons-material/MeetingRoom";
 import FloorIcon from "@mui/icons-material/Apartment";
 import VacantIcon from "@mui/icons-material/EventAvailable";
 import OccupiedIcon from "@mui/icons-material/EventBusy";
-import NightShelterRoundedIcon from '@mui/icons-material/NightShelterRounded';
+import NightShelterRoundedIcon from "@mui/icons-material/NightShelterRounded";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
@@ -58,14 +63,34 @@ function HostelBlockView() {
     }
   };
 
-
   const getData = async () => {
     setLoading(true);
     try {
       const response = await axios.get(
         `/api/hostel/hostelbedDetailsByBlockAndAcademic${values?.acYearId ? `?academicYearId=${values?.acYearId}` : ""}`
       );
-      setRows(response.data.data);
+
+      const mapped = response.data.data.map((row, index) => ({
+        ...row,
+        id: row.hostel_block_id || index,
+      }));
+
+      if (mapped.length > 0) {
+        const totalRow = {
+          id: "total",
+          block_name: "Total",
+          countOfFloors: mapped.reduce((acc, r) => acc + (r.countOfFloors || 0), 0),
+          countOfRooms: mapped.reduce((acc, r) => acc + (r.countOfRooms || 0), 0),
+          countOfBeds: mapped.reduce((acc, r) => acc + (r.countOfBeds || 0), 0),
+          assignedCountBeds: mapped.reduce((acc, r) => acc + (r.assignedCountBeds || 0), 0),
+          occupiedCountBeds: mapped.reduce((acc, r) => acc + (r.occupiedCountBeds || 0), 0),
+          vacantBeds: mapped.reduce((acc, r) => acc + (r.vacantBeds || 0), 0),
+          isTotal: true,
+        };
+        setRows([...mapped, totalRow]);
+      } else {
+        setRows(mapped);
+      }
     } catch (error) {
       setAlertMessage("Error fetching data");
       setAlertOpen(true);
@@ -75,18 +100,19 @@ function HostelBlockView() {
   };
 
   const handleChangeAdvance = (name, newValue) => {
-    const currentYear = academicYearOptions[0]?.value === newValue
+    const currentYear = academicYearOptions[0]?.value === newValue;
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
-      currentYear: currentYear
+      currentYear: currentYear,
     }));
   };
+
   const handleHistory = async (params, type) => {
     setHistoryOpen(true);
     try {
       const response = await axios.get(
-        `/api/hostel/hostelAssignedStudentDetails?academicYearId=${values?.acYearId}&hostelBlockId=${params?.id}&bedStatus=${type}`
+        `/api/hostel/hostelAssignedStudentDetails?academicYearId=${values?.acYearId}&hostelBlockId=${params?.hostel_block_id}&bedStatus=${type}`
       );
 
       const sortedData = response?.data?.data
@@ -99,12 +125,13 @@ function HostelBlockView() {
     }
   };
 
-
   const callHistoryColumns = [
     {
       field: "student_name",
       headerName: "Name",
       flex: 1,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => (
         <Typography
           variant="subtitle2"
@@ -114,35 +141,219 @@ function HostelBlockView() {
             color: "primary.main",
             textTransform: "capitalize",
             cursor: "pointer",
+            textAlign: "center",
+            width: "100%",
           }}
         >
           {params?.row?.student_name?.toLowerCase()}
         </Typography>
       ),
     },
-    { field: "auid", headerName: "AUID", flex: 1, minWidth: 120 },
-    { field: "bed_name", headerName: "Bed Name", flex: 1 },
-    { field: "template_name", headerName: "Template Name", flex: 1 },
+    {
+      field: "auid",
+      headerName: "AUID",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "bed_name",
+      headerName: "Bed Name",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "template_name",
+      headerName: "Template Name",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "occupied_date",
       headerName: "Occupied Date",
       flex: 1,
-      valueFormatter: (value) =>
-        moment(value).format("DD-MM-YYYY"),
-      renderCell: (params) =>
-        moment(params.row.occupied_date).format("DD-MM-YYYY"),
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Typography sx={{ width: "100%", textAlign: "center" }}>
+          {moment(params.row.occupied_date).format("DD-MM-YYYY")}
+        </Typography>
+      ),
     },
     {
       field: "paid",
       headerName: "Paid",
       flex: 1,
-      // valueGetter: (params) => (params?.row?.paid ? "Yes" : "No"),
-      // valueGetter: (params) => (params?.row?.paid),
+      align: "center",
+      headerAlign: "center",
     },
   ];
+
+  const columns = [
+    {
+      field: "block_name",
+      headerName: "Block Name",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Typography
+          variant="body1"
+          sx={{
+            fontWeight: "bold",
+            color: "#1976d2",
+            width: "100%",
+            textAlign: "center",
+          }}
+        >
+          {params.row.block_name}
+        </Typography>
+      ),
+    },
+    {
+      field: "countOfFloors",
+      headerName: "Floors",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      renderHeader: () => (
+        <Box display="flex" alignItems="center" justifyContent="center">
+          <FloorIcon sx={{ mr: 1 }} />
+          Floors
+        </Box>
+      ),
+    },
+    {
+      field: "countOfRooms",
+      headerName: "Rooms",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      renderHeader: () => (
+        <Box display="flex" alignItems="center" justifyContent="center">
+          <RoomIcon sx={{ mr: 1 }} />
+          Rooms
+        </Box>
+      ),
+    },
+    ...(values?.currentYear
+      ? [
+        {
+          field: "countOfBeds",
+          headerName: "Total Beds",
+          flex: 1,
+          align: "center",
+          headerAlign: "center",
+          renderHeader: () => (
+            <Box display="flex" alignItems="center" justifyContent="center">
+              <BedIcon sx={{ mr: 1 }} />
+              Total Beds
+            </Box>
+          ),
+        },
+      ]
+      : []),
+    {
+      field: "assignedCountBeds",
+      headerName: "Assigned Beds",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      renderHeader: () => (
+        <Box display="flex" alignItems="center" justifyContent="center">
+          <NightShelterRoundedIcon sx={{ mr: 1 }} />
+          Assigned Beds
+        </Box>
+      ),
+      renderCell: (params) => (
+        <Tooltip title="View Assigned Beds">
+          <Typography
+            onClick={() => handleHistory(params.row, "Assigned")}
+            sx={{
+              fontWeight: "bold",
+              cursor: "pointer",
+              textAlign: "center",
+              width: "100%",
+              "&:hover": { textDecoration: "underline" },
+            }}
+          >
+            {params.row.assignedCountBeds}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "occupiedCountBeds",
+      headerName: "Occupied Beds",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+      renderHeader: () => (
+        <Box display="flex" alignItems="center" justifyContent="center">
+          <OccupiedIcon sx={{ mr: 1, color: "red" }} />
+          Occupied Beds
+        </Box>
+      ),
+      renderCell: (params) => (
+        <Tooltip title="View Occupied Beds">
+          <Typography
+            onClick={() => handleHistory(params.row, "Occupied")}
+            sx={{
+              fontWeight: "bold",
+              cursor: "pointer",
+              textAlign: "center",
+              width: "100%",
+              "&:hover": { textDecoration: "underline" },
+            }}
+          >
+            {params.row.occupiedCountBeds}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    ...(values?.currentYear
+      ? [
+        {
+          field: "vacantBeds",
+          headerName: "Vacant Beds",
+          flex: 1,
+          align: "center",
+          headerAlign: "center",
+          renderHeader: () => (
+            <Box display="flex" alignItems="center" justifyContent="center">
+              <VacantIcon sx={{ mr: 1, color: "lightgreen" }} />
+              Vacant Beds
+            </Box>
+          ),
+          renderCell: (params) => (
+            <Tooltip title="View Vacant Beds">
+              <Typography
+                onClick={() =>
+                  navigate("/AllHostelBedViewMaster/AllHostelBedView/New", {
+                    state: params.row.hostel_block_id,
+                  })
+                }
+                sx={{
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  textAlign: "center",
+                  width: "100%",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
+                {params.row.vacantBeds}
+              </Typography>
+            </Tooltip>
+          ),
+        },
+      ]
+      : []),
+  ];
+
   return (
     <>
-      {/* Filter Dropdown */}
       <Grid container spacing={2} justifyContent="flex-end" mb={2}>
         <Grid item xs={12} sm={4} md={3}>
           <CustomAutocomplete
@@ -156,114 +367,45 @@ function HostelBlockView() {
         </Grid>
       </Grid>
 
-      {/* Custom Styled Table */}
-      <TableContainer component={Paper} sx={{ borderRadius: "12px", boxShadow: "0 4px 10px rgba(0,0,0,0.1)", overflow: "hidden" }}>
-        <Table>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: "primary.main", }}>
-              <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textAlign: "center" }}>Block Name</TableCell>
-              <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textAlign: "center" }}>
-                <FloorIcon sx={{ verticalAlign: "middle", marginRight: 1 }} /> Floors
-              </TableCell>
-              <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textAlign: "center" }}>
-                <RoomIcon sx={{ verticalAlign: "middle", marginRight: 1 }} /> Rooms
-              </TableCell>
-              {values?.currentYear && <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textAlign: "center" }}>
-                <BedIcon sx={{ verticalAlign: "middle", marginRight: 1 }} /> Total Beds
-              </TableCell>}
-              <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textAlign: "center" }}>
-                <NightShelterRoundedIcon sx={{ verticalAlign: "middle", marginRight: 1 }} /> Assigned Beds
-              </TableCell>
-              <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textAlign: "center" }}>
-                <OccupiedIcon sx={{ color: "red", verticalAlign: "middle", marginRight: 1 }} /> Occupied Beds
-              </TableCell>
-              {values?.currentYear && <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textAlign: "center" }}>
-                <VacantIcon sx={{ color: "lightgreen", verticalAlign: "middle", marginRight: 1 }} /> Vacant Beds
-              </TableCell>}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.length > 0 ? (
-              rows.map((block, index) => (
-                <TableRow
-                  key={block.id}
-                  sx={{
-                    backgroundColor: index % 2 === 0 ? "#f7f7f7" : "white",
-                    transition: "background-color 0.3s ease",
-                    "&:hover": { backgroundColor: "#e0f7fa" },
-                  }}
-                >
-                  <TableCell sx={{ fontWeight: "bold", fontSize: "14px", textAlign: "center" }}>
-                    <Typography variant="body1" sx={{ fontWeight: "bold", color: "#1976d2" }}>
-                      {block.block_name}
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ textAlign: "center", fontSize: "14px" }}>{block.countOfFloors}</TableCell>
-                  <TableCell sx={{ textAlign: "center", fontSize: "14px" }}>{block.countOfRooms}</TableCell>
-                  {values?.currentYear && <TableCell sx={{ textAlign: "center", fontSize: "14px" }}>{block.countOfBeds}</TableCell>}
-                  <TableCell
-                    variant="subtitle2"
-                    onClick={() => handleHistory(block, "Assigned")}
-                    sx={{
-                      textAlign: "center",
-                      fontSize: "14px",
-                      color: "green",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      "&:hover": {
-                        textDecoration: "underline",
-                      }
-                    }}
-                  >
-                    {block.assignedCountBeds}
-                  </TableCell>
-                  <TableCell
-                    variant="subtitle2"
-                    onClick={() => handleHistory(block, "Occupied")}
-                    sx={{
-                      textAlign: "center",
-                      fontSize: "14px",
-                      color: "red",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      "&:hover": {
-                        textDecoration: "underline",
-                      }
-                    }}
-                  >
-                    {block.occupiedCountBeds}
-                  </TableCell>
-                  {values?.currentYear && <TableCell
-                    variant="subtitle2"
-                    onClick={() => navigate("/AllHostelBedViewMaster/AllHostelBedView/New", { state: block.id })}
-                    sx={{
-                      textAlign: "center",
-                      fontSize: "14px",
-                      color: "green",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      "&:hover": {
-                        textDecoration: "underline",
-                      }
-                    }}
-                  >
-                    {block.vacantBeds}
-                  </TableCell>}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} sx={{ textAlign: "center", fontStyle: "italic", py: 2 }}>
-                  No data available
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <ModalWrapper open={historyOpen} setOpen={setHistoryOpen}
-        title={`Student Details`}
-      >
+      <Box mt={2} sx={{ position: "relative" }}>
+        <GridIndex
+          rows={rows}
+          columns={columns}
+          loading={isLoading}
+          getRowId={(row) => row.id}
+          getRowClassName={(params) =>
+            params.row?.isTotal ? "custom-total-row" : ""
+          }
+          isRowSelectable={(params) => !params.row?.isTotal}
+          sx={{
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "#376a7d",
+              color: "#fff",
+              fontWeight: "bold",
+              textAlign: "center",
+            },
+            "& .MuiDataGrid-cell": {
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+            },
+            "& .custom-total-row": {
+              backgroundColor: "#376a7d",
+              pointerEvents: "none",
+            },
+            "& .custom-total-row .MuiDataGrid-cell": {
+              color: "#fff !important",
+              fontWeight: "bold",
+              "& *": {
+                color: "#fff !important",
+              },
+            },
+          }}
+        />
+      </Box>
+
+      <ModalWrapper open={historyOpen} setOpen={setHistoryOpen} title="Student Details">
         <GridIndex rows={historyData} columns={callHistoryColumns} />
       </ModalWrapper>
     </>

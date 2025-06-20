@@ -2061,6 +2061,10 @@ const LaptopIssueForm = lazy(() =>
   import("./containers/indeces/laptopIssue/LaptopIssueForm.jsx")
 );
 
+const SendWhatsApp = lazy(() =>
+  import("./pages/indeces/SendWhatsApp.jsx")
+);
+
 const Health = lazy(() => import("./pages/Health.jsx"));
 const SalarySheetMaster = lazy(() =>
   import("./pages/indeces/SalarySheetMaster.jsx")
@@ -10333,6 +10337,15 @@ function RouteConfig() {
               }
             />
           ))}
+          <Route
+            exact
+            path="/student-whatsapp"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SendWhatsApp />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path={"/laptop-issue-form"}
