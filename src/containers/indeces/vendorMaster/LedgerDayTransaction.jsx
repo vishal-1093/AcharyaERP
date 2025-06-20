@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.primary.main,
         textDecoration: "none",
         cursor: "pointer",
-        "&:hover": { textDecoration: "underline" },
+        "&:hover": { textDecoration: "none" },
     },
 }));
 
@@ -345,7 +345,7 @@ const LedgerDayTransaction = () => {
                                                         sx={{
                                                             color: 'primary.main',
                                                             cursor: 'pointer',
-                                                            '&:hover': { textDecoration: 'underline' }
+                                                            '&:hover': { textDecoration: 'none' }
                                                         }}
                                                     >
                                                         {formatCurrency(row.debit)}
@@ -361,7 +361,7 @@ const LedgerDayTransaction = () => {
                                                         sx={{
                                                             color: 'primary.main',
                                                             cursor: 'pointer',
-                                                            '&:hover': { textDecoration: 'underline' }
+                                                            '&:hover': { textDecoration: 'none' }
                                                         }}
                                                     >
                                                         {formatCurrency(row.credit)}

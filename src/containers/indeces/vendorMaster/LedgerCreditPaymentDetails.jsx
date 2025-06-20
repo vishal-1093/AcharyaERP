@@ -138,7 +138,7 @@ function LedgerCreditPaymentDetail() {
             start_date: queryValues?.date,
             end_date: queryValues?.date,
             school_id: queryValues?.schoolId,
-            bankId: queryValues?.bankId,
+            bank_id: queryValues?.bankId,
             active:true
         };
         const baseUrl = '/api/finance/fetchAllPaymentVoucher'
