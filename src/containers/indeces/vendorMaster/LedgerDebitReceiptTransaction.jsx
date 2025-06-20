@@ -28,6 +28,12 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const useStyles = makeStyles((theme) => ({
+  inactiveRow: {
+    background: "#fdecea !important",
+  },
+}));
+
 function LedgerDebitReceiptDetail() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -38,11 +44,11 @@ function LedgerDebitReceiptDetail() {
     paid_year: false,
     cheque_dd_no: false,
     school_name_short: false,
-    bank_name: false,
-    created_date: false
+    bank_name: false
   });
   const location = useLocation()
   const queryValues = location.state;
+  const classes = useStyles();
 
   useEffect(() => {
     getData();
@@ -58,7 +64,7 @@ function LedgerDebitReceiptDetail() {
       date_range: 'custom',
       start_date: date,
       end_date: date,
-      school_id: schoolId,
+      inter_school_id: schoolId,
       bankId: bankId
     }
     const baseUrl = 'api/finance/fetchAllFeeReceipt'
@@ -142,6 +148,12 @@ function LedgerDebitReceiptDetail() {
       flex: 1,
       hideable: false,
       align: "center",
+    },
+    {
+      field: "created_date",
+      headerName: "Receipt Date",
+      flex: 1,
+      valueGetter: (row, value) => moment(row).format("DD-MM-YYYY"),
     },
     {
       field: "auid",
@@ -229,12 +241,6 @@ function LedgerDebitReceiptDetail() {
             : null,
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
-    {
-      field: "created_date",
-      headerName: "Created Date",
-      flex: 1,
-      valueGetter: (row, value) => moment(row).format("DD-MM-YYYY"),
-    },
   ];
 
   return (
@@ -247,6 +253,9 @@ function LedgerDebitReceiptDetail() {
           columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel}
           getRowId={(row, index) => row?.id}
+           getRowClassName={(params) => {
+            return params.row.active === false ? `${classes.inactiveRow}` : '';
+          }}
         />
       </Box>
     </Box>
