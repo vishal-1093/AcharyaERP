@@ -527,7 +527,7 @@ const BRSTransactionDetail = () => {
                                     fontWeight: 600,
                                     color: '#2c3e50'
                                 }}>
-                                    Bank Balance as per Cash Book
+                                    Bank Balance as per Cash Book (a)
                                 </Typography>
                             </Box>
                             <Typography variant="body1" sx={{
@@ -569,7 +569,7 @@ const BRSTransactionDetail = () => {
                                     <Box>
                                         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                                             {/* CHQ Issued Not Debited */}
-                                            (+) Cheque Issued not Presented
+                                            (+) Cheque Issued not Presented (b)
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: '#64748b' }}>
                                             {chqIssuedNotDebitData?.paymentVouchers?.length} transactions
@@ -680,7 +680,7 @@ const BRSTransactionDetail = () => {
                                     <Box>
                                         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                                             {/* CHQ/DD Deposited Not Credited */}
-                                            (-) DD Deposits in Transit
+                                            (-) DD Deposits in Transit (c)
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: '#64748b' }}>
                                             {chqIssuedNotCreditData?.ddDetails?.length} transactions
@@ -791,7 +791,7 @@ const BRSTransactionDetail = () => {
                                     <Box>
                                         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                                             {/* Direct Credits to Bank */}
-                                            (+) Direct Electronic Credits to Bank
+                                            (+) Direct Electronic Credits to Bank (d)
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: '#64748b' }}>
                                             {directCreditsData?.bankImportTransactions?.length} transactions
@@ -904,7 +904,7 @@ const BRSTransactionDetail = () => {
                             fontWeight: 600,
                             color: '#065f46'
                         }}>
-                            Total
+                            Total (a) + (b) - (c) + (d)
                         </Typography>
                         <Typography variant="subtitle1" sx={{
                             fontWeight: 700,
