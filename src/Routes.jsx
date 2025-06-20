@@ -50,6 +50,8 @@ import NewAdmissionsDueReport from "./pages/forms/studentDueReport/newAdmissions
 import InstituteBankBalance from "./containers/indeces/bankGroupBankBalanceMaster/InstituteBankBalance.jsx";
 import BRSTransactionDetail from "./containers/indeces/bankGroupBankBalanceMaster/BRSTransactionDetails.jsx";
 import BRSChqNotIssuedDebitedDetail from "./containers/indeces/bankGroupBankBalanceMaster/BRSChqIssuedNotDebitedDetails.jsx";
+import BRSDirectCreditedToBankDetail from "./containers/indeces/bankGroupBankBalanceMaster/BRSDirectCreditedToBankDetails.jsx";
+import BRSChqDepositedNotCreditedDetail from "./containers/indeces/bankGroupBankBalanceMaster/BrsChqDepositedNotCreditedDetails.jsx";
 
 
 const PaysliplockIndex = lazy(() =>
@@ -10425,15 +10427,34 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
+           <Route
             exact
-            path={"/brs-chq-issued-not-debited"}
+            path={"/brs-cheque-issued-not-debit-detail"}
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <BRSChqNotIssuedDebitedDetail />
               </Suspense>
             }
+          />    
+           <Route
+            exact
+            path={"/brs-cheque-issued-not-credit-detail"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BRSChqDepositedNotCreditedDetail />
+              </Suspense>
+            }
           />
+           <Route
+            exact
+            path={"/brs-direct-credit-to-bank-detail"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BRSDirectCreditedToBankDetail />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/lms"
