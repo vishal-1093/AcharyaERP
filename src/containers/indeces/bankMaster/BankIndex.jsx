@@ -29,7 +29,7 @@ function BankIndex() {
     internal_status: false,
     created_username: false
   })
-
+  const [openingBalance, setOpeningBalance] = useState()
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -70,11 +70,18 @@ function BankIndex() {
       headerName: "Bank Balance",
       flex: 1,
       type: "actions",
-      getActions: (params) => [
-        <IconButton onClick={() => handleBankBalance(params.row)}>
-          <AddIcon />
-        </IconButton>,
-      ],
+      renderCell: (params) => {
+        return <Typography
+          onClick={() => handleBankBalance(params.row)}
+          sx={{
+            color: 'primary.main',
+            cursor: 'pointer',
+            '&:hover': { textDecoration: 'none' }
+          }}
+        >
+          {params?.row?.bank_balance}
+        </Typography>
+      }
     },
     {
       field: "opening_balance",
@@ -188,6 +195,7 @@ function BankIndex() {
       ...prev,
       bankBalance: paramObj?.bank_balance,
     }));
+    setOpeningBalance(paramObj?.opening_balance)
     getProgramData(paramObj?.id)
   }
 
@@ -238,7 +246,8 @@ function BankIndex() {
     temp.bank_group_id = values.bankGroup;
     temp.swift_code = values.swiftCode;
     temp.bank_name = values.bankName;
-    temp.bank_balance = values.bankBalance
+    temp.bank_balance = values.bankBalance;
+    temp.opening_balance = openingBalance;
 
     await axios
       .put(`/api/finance/Bank/${values.bankId}`, temp)
@@ -315,7 +324,7 @@ function BankIndex() {
       </Grid>
     )
   }
-  
+
   return (
     <>
       <CustomModal

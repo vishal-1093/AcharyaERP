@@ -65,7 +65,7 @@ function LedgerDebitReceiptDetail() {
       start_date: date,
       end_date: date,
       inter_school_id: schoolId,
-      bankId: bankId
+      bank_id: bankId
     }
     const baseUrl = 'api/finance/fetchAllFeeReceipt'
     await axios

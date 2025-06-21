@@ -107,10 +107,18 @@ const VendorMonthlyDetails = () => {
   };
 
   useEffect(() => {
+   if(queryValues?.isBRSTrue){
+     setBreadCrumbs([
+            { name: "Bank Balance", link: "/bank-balance" },
+            { name: "BRS", link: "/institute-bank-balance", state: { bankGroupId: queryValues?.bankGroupId } },
+            { name: "Monthly Transaction" },
+        ]);
+  }else{
     setBreadCrumbs([
       { name: "Ledger", link: "/Accounts-ledger", state: queryValues },
       { name: "Monthly Transaction" }
     ])
+  }
     setCrumbs([])
   }, [])
 
@@ -180,7 +188,7 @@ const VendorMonthlyDetails = () => {
     const query = { ...queryValues, fcYear: currFcYear?.fcYear, fcYearId: currFcYear?.fcYearId, month, month_name }
     navigate('/Accounts-ledger-day-transaction', { state: query })
   };
-
+  
   const handlePreviousOpeningBalance = () => {
     const { fcYearOpt: fcYearOptions } = queryValues
     const currentIndex = fcYearOptions?.findIndex(
@@ -435,7 +443,7 @@ const VendorMonthlyDetails = () => {
               {rows?.vendorDetails?.length > 0 ? (
                 <>
                   <TableBody>
-                    {rows.vendorDetails.map((row, index) => (
+                    {rows?.vendorDetails?.map((row, index) => (
                       <TableRow
                         key={index}
                         hover

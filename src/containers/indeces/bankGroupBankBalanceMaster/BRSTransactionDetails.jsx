@@ -329,7 +329,7 @@ const BRSTransactionDetail = () => {
     useEffect(() => {
         setBreadCrumbs([
             { name: "Bank Balance", link: "/bank-balance" },
-            { name: "BRS", link: "/institute-bank-balance", state: { id: queryValues?.id } },
+            { name: "BRS", link: "/institute-bank-balance", state: { bankGroupId: queryValues?.bankGroupId } },
             { name: "BRS Transactions" },
         ]);
         setCrumbs([]);
@@ -373,11 +373,11 @@ const BRSTransactionDetail = () => {
 
     const handleViewTransactionDetails = (row, type) => {
         if (type === 'chqIssued') {
-            navigate('/brs-cheque-issued-not-debit-detail', {state: queryValues});
+            navigate('/brs-cheque-issued-not-debit-detail', { state: queryValues });
         } else if (type === 'chqDeposited') {
-            navigate('/brs-cheque-issued-not-credit-detail', {state: queryValues});
+            navigate('/brs-cheque-issued-not-credit-detail', { state: queryValues });
         } else {
-            navigate('/brs-direct-credit-to-bank-detail', {state: queryValues});
+            navigate('/brs-direct-credit-to-bank-detail', { state: queryValues });
         }
     }
 
@@ -497,6 +497,7 @@ const BRSTransactionDetail = () => {
                         </Box>
                     </Box>
                 </Box>
+             
                 <Box sx={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -526,7 +527,7 @@ const BRSTransactionDetail = () => {
                                     fontWeight: 600,
                                     color: '#2c3e50'
                                 }}>
-                                    Bank Balance as per Cash Book
+                                    Bank Balance as per Cash Book (a)
                                 </Typography>
                             </Box>
                             <Typography variant="body1" sx={{
@@ -535,14 +536,15 @@ const BRSTransactionDetail = () => {
                                 color: '#376a7d',
                                 fontSize: '1rem'
                             }}>
-                                {/* {queryValues?.closingBalance || 0} */}
-                                {new Intl.NumberFormat("en-IN", {
+                                {queryValues?.closingBalance || 0}
+                                {/* {new Intl.NumberFormat("en-IN", {
                                     minimumFractionDigits: 2,
                                     maximumSignificantDigits: 2
-                                }).format(queryValues?.closingBalance || 0)}
+                                }).format(queryValues?.closingBalance || 0)} */}
                             </Typography>
                         </Box>
                     </Paper>
+                    <Divider sx={{ borderColor: '#e0e0e0', width: '98%', margin: 'auto' }} />
                     <Box>
                         <Paper elevation={0} sx={{
                             p: 2,
@@ -567,7 +569,7 @@ const BRSTransactionDetail = () => {
                                     <Box>
                                         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                                             {/* CHQ Issued Not Debited */}
-                                            (+) Cheque Issued not Presented
+                                            (+) Cheque Issued not Presented (b)
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: '#64748b' }}>
                                             {chqIssuedNotDebitData?.paymentVouchers?.length} transactions
@@ -582,10 +584,11 @@ const BRSTransactionDetail = () => {
                                         mr: 1,
                                         fontSize: '1rem'
                                     }}>
-                                        {new Intl.NumberFormat("en-IN", {
+                                        {chqIssuedNotDebitData?.totalAmount}
+                                        {/* {new Intl.NumberFormat("en-IN", {
                                             minimumFractionDigits: 2,
                                             maximumSignificantDigits: 2
-                                        }).format(chqIssuedNotDebitData?.totalAmount || 0)}
+                                        }).format(chqIssuedNotDebitData?.totalAmount || 0)} */}
                                     </Typography>
                                     {chqIssuedNotDebitData?.paymentVouchers?.length > 100 ? (
                                         <IconButton onClick={() => handleViewTransactionDetails(chqIssuedNotDebitData?.paymentVouchers, 'chqIssued')} size="small">
@@ -599,41 +602,60 @@ const BRSTransactionDetail = () => {
                                 </Box>
                             </Box>
                             <Collapse in={expanded.chqIssued}>
-                                <TableContainer sx={{ mt: 2 }}>
-                                    <Table size="small">
-                                        <TableHead>
-                                            <TableRow sx={{ backgroundColor: '#f1f5f9' }}>
-                                                <TableCell>VCHR No</TableCell>
-                                                <TableCell>Date</TableCell>
-                                                <TableCell>Pay To</TableCell>
-                                                <TableCell align="right">Amount</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {getPaginatedData('chqIssued').map((item) => (
-                                                <TableRow key={item?.id} hover>
-                                                    <TableCell>{item?.vochar_no}</TableCell>
-                                                    <TableCell>{item?.vochar_date}</TableCell>
-                                                    <TableCell>{item?.pay_to}</TableCell>
-                                                    <TableCell align="right">{item?.amount}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                                <Box>
-                                    <Pagination
-                                        count={Math.ceil(chqIssuedNotDebitData?.paymentVouchers?.length / pagination.chqIssued.rowsPerPage)}
-                                        page={pagination.chqIssued.page}
-                                        onChange={(e, page) => handlePageChange('chqIssued', page)}
-                                        color="primary"
-                                        size="small"
-                                    />
-                                </Box>
+                                {chqIssuedNotDebitData?.paymentVouchers?.length ? (
+                                    <>
+                                        <TableContainer sx={{ mt: 2 }}>
+                                            <Table size="small">
+                                                <TableHead>
+                                                    <TableRow sx={{ backgroundColor: '#f1f5f9' }}>
+                                                        <TableCell>VCHR No</TableCell>
+                                                        <TableCell>Date</TableCell>
+                                                        <TableCell>Pay To</TableCell>
+                                                        <TableCell align="right">Amount</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {getPaginatedData('chqIssued').map((item) => (
+                                                        <TableRow key={item?.id} hover>
+                                                            <TableCell>{item?.vochar_no}</TableCell>
+                                                            <TableCell>{item?.vochar_date}</TableCell>
+                                                            <TableCell>{item?.pay_to}</TableCell>
+                                                            <TableCell align="right">{item?.amount}</TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                        <Box>
+                                            <Pagination
+                                                count={Math.ceil(chqIssuedNotDebitData?.paymentVouchers?.length / pagination.chqIssued.rowsPerPage)}
+                                                page={pagination.chqIssued.page}
+                                                onChange={(e, page) => handlePageChange('chqIssued', page)}
+                                                color="primary"
+                                                size="small"
+                                            />
+                                        </Box>
+                                    </>
+                                ) : (
+                                    <Box
+                                        sx={{
+                                            mt: 2,
+                                            p: 2,
+                                            textAlign: 'center',
+                                            color: '#888',
+                                            fontStyle: 'italic',
+                                            backgroundColor: '#fafafa',
+                                            border: '1px dashed #ddd',
+                                            borderRadius: 1
+                                        }}
+                                    >
+                                        No transactions found.
+                                    </Box>
+                                )}
                             </Collapse>
                         </Paper>
                     </Box>
-
+                    <Divider sx={{ borderColor: '#e0e0e0', width: '98%', margin: 'auto' }} />
                     <Box>
                         <Paper elevation={0} sx={{
                             p: 2,
@@ -658,7 +680,7 @@ const BRSTransactionDetail = () => {
                                     <Box>
                                         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                                             {/* CHQ/DD Deposited Not Credited */}
-                                            (-) DD Deposits in Transit
+                                            (-) DD Deposits in Transit (c)
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: '#64748b' }}>
                                             {chqIssuedNotCreditData?.ddDetails?.length} transactions
@@ -672,13 +694,13 @@ const BRSTransactionDetail = () => {
                                         mr: 1,
                                         fontSize: '1rem'
                                     }}>
-                                        {/* {chqIssuedNotCreditData?.totalAmount} */}
-                                        {new Intl.NumberFormat("en-IN", {
+                                        {chqIssuedNotCreditData?.totalAmount}
+                                        {/* {new Intl.NumberFormat("en-IN", {
                                             minimumFractionDigits: 2,
                                             maximumSignificantDigits: 2
-                                        }).format(chqIssuedNotCreditData?.totalAmount || 0)}
+                                        }).format(chqIssuedNotCreditData?.totalAmount || 0)} */}
                                     </Typography>
-                                    {chqIssuedNotCreditData?.ddDetails?.length > 3 ? (
+                                    {chqIssuedNotCreditData?.ddDetails?.length > 100 ? (
                                         <IconButton onClick={() => handleViewTransactionDetails(chqIssuedNotCreditData?.ddDetails, 'chqDeposited')} size="small">
                                             <VisibilityIcon fontSize="small" />
                                         </IconButton>
@@ -691,41 +713,60 @@ const BRSTransactionDetail = () => {
                             </Box>
 
                             <Collapse in={expanded.chqDeposited}>
-                                <TableContainer sx={{ mt: 2 }}>
-                                    <Table size="small">
-                                        <TableHead>
-                                            <TableRow sx={{ backgroundColor: '#f1f5f9' }}>
-                                                <TableCell>DD No</TableCell>
-                                                <TableCell>DD Date</TableCell>
-                                                <TableCell>DD Bank</TableCell>
-                                                <TableCell align="right">Amount</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {getPaginatedData('chqDeposited').map((item) => (
-                                                <TableRow key={item?.dd_id} hover>
-                                                    <TableCell>{item?.dd_number}</TableCell>
-                                                    <TableCell>{parseDate(item?.dd_date)}</TableCell>
-                                                    <TableCell>{item?.bank_name}</TableCell>
-                                                    <TableCell align="right">{item?.dd_amount}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                                    <Pagination
-                                        count={Math.ceil(chqIssuedNotCreditData?.ddDetails?.length / pagination.chqDeposited.rowsPerPage)}
-                                        page={pagination.chqDeposited.page}
-                                        onChange={(e, page) => handlePageChange('chqDeposited', page)}
-                                        color="primary"
-                                        size="small"
-                                    />
-                                </Box>
+                                {chqIssuedNotCreditData?.ddDetails?.length > 0 ? (
+                                    <>
+                                        <TableContainer sx={{ mt: 2 }}>
+                                            <Table size="small">
+                                                <TableHead>
+                                                    <TableRow sx={{ backgroundColor: '#f1f5f9' }}>
+                                                        <TableCell>DD No</TableCell>
+                                                        <TableCell>DD Date</TableCell>
+                                                        <TableCell>DD Bank</TableCell>
+                                                        <TableCell align="right">Amount</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {getPaginatedData('chqDeposited').map((item) => (
+                                                        <TableRow key={item?.dd_id} hover>
+                                                            <TableCell>{item?.dd_number}</TableCell>
+                                                            <TableCell>{parseDate(item?.dd_date)}</TableCell>
+                                                            <TableCell>{item?.bank_name}</TableCell>
+                                                            <TableCell align="right">{item?.dd_amount}</TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                                            <Pagination
+                                                count={Math.ceil(chqIssuedNotCreditData?.ddDetails?.length / pagination.chqDeposited.rowsPerPage)}
+                                                page={pagination.chqDeposited.page}
+                                                onChange={(e, page) => handlePageChange('chqDeposited', page)}
+                                                color="primary"
+                                                size="small"
+                                            />
+                                        </Box>
+                                    </>
+                                ) : (
+                                    <Box
+                                        sx={{
+                                            mt: 2,
+                                            p: 2,
+                                            textAlign: 'center',
+                                            color: '#888',
+                                            fontStyle: 'italic',
+                                            backgroundColor: '#fafafa',
+                                            border: '1px dashed #ddd',
+                                            borderRadius: 1
+                                        }}
+                                    >
+                                        No transactions found.
+                                    </Box>
+                                )}
                             </Collapse>
                         </Paper>
                     </Box>
-
+                    <Divider sx={{ borderColor: '#e0e0e0', width: '98%', margin: 'auto' }} />
                     <Box>
                         <Paper elevation={0} sx={{
                             p: 2,
@@ -750,7 +791,7 @@ const BRSTransactionDetail = () => {
                                     <Box>
                                         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                                             {/* Direct Credits to Bank */}
-                                            (+) Direct Electronic Credits to Bank
+                                            (+) Direct Electronic Credits to Bank (d)
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: '#64748b' }}>
                                             {directCreditsData?.bankImportTransactions?.length} transactions
@@ -764,10 +805,11 @@ const BRSTransactionDetail = () => {
                                         mr: 1,
                                         fontSize: '1rem'
                                     }}>
-                                        {new Intl.NumberFormat("en-IN", {
+                                        {directCreditsData?.totalAmount}
+                                        {/* {new Intl.NumberFormat("en-IN", {
                                             minimumFractionDigits: 2,
                                             maximumSignificantDigits: 2
-                                        }).format(directCreditsData?.totalAmount || 0)}
+                                        }).format(directCreditsData?.totalAmount || 0)} */}
                                     </Typography>
                                     {directCreditsData?.bankImportTransactions?.length > 100 ? (
                                         <IconButton onClick={() => handleViewTransactionDetails(directCreditsData?.bankImportTransactions, 'directCredits')} size="small">
@@ -780,44 +822,64 @@ const BRSTransactionDetail = () => {
                                     )}
                                 </Box>
                             </Box>
-
                             <Collapse in={expanded.directCredits}>
-                                <TableContainer sx={{ mt: 2 }}>
-                                    <Table size="small">
-                                        <TableHead>
-                                            <TableRow sx={{ backgroundColor: '#f1f5f9' }}>
-                                                <TableCell>TRN Date</TableCell>
-                                                <TableCell>Order Id</TableCell>
-                                                <TableCell>AUID</TableCell>
-                                                <TableCell align="right">Amount</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {getPaginatedData('directCredits').map((item) => (
-                                                <TableRow key={item?.index} hover>
-                                                    <TableCell>{parseDate(item?.transaction_date)}</TableCell>
-                                                    <TableCell>{item?.order_id}</TableCell>
-                                                    <TableCell>{item?.auid}</TableCell>
-                                                    <TableCell align="right">{item?.amount}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                                    <Pagination
-                                        count={Math.ceil(directCreditsData?.bankImportTransactions?.length / pagination.directCredits.rowsPerPage)}
-                                        page={pagination.directCredits.page}
-                                        onChange={(e, page) => handlePageChange('directCredits', page)}
-                                        color="primary"
-                                        size="small"
-                                    />
-                                </Box>
+                                {directCreditsData?.bankImportTransactions?.length ? (
+                                    <>
+                                        <TableContainer sx={{ mt: 2 }}>
+                                            <Table size="small">
+                                                <TableHead>
+                                                    <TableRow sx={{ backgroundColor: '#f1f5f9' }}>
+                                                        <TableCell sx={{ width: 100 }} align="center">TRN Date</TableCell>
+                                                        <TableCell sx={{ width: 140 }} align="center">TRN No</TableCell>
+                                                        <TableCell sx={{ width: 140 }} align="center">Order Id</TableCell>
+                                                        <TableCell sx={{ width: 80 }} align="center">AUID</TableCell>
+                                                        <TableCell align="center" sx={{ width: 100 }}>Amount</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {getPaginatedData('directCredits').map((item) => (
+                                                        <TableRow key={item?.index} hover>
+                                                            <TableCell align="center">{parseDate(item?.transaction_date)}</TableCell>
+                                                            <TableCell>{item?.cheque_dd_no}</TableCell>
+                                                            <TableCell>{item?.order_id}</TableCell>
+                                                            <TableCell>{item?.auid}</TableCell>
+                                                            <TableCell align="center">{item?.amount}</TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                                            <Pagination
+                                                count={Math.ceil(directCreditsData?.bankImportTransactions?.length / pagination.directCredits.rowsPerPage)}
+                                                page={pagination.directCredits.page}
+                                                onChange={(e, page) => handlePageChange('directCredits', page)}
+                                                color="primary"
+                                                size="small"
+                                            />
+                                        </Box>
+                                    </>
+                                ) : (
+                                    <Box
+                                        sx={{
+                                            mt: 2,
+                                            p: 2,
+                                            textAlign: 'center',
+                                            color: '#888',
+                                            fontStyle: 'italic',
+                                            backgroundColor: '#fafafa',
+                                            border: '1px dashed #ddd',
+                                            borderRadius: 1
+                                        }}
+                                    >
+                                        No transactions found.
+                                    </Box>
+                                )}
                             </Collapse>
                         </Paper>
                     </Box>
                 </Box>
-                {/* <Divider sx={{ my: 3, borderColor: '#e0e0e0' }} /> */}
+                <Divider sx={{ borderColor: '#e0e0e0', width: '98%', margin: 'auto' }} />
                 <Paper elevation={0} sx={{
                     p: 2,
                     borderRadius: 2,
@@ -842,7 +904,7 @@ const BRSTransactionDetail = () => {
                             fontWeight: 600,
                             color: '#065f46'
                         }}>
-                            Total
+                            Total (a) + (b) - (c) + (d)
                         </Typography>
                         <Typography variant="subtitle1" sx={{
                             fontWeight: 700,
@@ -850,7 +912,12 @@ const BRSTransactionDetail = () => {
                             color: '#065f46',
                             fontSize: '1rem'
                         }}>
-                            {new Intl.NumberFormat("en-IN", {
+                            {(queryValues?.closingBalance +
+                                chqIssuedNotCreditData?.totalAmount -
+                                chqIssuedNotDebitData?.totalAmount +
+                                directCreditsData?.totalAmount) || 0
+                            }
+                            {/* {new Intl.NumberFormat("en-IN", {
                                 minimumFractionDigits: 2,
                                 maximumSignificantDigits: 2
                             }).format(
@@ -858,7 +925,7 @@ const BRSTransactionDetail = () => {
                                     chqIssuedNotCreditData?.totalAmount +
                                     chqIssuedNotDebitData?.totalAmount +
                                     directCreditsData?.totalAmount) || 0
-                            )}
+                            )} */}
                         </Typography>
                     </Box>
                     <Box sx={{
@@ -879,13 +946,15 @@ const BRSTransactionDetail = () => {
                             color: '#374151',
                             fontSize: '1rem'
                         }}>
-                            {new Intl.NumberFormat("en-IN", {
+                            {queryValues?.bankBalance}
+                            {/* {new Intl.NumberFormat("en-IN", {
                                 minimumFractionDigits: 2,
                                 maximumSignificantDigits: 2
-                            }).format(queryValues?.bankBalance || 0)}
+                            }).format(queryValues?.bankBalance || 0)} */}
                         </Typography>
                     </Box>
                 </Paper>
+                <Divider sx={{ borderColor: '#e0e0e0', width: '98%', margin: 'auto' }} />
                 <Paper elevation={0} sx={{
                     p: 2,
                     borderRadius: 2,
@@ -918,7 +987,13 @@ const BRSTransactionDetail = () => {
                             color: '#b91c1c',
                             fontSize: '1rem'
                         }}>
-                            {new Intl.NumberFormat("en-IN", {
+                            {((queryValues?.closingBalance +
+                                chqIssuedNotCreditData?.totalAmount +
+                                chqIssuedNotDebitData?.totalAmount +
+                                directCreditsData?.totalAmount) -
+                                queryValues?.bankBalance) || 0
+                            }
+                            {/* {new Intl.NumberFormat("en-IN", {
                                 minimumFractionDigits: 2,
                                 maximumSignificantDigits: 2
                             }).format(
@@ -927,7 +1002,7 @@ const BRSTransactionDetail = () => {
                                     chqIssuedNotDebitData?.totalAmount +
                                     directCreditsData?.totalAmount) -
                                     queryValues?.bankBalance) || 0
-                            )}
+                            )} */}
                         </Typography>
                     </Box>
                 </Paper>

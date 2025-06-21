@@ -253,7 +253,7 @@ const InstituteBankBalance = () => {
     })
     const navigate = useNavigate();
     const location = useLocation()
-    const bankGroupId = location?.state?.id
+    const bankGroupId = location?.state?.bankGroupId
     const setCrumbs = useBreadcrumbs();
     const roleShortName = JSON.parse(
         sessionStorage.getItem("AcharyaErpUser")
@@ -289,28 +289,21 @@ const InstituteBankBalance = () => {
             const details = detailsRes?.data?.data?.Paginated_data?.content || [];
             const ledger = ledgerRes?.data?.data || [];
             const balanceMap = new Map();
-
             ledger.forEach(item => {
-                const schoolId = item?.school_id;
-                const bankId = item?.bankId;
-                const closingBalance = item?.closingBalance || 0;
-
-                const key = `${schoolId}_${bankId}`;
-                if (balanceMap.has(key)) {
-                    const current = balanceMap.get(key);
-                    balanceMap.set(key, current + closingBalance);
-                } else {
-                    balanceMap.set(key, closingBalance);
-                }
+                const key = `${item.school_id}_${item.bankId}`;
+                balanceMap.set(key, {
+                    closing_balance: item.closingBalance || 0,
+                    brs_amount: item.brs_amount || 0
+                });
             });
             const mergedData = details.map(row => {
-                const schoolId = row?.school_id;
-                const bankId = row?.id;
-                const key = `${schoolId}_${bankId}`;
+                const key = `${row.school_id}_${row.id}`;
+                const match = balanceMap.get(key);
 
                 return {
                     ...row,
-                    closing_balance: balanceMap.get(key) || 0
+                    closing_balance: match?.closing_balance ?? null,
+                    brs_amount: match?.brs_amount ?? null
                 };
             });
             setLoading(false)
@@ -342,28 +335,28 @@ const InstituteBankBalance = () => {
             .catch((err) => console.error(err));
     };
 
-    const viewClosingBalanceDetails = (voucher_head_new_id, schoolId, schoolName, bankName) => {
-        const queryValues = { voucherHeadId: voucher_head_new_id, schoolId, voucherHeadName: bankName, fcYearOpt: fcYearOption, ...currFcYear }
+    const viewClosingBalanceDetails = (voucher_head_new_id, schoolId, schoolName, bankName, bankId) => {
+        const queryValues = { voucherHeadId: voucher_head_new_id, schoolId, voucherHeadName: bankName, fcYearOpt: fcYearOption, isBRSTrue: true, bankGroupId, bankId, ...currFcYear }
         navigate('/Accounts-ledger-monthly-detail', { state: queryValues })
     }
 
     const handleBRSAmount = (row) => {
-        const queryValues = {bankBalance: row?.bank_balance, closingBalance: row?.closing_balance, id: bankGroupId, schoolId: row?.school_id, bankId: row?.id, accountNo: row?.account_number, bankName: row?.bank_name, schoolName:row?.school_name }
+        const queryValues = { bankBalance: row?.bank_balance, closingBalance: row?.closing_balance, bankGroupId, schoolId: row?.school_id, bankId: row?.id, accountNo: row?.account_number, bankName: row?.bank_name, schoolName: row?.school_name }
         navigate('/institute-brs-transaction', { state: queryValues })
     }
 
     const headers = [
         { id: 'bank', label: 'Bank', width: '15%' },
         { id: 'institute', label: 'Institute', width: '20%' },
-        { id: 'book', label: 'Book Balance', width: '15%', align: 'right' },
+        { id: 'closing_balance', label: 'Book Balance', width: '15%', align: 'right' },
         { id: 'bank_balance', label: 'Bank Balance', width: '15%', align: 'right' },
-        { id: 'difference', label: 'BRS Difference', width: '15%', align: 'right' },
+        { id: 'brs_amount', label: 'BRS Difference', width: '15%', align: 'right' },
         { id: 'updated', label: 'BB updated date', width: '20%', align: 'center' }
     ];
 
     return (
         <Paper elevation={0} sx={{
-            width: "80%",
+            width: "90%",
             margin: "auto",
             mt: 4,
             borderRadius: '12px',
@@ -440,27 +433,29 @@ const InstituteBankBalance = () => {
                                 const isBalanced = row?.brs_difference === 0;
                                 return <TableRow
                                     key={index}
-                                   // hover
-                                    // sx={{
-                                    //     backgroundColor: isBalanced ? 'rgba(102, 187, 106, 0.08)' : 'rgba(239, 83, 80, 0.08)',
-                                    //     '&:hover': {
-                                    //         backgroundColor: isBalanced ? 'rgba(102, 187, 106, 0.12)' : 'rgba(239, 83, 80, 0.12)'
-                                    //     },
-                                    //     transition: 'background-color 0.3s ease'
-                                    // }}
+                                    sx={{
+                                        '& .MuiTableCell-root': {
+                                            py: '4px',
+                                            height: '30px',
+                                            // fontSize: '13px', 
+                                        },
+                                    }}
+                                // hover
+                                // sx={{
+                                //     backgroundColor: isBalanced ? 'rgba(102, 187, 106, 0.08)' : 'rgba(239, 83, 80, 0.08)',
+                                //     '&:hover': {
+                                //         backgroundColor: isBalanced ? 'rgba(102, 187, 106, 0.12)' : 'rgba(239, 83, 80, 0.12)'
+                                //     },
+                                //     transition: 'background-color 0.3s ease'
+                                // }}
                                 >
                                     <TableCell align="left" sx={{ fontWeight: 500 }}>
                                         {row.bank_name}
                                     </TableCell>
                                     <TableCell align="left" sx={{
                                         width: '20%',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
                                     }}>
-                                        <Tooltip title={row.school_name} arrow>
-                                            <span>{row.school_name}</span>
-                                        </Tooltip>
+                                        {row.school_name}
                                     </TableCell>
                                     <TableCell align="right">
                                         <Button
@@ -469,7 +464,8 @@ const InstituteBankBalance = () => {
                                                 row?.voucher_head_new_id,
                                                 row?.school_id,
                                                 row?.school_name,
-                                                row?.bank_name
+                                                row?.bank_name,
+                                                row?.id
                                             )}
                                             sx={{
                                                 color: '#376a7d',
@@ -483,11 +479,13 @@ const InstituteBankBalance = () => {
                                                 }
                                             }}
                                         >
-                                            {formatCurrency(row?.closing_balance)}
+                                            {/* {formatCurrency(row?.closing_balance)} */}
+                                            {row?.closing_balance}
                                         </Button>
                                     </TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 500 }}>
-                                        {formatCurrency(row?.bank_balance)}
+                                        {/* {formatCurrency(row?.bank_balance)} */}
+                                        {row?.bank_balance}
                                     </TableCell>
                                     <TableCell align="right">
                                         <Button
@@ -505,7 +503,8 @@ const InstituteBankBalance = () => {
                                                 }
                                             }}
                                         >
-                                            {formatCurrency(row?.brs_difference || 0)}
+                                            {formatCurrency(row?.brs_amount || 0)}
+                                            {/* {row?.brs_difference } */}
                                         </Button>
                                     </TableCell>
                                     <TableCell align="center" sx={{ color: '#666', fontSize: '12px' }}>
@@ -533,9 +532,9 @@ const InstituteBankBalance = () => {
                                         <Typography variant="body1" sx={{ fontWeight: 500 }}>
                                             No reconciliation data available
                                         </Typography>
-                                        <Typography variant="body2" sx={{ mt: 1 }}>
+                                        {/* <Typography variant="body2" sx={{ mt: 1 }}>
                                             {loading ? 'Loading data...' : 'Try adjusting your filters or check back later'}
-                                        </Typography>
+                                        </Typography> */}
                                     </Box>
                                 </TableCell>
                             </TableRow>

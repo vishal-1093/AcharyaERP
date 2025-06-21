@@ -136,17 +136,18 @@ function BankForm() {
       .get(`/api/finance/Bank/${id}`)
       .then((res) => {
         setValues({
-          bankName: res.data.data.voucher_head_new_id,
-          bankShortName: res.data.data.bank_short_name,
-          bankBranchName: res.data.data.bank_branch_name,
-          internalStatus: res.data.data.internal_status,
-          ifscCode: res.data.data.ifsc_code,
-          school: res.data.data.school_id,
-          accName: res.data.data.account_name,
-          accNumber: res.data.data.account_number,
-          bankGroup: res.data.data.bank_group_id,
-          swiftCode: res.data.data.swift_code,
-          openingBalance: res.data.data.opening_balance
+          bankName: res?.data?.data?.voucher_head_new_id,
+          bankShortName: res?.data?.data?.bank_short_name,
+          bankBranchName: res?.data?.data?.bank_branch_name,
+          internalStatus: res?.data?.data?.internal_status,
+          ifscCode: res?.data?.data?.ifsc_code,
+          school: res?.data?.data?.school_id,
+          accName: res?.data?.data?.account_name,
+          accNumber: res?.data?.data?.account_number,
+          bankGroup: res?.data?.data?.bank_group_id,
+          swiftCode: res?.data?.data?.swift_code,
+          openingBalance: res.data.data.opening_balance,
+          bankBalance: res?.data?.data?.bank_balance
         });
 
         setBankId(res.data.data.bank_id);
@@ -206,19 +207,19 @@ function BankForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.bank_short_name = values.bankShortName;
-      temp.internal_status = values.internalStatus;
-      temp.ifsc_code = values.ifscCode;
-      temp.school_id = values.school;
-      temp.account_name = values.accName;
-      temp.account_number = values.accNumber;
-      temp.bank_group_id = values.bankGroup;
-      temp.bank_branch_name = values.bankBranchName;
-      temp.voucher_head_new_id = values.bankName;
-      temp.swift_code = values.swiftCode;
-      temp.bank_name = voucherHeadSelected.label;
-      temp.bank_balance = values.bankBalance;
-      temp.opening_balance= values.openingBalance
+      temp.bank_short_name = values?.bankShortName;
+      temp.internal_status = values?.internalStatus;
+      temp.ifsc_code = values?.ifscCode;
+      temp.school_id = values?.school;
+      temp.account_name = values?.accName;
+      temp.account_number = values?.accNumber;
+      temp.bank_group_id = values?.bankGroup;
+      temp.bank_branch_name = values?.bankBranchName;
+      temp.voucher_head_new_id = values?.bankName;
+      temp.swift_code = values?.swiftCode;
+      temp.bank_name = voucherHeadSelected?.label;
+      temp.bank_balance = values?.bankBalance;
+      temp.opening_balance= values?.openingBalance
 
       await axios
         .post(`/api/finance/Bank`, temp)
@@ -276,7 +277,8 @@ function BankForm() {
       temp.bank_group_id = values.bankGroup;
       temp.swift_code = values.swiftCode;
       temp.bank_name = voucherHeadSelected.label;
-      temp.opening_balance= values.openingBalance
+      temp.opening_balance= values.openingBalance;
+      temp.bank_balance= values?.bankBalance;
 
       await axios
         .put(`/api/finance/Bank/${id}`, temp)
