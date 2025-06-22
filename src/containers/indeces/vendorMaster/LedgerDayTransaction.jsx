@@ -63,11 +63,20 @@ const LedgerDayTransaction = () => {
     useEffect(() => {
         if (currMonth?.month) {
             getData()
-            setBreadCrumbs([
-                { name: "Ledger", link: "/Accounts-ledger", state: queryValues },
-                { name: "Monthly Transaction", link: "/Accounts-ledger-monthly-detail", state: queryValues },
-                { name: 'Daily Summary' }
-            ])
+            if (queryValues?.isBRSTrue) {
+                setBreadCrumbs([
+                    { name: "Bank Balance", link: "/bank-balance" },
+                    { name: "BRS", link: "/institute-bank-balance", state: { bankGroupId: queryValues?.bankGroupId } },
+                    { name: "Monthly Transaction", link: "/Accounts-ledger-monthly-detail", state: queryValues },
+                    { name: 'Daily Summary' }
+                ]);
+            } else {
+                setBreadCrumbs([
+                    { name: "Ledger", link: "/Accounts-ledger", state: queryValues },
+                    { name: "Monthly Transaction", link: "/Accounts-ledger-monthly-detail", state: queryValues },
+                    { name: 'Daily Summary' }
+                ])
+            }
             setCrumbs([])
         }
     }, [currMonth?.month])
@@ -152,28 +161,28 @@ const LedgerDayTransaction = () => {
 
 
     const formatCurrency = (value, decimals = 2) => {
-  if (value === null || value === undefined || value === '') return `0.00`;
-  if (typeof value === 'string' && (value.includes('Cr') || value.includes('Dr'))) {
-    const parts = value.split(' ');
-    const numValue = parseFloat(parts[0]);
-    const suffix = parts[1] || '';
+        if (value === null || value === undefined || value === '') return `0.00`;
+        if (typeof value === 'string' && (value.includes('Cr') || value.includes('Dr'))) {
+            const parts = value.split(' ');
+            const numValue = parseFloat(parts[0]);
+            const suffix = parts[1] || '';
 
-    if (isNaN(numValue)) return `0.00`;
+            if (isNaN(numValue)) return `0.00`;
 
-    return `${numValue.toLocaleString('en-IN', {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals
-    })} ${suffix}`;
-  }
+            return `${numValue.toLocaleString('en-IN', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            })} ${suffix}`;
+        }
 
-  const numValue = typeof value === 'string' ? parseFloat(value) : value;
-  if (isNaN(numValue)) return `0.00`;
+        const numValue = typeof value === 'string' ? parseFloat(value) : value;
+        if (isNaN(numValue)) return `0.00`;
 
-  return numValue.toLocaleString('en-IN', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  });
-};
+        return numValue.toLocaleString('en-IN', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+    };
 
     return (
         <Paper elevation={0} sx={{
