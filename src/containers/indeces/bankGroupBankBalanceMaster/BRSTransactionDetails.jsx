@@ -255,7 +255,7 @@ const BRSTransactionDetail = () => {
                                 </Typography>
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Typography fontWeight={600}>{chqIssuedNotDebitData?.totalAmount || 0}</Typography>
+                                <Typography fontWeight={600}>{chqIssuedNotDebitData?.totalAmount?.toFixed(2) || 0}</Typography>
                                 {/* {expanded.chqIssued ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />} */}
                                 {chqIssuedNotDebitData?.paymentVouchers?.length > 100 ? (
                                         <IconButton onClick={() => handleViewTransactionDetails(chqIssuedNotDebitData?.paymentVouchers, 'chqIssued')} size="small">
@@ -343,7 +343,7 @@ const BRSTransactionDetail = () => {
                                 </Typography>
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Typography fontWeight={600}>{chqIssuedNotCreditData?.totalAmount || 0}</Typography>
+                                <Typography fontWeight={600}>{chqIssuedNotCreditData?.totalAmount?.toFixed(2) || 0}</Typography>
                                 {/* {expanded.chqDeposited ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />} */}
                                 {chqIssuedNotCreditData?.ddDetails?.length > 100 ? (
                                         <IconButton onClick={() => handleViewTransactionDetails(chqIssuedNotCreditData?.ddDetails, 'chqDeposited')} size="small">
@@ -373,10 +373,10 @@ const BRSTransactionDetail = () => {
                                                 <TableBody>
                                                     {getPaginatedData('chqDeposited').map((item) => (
                                                         <TableRow key={item?.id} hover>
-                                                            <TableCell>{item?.dd_no}</TableCell>
+                                                            <TableCell>{item?.dd_number}</TableCell>
                                                             <TableCell>{item?.dd_date ? moment(item?.dd_date).format("DD-MM-YYYY"):""}</TableCell>
                                                             <TableCell>{item?.bank_name}</TableCell>
-                                                            <TableCell align="right">{item?.amount}</TableCell>
+                                                            <TableCell align="right">{item?.dd_amount}</TableCell>
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>
@@ -431,7 +431,7 @@ const BRSTransactionDetail = () => {
                                 </Typography>
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Typography fontWeight={600}>{directCreditsData?.totalAmount || 0}</Typography>
+                                <Typography fontWeight={600}>{directCreditsData?.totalAmount?.toFixed(2) || 0}</Typography>
                                   {directCreditsData?.bankImportTransactions?.length > 100 ? (
                                         <IconButton onClick={() => handleViewTransactionDetails(directCreditsData?.bankImportTransactions, 'directCredits')} size="small">
                                             <VisibilityIcon fontSize="small" />
@@ -510,7 +510,7 @@ const BRSTransactionDetail = () => {
                             {(queryValues?.closingBalance +
                                 chqIssuedNotDebitData?.totalAmount -
                                 chqIssuedNotCreditData?.totalAmount +
-                                directCreditsData?.totalAmount) || 0}
+                                directCreditsData?.totalAmount)?.toFixed(2) || 0}
                         </Typography>
                     </Box>
                     <Box sx={{
@@ -537,7 +537,7 @@ const BRSTransactionDetail = () => {
                                     chqIssuedNotCreditData?.totalAmount +
                                     directCreditsData?.totalAmount) -
                                 queryValues?.bankBalance
-                            ) || 0}
+                            )?.toFixed(2) || 0}
                         </Typography>
                     </Box>
                 </Box>

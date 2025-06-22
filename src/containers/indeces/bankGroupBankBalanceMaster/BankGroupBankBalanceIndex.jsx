@@ -114,7 +114,7 @@ const BankGroupBankBalanceIndex = () => {
                 item => item.bank_group_name.toLowerCase() === 'cash in hand'
             );
             const cashCreditIndex = result.findIndex(
-                item => item.bank_group_name.toLowerCase() === 'cash credit group'
+                item => item.bank_group_name.toLowerCase() === 'cash credits'
             );
             const cashInHand = cashInHandIndex !== -1 ? result.splice(cashInHandIndex, 1)[0] : null;
             const cashCredit = cashCreditIndex !== -1 ? result.splice(cashCreditIndex, 1)[0] : null;
@@ -248,7 +248,7 @@ const BankGroupBankBalanceIndex = () => {
                             const name = row?.bank_group_name?.toLowerCase();
                             const isCashInHand = name === 'cash in hand';
                             const isTotal = name === 'total';
-                            const isCashCredit = name === 'cash credit group';
+                            const isCashCredit = name === 'cash credits';
                             return isCashInHand || isTotal || isCashCredit ? (
                                 <TableRow
                                     key={i}
