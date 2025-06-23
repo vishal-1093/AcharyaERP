@@ -132,7 +132,7 @@ function LeaveApplyAdminForm() {
       });
 
       setEmpOptions(optionData);
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const getLeaveTypeOptions = async () => {
@@ -424,6 +424,7 @@ function LeaveApplyAdminForm() {
     setValues((prev) => ({
       ...prev,
       [name]: value,
+      ...(name === "leaveType" && { compOffDate: "", leaveDate: "", toDate: "", fromDate: "", appliedDays: "", shift: "", }),
     }));
   };
 
@@ -439,6 +440,10 @@ function LeaveApplyAdminForm() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+      ...(name === "empId" && { leaveId: "", pendingLeaves: "", leaveType: "", compOffDate: "", leaveDate: "", toDate: "", fromDate: "", appliedDays: "", shift: "" }),
+      ...(name === "leaveId" && { pendingLeaves: "", leaveType: "", compOffDate: "", leaveDate: "", toDate: "", fromDate: "", appliedDays: "", shift: "" }),
+      ...(name === "leaveType" && { compOffDate: "", leaveDate: "", toDate: "", fromDate: "", appliedDays: "", shift: "", }),
+      // ...(name === "fromDate" && { toDate: "" }),
     }));
   };
 
@@ -497,14 +502,14 @@ function LeaveApplyAdminForm() {
           leaveTypeData[leaveId].shortName === "CP"
             ? moment(leaveDate).format("DD-MM-YYYY")
             : leaveTypeData[leaveId].shortName === "PR"
-            ? moment(fromDate).format("DD-MM-YYYY")
-            : moment(toDate).format("DD-MM-YYYY"),
+              ? moment(fromDate).format("DD-MM-YYYY")
+              : moment(toDate).format("DD-MM-YYYY"),
         no_of_days_applied:
           leaveType === "halfday"
             ? 0.5
             : leaveTypeData[leaveId].shortName === "CP"
-            ? 1
-            : appliedDays,
+              ? 1
+              : appliedDays,
         shift,
         leave_comments: reason,
         emp_id: empId,
@@ -528,11 +533,11 @@ function LeaveApplyAdminForm() {
       if (leaveAppliedIds.length > 0) {
         const fileUploadPromise = document
           ? (async () => {
-              const dataArray = new FormData();
-              dataArray.append("file", document);
-              dataArray.append("leave_apply_id", leaveAppliedIds.toString());
-              return axios.post("/api/leaveApplyUploadFile", dataArray);
-            })()
+            const dataArray = new FormData();
+            dataArray.append("file", document);
+            dataArray.append("leave_apply_id", leaveAppliedIds.toString());
+            return axios.post("/api/leaveApplyUploadFile", dataArray);
+          })()
           : Promise.resolve();
 
         await Promise.all([fileUploadPromise]);
@@ -561,7 +566,7 @@ function LeaveApplyAdminForm() {
       message: "Would you like to confirm?",
       buttons: [
         { name: "Yes", color: "primary", func: handleCreate },
-        { name: "No", color: "primary", func: () => {} },
+        { name: "No", color: "primary", func: () => { } },
       ],
     });
     setConfirmOpen(true);
@@ -603,7 +608,7 @@ function LeaveApplyAdminForm() {
               />
             </Grid>
 
-            {values.leaveId && (
+            {values?.leaveId && (
               <>
                 {leaveTypeData[values.leaveId].kitty && (
                   <Grid item xs={12} md={3}>
@@ -617,8 +622,8 @@ function LeaveApplyAdminForm() {
                 )}
 
                 {leaveTypeData[values.leaveId].shortName !== "RH" &&
-                leaveTypeData[values.leaveId].shortName !== "PR" &&
-                leaveTypeData[values.leaveId].shortName !== "CP" ? (
+                  leaveTypeData[values.leaveId].shortName !== "PR" &&
+                  leaveTypeData[values.leaveId].shortName !== "CP" ? (
                   <Grid item xs={12} md={3}>
                     <CustomSelect
                       name="leaveType"
@@ -699,7 +704,7 @@ function LeaveApplyAdminForm() {
                 )}
 
                 {values.leaveType === "halfday" ||
-                leaveTypeData[values.leaveId].shortName === "PR" ? (
+                  leaveTypeData[values.leaveId].shortName === "PR" ? (
                   <Grid item xs={12} md={3}>
                     <CustomSelect
                       name="shift"

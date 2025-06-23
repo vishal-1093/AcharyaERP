@@ -40,7 +40,11 @@ const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
 
-const initialValues = { acyearId: null, cancelRemarks: "" };
+const initialValues = {
+  acyearId: null, cancelRemarks: "", schoolId: null,
+  programId: null,
+  programSpeId: null,
+};
 
 function ScholarshipApproverHistory() {
   const [values, setValues] = useState(initialValues);
@@ -49,6 +53,9 @@ function ScholarshipApproverHistory() {
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [rowData, setRowData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [programOptions, setProgramOptions] = useState([]);
+  const [programData, setProgramData] = useState();
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -58,12 +65,22 @@ function ScholarshipApproverHistory() {
 
   useEffect(() => {
     getAcademicYears();
+    getSchoolDetails()
     setCrumbs([{ name: "Scholarship Report" }]);
   }, []);
 
   useEffect(() => {
     getData();
   }, [values.acyearId]);
+
+  useEffect(() => {
+    getProgram();
+    getData();
+  }, [values.schoolId]);
+
+  useEffect(() => {
+    getData();
+  }, [values.programId]);
 
   const getAcademicYears = async () => {
     try {
@@ -93,14 +110,26 @@ function ScholarshipApproverHistory() {
   };
 
   const getData = async () => {
-    const { acyearId } = values;
+
+    const { acyearId, schoolId, programId } = values;
     if (!acyearId) return;
 
     try {
+      setIsLoading(true);
       const response = await axios.get(
-        `/api/student/getIsApprovedDataForIndex/${acyearId}`,
+        `/api/student/getIsApprovedDataForIndex`,
         {
-          params: { page: 0, page_size: 10000, sort: "created_date" },
+          params: {
+            page: 0,
+            page_size: 10000,
+            sort: "created_date",
+            ...(acyearId && { ac_year_id: acyearId }),
+            ...(schoolId && { school_id: schoolId }),
+            ...(programId && {
+              program_id: programData[values?.programId]?.program_id,
+            }),
+            ...(programId && { program_specialization_id: programId }),
+          },
         }
       );
 
@@ -111,9 +140,57 @@ function ScholarshipApproverHistory() {
         message: "Failed to fetch the data !!",
       });
       setAlertOpen(true);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name_short,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getProgram = async () => {
+    const { schoolId } = values;
+    if (!schoolId) return null;
 
+    try {
+      const { data: response } = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`
+      );
+      const optionData = [];
+      const responseData = response.data;
+      response.data.forEach((obj) => {
+        optionData.push({
+          value: obj.program_specialization_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+        });
+      });
+      const programObject = responseData.reduce((acc, next) => {
+        acc[next.program_specialization_id] = next;
+        return acc;
+      }, {});
+      setProgramOptions(optionData);
+      setProgramData(programObject);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the programs data",
+      });
+      setAlertOpen(true);
+    }
+  };
   const handleDownload = async (obj) => {
     try {
       setIsLoading(true);
@@ -400,22 +477,8 @@ function ScholarshipApproverHistory() {
         <OverlayLoader />
       ) : (
         <>
-          <Box sx={{ marginTop: { md: -5 } }}>
-            <Grid container justifyContent="flex-end">
-              <Grid item xs={12} md={3}>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  justifyContent={{ md: "right" }}
-                  sx={{ marginRight: 2, marginBottom: 2 }}
-                  alignItems="center"
-                >
-                  <AvatarCells color="#dcf7dd" />
-                  <AvatarLabelCells label="Approved" />
-                  <AvatarCells color="#ef9a9a" />
-                  <AvatarLabelCells label="Rejected" />
-                </Stack>
-              </Grid>
+          <Box>
+            <Grid container justifyContent="flex-start" gap={2}>
 
               <Grid item xs={12} md={2}>
                 <CustomAutocomplete
@@ -426,6 +489,47 @@ function ScholarshipApproverHistory() {
                   required
                 />
               </Grid>
+              <Grid item xs={12} md={2}>
+                <CustomAutocomplete
+                  name="schoolId"
+                  label="School"
+                  value={values.schoolId}
+                  options={schoolOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  disabled={!values.acyearId}
+
+                />
+              </Grid>
+
+              <Grid item xs={12} md={2.5}>
+                <CustomAutocomplete
+                  name="programId"
+                  label="Program"
+                  options={programOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  value={values.programId}
+                  disabled={!values.schoolId}
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+
+              </Grid>
+              {/* <Grid item xs={12} md={2} justifyContent="center"> */}
+              <Stack
+                direction="row"
+                spacing={1}
+                justifyContent={{ md: "right" }}
+                sx={{ marginRight: 2, marginBottom: 2 }}
+                alignItems="center"
+              >
+                <AvatarCells color="#dcf7dd" />
+                <AvatarLabelCells label="Approved" />
+                <AvatarCells color="#ef9a9a" />
+                <AvatarLabelCells label="Rejected" />
+              </Stack>
+              {/* </Grid> */}
+
+
             </Grid>
           </Box>
 

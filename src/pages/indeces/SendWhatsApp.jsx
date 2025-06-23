@@ -152,7 +152,7 @@ const SendWhatsApp = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          acYearList: res.data.data.map((ele) => ({ value: ele.ac_year_id, label: ele.ac_year }))
+          acYearList: res.data.data.map((ele) => ({ value: ele.ac_year_id, label: ele.ac_year }))?.filter((li)=>li.label >= "2025")
         }))
       }
     } catch (error) {
@@ -250,6 +250,7 @@ const SendWhatsApp = () => {
       const payload = {
         "schoolId": schoolId,
         "programSpecializationId": programSpecializationId,
+        "programId":programmeSpecializationList?.find((li)=>li.value == programSpecializationId)?.programId,
         "year": year,
         "Sem": sem,
         "whatsappTemplateId": whatsappTemplate,
@@ -374,7 +375,7 @@ const SendWhatsApp = () => {
             onClick={getStudentData}
             disabled={!(acYear && schoolId && programSpecializationId && yearSem && whatsappTemplate && feeAdmissionCategory)}
           >
-            Filter
+            Submit
           </Button>
         </Grid>
         <Grid item xs={12} md={1}>
