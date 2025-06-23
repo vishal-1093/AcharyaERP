@@ -542,7 +542,7 @@ function BulkFeeReceipt() {
       tempTwo.transaction_type = values.transactionType;
       tempTwo.vendor_id = null;
       tempTwo.bank_transaction_history_id = values.bankImportedId;
-      tempTwo.bank_id = bankImportedDataById.deposited_bank_id;
+      tempTwo.bank_id = bankImportedDataById?.deposited_bank_id;
 
       mainData.tr = tempOne;
       mainData.fr = tempTwo;
@@ -557,7 +557,7 @@ function BulkFeeReceipt() {
         }
         bit.bank_import_transaction_id = values.bankImportedId;
         bit.cheque_dd_no = bankImportedDataById.cheque_dd_no;
-        bit.deposited_bank_id = bankImportedDataById.deposited_bank_id;
+        bit.deposited_bank_id = bankImportedDataById?.deposited_bank_id;
 
         bit.student_id = studentData.student_id;
 
@@ -694,6 +694,8 @@ function BulkFeeReceipt() {
         }
       }
     } catch (error) {
+      console.log(error);
+
       setAlertMessage({
         severity: "error",
         message: error.response ? error.response.data.message : "Error Occured",
