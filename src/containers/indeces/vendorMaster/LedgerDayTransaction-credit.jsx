@@ -8,7 +8,7 @@ import moment from "moment";
 
 const LedgerCreditPaymentDetail = lazy(() => import("./LedgerCreditPaymentDetails"));
 const StudentCancelledFeereceiptIndex = lazy(() =>
-  import("../studentMaster/CancelReceiptIndex")
+    import("../studentMaster/CancelReceiptIndex")
 );
 
 const breadcrumbStyles = makeStyles((theme) => ({
@@ -28,7 +28,7 @@ const breadcrumbStyles = makeStyles((theme) => ({
 
 const tabsData = [
     { label: "Payment", value: "payment", component: LedgerCreditPaymentDetail },
-     { label: "Void Receipt", value: "voidReceipt", component: StudentCancelledFeereceiptIndex },
+    { label: "Void Receipt", value: "voidReceipt", component: StudentCancelledFeereceiptIndex },
 ];
 
 const LedgerCreditDayTransaction = () => {
@@ -45,12 +45,22 @@ const LedgerCreditDayTransaction = () => {
         setTab(
             tabsData.find((tab) => pathname.includes(tab.value))?.value || "payment"
         );
-        setBreadCrumbs([
-            { name: "Ledger", link: "/Accounts-ledger", state: queryValues },
-            { name: "Monthly Transaction", link: "/Accounts-ledger-monthly-detail", state: queryValues },
-            { name: 'Daily Summary', link: "/Accounts-ledger-day-transaction", state: queryValues },
-            { name: `${queryValues?.voucherHeadName || ""} FY ${queryValues?.fcYear} as on ${moment().format('DD-MMMM-YYYY')}` },
-        ])
+        if (queryValues?.isBRSTrue) {
+            setBreadCrumbs([
+                { name: "Bank Balance", link: "/bank-balance" },
+                { name: "BRS", link: "/institute-bank-balance", state: { bankGroupId: queryValues?.bankGroupId } },
+                { name: "Monthly Transaction", link: "/Accounts-ledger-monthly-detail", state: queryValues },
+                { name: 'Daily Summary', link: "/Accounts-ledger-day-transaction", state: queryValues },
+                { name: `${queryValues?.voucherHeadName || ""} FY ${queryValues?.fcYear} as on ${moment().format('DD-MMMM-YYYY')}` },
+            ]);
+        } else {
+            setBreadCrumbs([
+                { name: "Ledger", link: "/Accounts-ledger", state: queryValues },
+                { name: "Monthly Transaction", link: "/Accounts-ledger-monthly-detail", state: queryValues },
+                { name: 'Daily Summary', link: "/Accounts-ledger-day-transaction", state: queryValues },
+                { name: `${queryValues?.voucherHeadName || ""} FY ${queryValues?.fcYear} as on ${moment().format('DD-MMMM-YYYY')}` },
+            ])
+        }
         setCrumbs([]);
     }, [pathname || tab]);
 

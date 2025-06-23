@@ -430,24 +430,21 @@ const InstituteBankBalance = () => {
                     <TableBody>
                         {rows.length > 0 ? (
                             rows.map((row, index) => {
-                                const isBalanced = row?.brs_difference === 0;
+                                const isBalanced = row?.brs_amount !== 0;
                                 return <TableRow
                                     key={index}
                                     sx={{
                                         '& .MuiTableCell-root': {
                                             py: '4px',
                                             height: '30px',
+                                            backgroundColor: isBalanced ? 'rgba(239, 83, 80, 0.08)' : 'rgba(76, 175, 80, 0.15)' ,
+                                            '&:hover': {
+                                                backgroundColor: isBalanced ? 'rgba(239, 83, 80, 0.12)' : 'rgba(76, 175, 80, 0.25)' 
+                                            },
+                                            transition: 'background-color 0.3s ease'
                                             // fontSize: '13px', 
                                         },
                                     }}
-                                // hover
-                                // sx={{
-                                //     backgroundColor: isBalanced ? 'rgba(102, 187, 106, 0.08)' : 'rgba(239, 83, 80, 0.08)',
-                                //     '&:hover': {
-                                //         backgroundColor: isBalanced ? 'rgba(102, 187, 106, 0.12)' : 'rgba(239, 83, 80, 0.12)'
-                                //     },
-                                //     transition: 'background-color 0.3s ease'
-                                // }}
                                 >
                                     <TableCell align="left" sx={{ fontWeight: 500 }}>
                                         {row.bank_name}

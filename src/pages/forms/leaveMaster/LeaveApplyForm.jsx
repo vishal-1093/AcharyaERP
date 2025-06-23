@@ -515,6 +515,7 @@ function LeaveApplyForm() {
     setValues((prev) => ({
       ...prev,
       [name]: value,
+      ...(name === "leaveType" && { compOffDate: "", leaveDate: "", toDate: "", fromDate: "", appliedDays: "", shift: "", }),
     }));
   };
 
@@ -526,7 +527,13 @@ function LeaveApplyForm() {
         toDate: newValue,
       }));
     }
-    setValues((prev) => ({ ...prev, [name]: newValue }));
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+      ...(name === "leaveId" && { pendingLeaves: "", leaveType: "", compOffDate: "", leaveDate: "", toDate: "", appliedDays: "", fromDate: "", shift: "" }),
+      ...(name === "leaveType" && { compOffDate: "", leaveDate: "", toDate: "", fromDate: "", appliedDays: "", shift: "", }),
+      // ...(name === "fromDate" && { toDate: "" }),
+    }));
   };
 
   const handleFileDrop = (name, newFile) => {
