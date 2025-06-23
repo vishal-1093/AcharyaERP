@@ -79,7 +79,11 @@ function BankIndex() {
             '&:hover': { textDecoration: 'none' }
           }}
         >
-          {params?.row?.bank_balance}
+          {params?.row?.bank_balance ? params?.row?.bank_balance :(
+             <IconButton onClick={() =>  handleBankBalance(params.row)}>
+                      <AddIcon />
+                    </IconButton>
+          )}
         </Typography>
       }
     },
