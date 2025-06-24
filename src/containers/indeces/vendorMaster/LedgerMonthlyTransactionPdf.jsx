@@ -6,18 +6,18 @@ const styles = StyleSheet.create({
     padding: 20,
     fontFamily: 'Helvetica'
   },
- headerContainer: {
+  headerContainer: {
     backgroundColor: '#376a7d',
-    padding: 5,
-    marginBottom: 5,
-    borderRadius: 2,
-    fontWeight: 'bold', 
+    color: 'white',
+    padding: 15,
+    // marginBottom: 10,
+    textAlign: 'center'
   },
   headerText: {
-    fontSize: 14,   
+    fontSize: 14,
     color: '#fff',
     textAlign: 'center',
-    fontWeight: 'bold', 
+    fontWeight: 'bold',
   },
   subtitleContainer: {
     backgroundColor: '#f9f9f9',
@@ -40,7 +40,12 @@ const styles = StyleSheet.create({
     borderRadius: 4
   },
   tableHeader: {
-    backgroundColor: '#376a7d',
+    backgroundColor: '#f5f5f5',
+    color: 'rgba(0, 0, 0, 0.87)',
+    fontWeight: 'bold',
+    fontSize: '0.8125rem',
+    // borderBottom: '1px solid rgba(224, 224, 224, 1)',
+    // borderTop: '1px solid rgba(224, 224, 224, 1)',
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0'
@@ -49,7 +54,7 @@ const styles = StyleSheet.create({
     padding: 8,
     fontSize: 10,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'rgba(0, 0, 0, 0.87)',
     flex: 1,
     textAlign: 'center'
   },
@@ -92,40 +97,48 @@ const LedgerMonthlyTransactionPdf = ({ rows, currFcYear, queryValues }) => {
     });
   };
 
-  const getFormattedMonthYear = (month, year) => {
-    if (!month) return '';
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"];
-    return `${monthNames[month - 1]} ${year}`;
+  const getFormattedMonthYear = (monthNumber, year) => {
+    const monthMap = {
+      1: 'Jan',
+      2: 'Feb',
+      3: 'Mar',
+      4: 'Apr',
+      5: 'May',
+      6: 'Jun',
+      7: 'Jul',
+      8: 'Aug',
+      9: 'Sep',
+      10: 'Oct',
+      11: 'Nov',
+      12: 'Dec',
+    };
+    const [startYear, endYear] = year.split("-");
+    const yearSuffix = monthNumber >= 4 ? startYear.slice(-2) : endYear.slice(-2);
+    return `${monthMap[monthNumber]} ${yearSuffix}`;
   };
 
   return (
     <Document>
       <Page size="A4" style={styles.page} orientation="landscape">
-        {/* School Name Header */}
         <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>{rows?.schoolName}</Text>
-        </View>
-
-        {/* Subtitle */}
-        <View style={styles.subtitleContainer}>
-          <Text style={styles.subtitleText}>
-            {`${queryValues?.voucherHeadName} for Financial Year ${currFcYear?.fcYear} as on ${moment().format('DD-MM-YYYY')}`}
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: '7px' }}>
+            {rows?.schoolName}
+          </Text>
+          <Text style={{ fontSize: 12, marginBottom: '7px' }}>
+            {`${queryValues?.voucherHeadName} Ledger for Financial Year ${currFcYear?.fcYear}`}
+          </Text>
+          <Text style={{ fontSize: 12 }}>
+            {`As on ${moment().format('DD-MM-YYYY')}`}
           </Text>
         </View>
-
-        {/* Table */}
         <View style={styles.table}>
-          {/* Table Header */}
           <View style={styles.tableHeader}>
             <Text style={[styles.tableHeaderCell, { width: '20%' }]}>Month</Text>
-            <Text style={[styles.tableHeaderCell, { width: '20%' }]}>Opening Balance</Text>
-            <Text style={[styles.tableHeaderCell, { width: '20%' }]}>Debit</Text>
-            <Text style={[styles.tableHeaderCell, { width: '20%' }]}>Credit</Text>
-            <Text style={[styles.tableHeaderCell, { width: '20%' }]}>Closing Balance</Text>
+            <Text style={[styles.tableHeaderCell, { width: '20%', textAlign: 'right' }]}>Opening Balance</Text>
+            <Text  style={[styles.tableHeaderCell, { width: '20%', textAlign: 'right' }]}>Debit</Text>
+            <Text  style={[styles.tableHeaderCell, { width: '20%', textAlign: 'right' }]}>Credit</Text>
+            <Text  style={[styles.tableHeaderCell, { width: '20%', textAlign: 'right' }]}>Closing Balance</Text>
           </View>
-
-          {/* Table Rows */}
           {rows?.vendorDetails?.length > 0 ? (
             <>
               {rows.vendorDetails.map((row, index) => (
@@ -141,8 +154,6 @@ const LedgerMonthlyTransactionPdf = ({ rows, currFcYear, queryValues }) => {
                   </Text>
                 </View>
               ))}
-
-              {/* Total Row */}
               <View style={styles.totalRow}>
                 <Text style={[styles.tableCell, styles.boldText, { width: '20%' }]}>Total</Text>
                 <Text style={[styles.tableCellRight, { width: '20%' }]}></Text>

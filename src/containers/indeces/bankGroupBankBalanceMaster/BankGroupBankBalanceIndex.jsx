@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Button, ButtonGroup, Card, CardContent, CircularProgress, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Card, CardContent, CircularProgress, InboxIcon, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -12,74 +12,10 @@ const BankGroupBankBalanceIndex = () => {
     const navigate = useNavigate();
     const location = useLocation()
     const setCrumbs = useBreadcrumbs();
-    const roleShortName = JSON.parse(
-        sessionStorage.getItem("AcharyaErpUser")
-    )?.roleShortName;
-
     useEffect(() => {
         setCrumbs([{ name: "" }])
         getData();
     }, []);
-
-
-    // const getData = async () => {
-    //     setLoading(true);
-
-    //     try {
-    //         const res = await axios.get(
-    //             '/api/finance/fetchAllBanknDetails?page=0&page_size=10000&sort=created_date'
-    //         );
-    //         const { Paginated_data } = res?.data?.data;
-
-    //         const result = [];
-    //         Paginated_data?.content?.forEach(item => {
-    //             const groupId = item.bank_group_id;
-    //             const groupName = item.bank_group_name;
-    //             const balance = Number(item.bank_balance) || 0;
-
-    //             const existingGroup = result.find(group => group.id === groupId);
-    //             if (existingGroup) {
-    //                 existingGroup.total_balance += balance;
-    //             } else {
-    //                 result.push({
-    //                     id: groupId,
-    //                     bank_group_name: groupName,
-    //                     total_balance: balance,
-    //                 });
-    //             }
-    //         });
-
-    //         result.forEach(group => {
-    //             group.total_balance = parseFloat(group.total_balance.toFixed(2));
-    //         });
-
-    //         const cashInHandIndex = result.findIndex(
-    //             item => item.bank_group_name.toLowerCase() === 'cash in hand'
-    //         );
-    //         const cashInHand = cashInHandIndex !== -1 ? result.splice(cashInHandIndex, 1)[0] : null;
-
-    //         const totalBalance = result.reduce((acc, curr) => acc + curr.total_balance, 0);
-    //         const totalRow = {
-    //             id: 'total',
-    //             bank_group_name: 'TOTAL',
-    //             total_balance: parseFloat(totalBalance.toFixed(2)),
-    //             isTotal: true,
-    //         };
-
-    //         if (cashInHand) {
-    //             cashInHand.isCashInHand = true;
-    //             setRows([...result, totalRow, cashInHand]);
-    //         } else {
-    //             setRows([...result, totalRow]);
-    //         }
-
-    //     } catch (err) {
-    //         console.error(err);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
 
     const getData = async () => {
         setLoading(true);
@@ -107,40 +43,52 @@ const BankGroupBankBalanceIndex = () => {
                 }
             });
 
+            let cashInHand = null;
+            let cashCredit = null;
+            const termLoanGroups = [];
+            const regularGroups = [];
             result.forEach(group => {
-                group.total_balance = parseFloat(group.total_balance.toFixed(2));
-            });
-            const cashInHandIndex = result.findIndex(
-                item => item.bank_group_name.toLowerCase() === 'cash in hand'
-            );
-            const cashCreditIndex = result.findIndex(
-                item => item.bank_group_name.toLowerCase() === 'cash credits'
-            );
-            const cashInHand = cashInHandIndex !== -1 ? result.splice(cashInHandIndex, 1)[0] : null;
-            const cashCredit = cashCreditIndex !== -1 ? result.splice(cashCreditIndex, 1)[0] : null;
-            const totalBalance = result.reduce((acc, curr) => acc + curr.total_balance, 0);
+                const name = group.bank_group_name?.toLowerCase().trim();
 
+                if (name === 'cash in hand') {
+                    cashInHand = { ...group, isCashInHand: true };
+                } else if (name === 'cash credits') {
+                    cashCredit = { ...group, isCashCredit: true };
+                } else if (name.includes('term loan')) {
+                    termLoanGroups.push({ ...group, isTermLoan: true });
+                }
+                else {
+                    group.total_balance = parseFloat(group.total_balance.toFixed(2));
+                    regularGroups.push(group);
+                }
+            });
+            const totalBalance = regularGroups.reduce((sum, g) => sum + g.total_balance, 0);
             const totalRow = {
                 id: 'total',
-                bank_group_name: 'TOTAL',
+                bank_group_name: 'Total',
                 total_balance: parseFloat(totalBalance.toFixed(2)),
                 isTotal: true,
             };
+            // const finalData = [...regularGroups, totalRow];
+            // if (cashCredit) {
+            //     finalData.push(cashCredit);
+            // }
+            // if (cashInHand) {
+            //     finalData.push(cashInHand);
+            // }
 
-            const finalData = [...result, totalRow];
-
-            if (cashCredit) {
-                cashCredit.isCashCredit = true;
-                finalData.push(cashCredit);
-            }
-
-            if (cashInHand) {
-                cashInHand.isCashInHand = true;
-                finalData.push(cashInHand);
-            }
+            const finalData = [
+                ...regularGroups,
+                totalRow,
+                ...termLoanGroups,
+                ...(cashCredit ? [cashCredit] : []),
+                ...(cashInHand ? [cashInHand] : [])
+            ];
 
             setRows(finalData);
+            setLoading(false)
         } catch (err) {
+            setLoading(false)
             console.error(err);
         } finally {
             setLoading(false);
@@ -158,22 +106,6 @@ const BankGroupBankBalanceIndex = () => {
             mx: "auto",
             fontFamily: "'Roboto', sans-serif"
         }}>
-            {/* <Box sx={{
-                            width: '100%',
-                            margin: '20px auto 10px auto',
-                            textAlign: 'left',
-                            paddingRight: '12px'
-                        }}>
-                            <Typography variant="subtitle2" sx={{
-                                fontWeight: 600,
-                                color: '#376a7d',
-                                // fontStyle: 'italic',
-                                fontSize: '20px',
-                                 textAlign: 'left'
-                            }}>
-                            {`Bank Balances as on ${moment().format('DD-MM-YYYY')}`}
-                            </Typography>
-                        </Box> */}
             <Box sx={{
                 textAlign: 'center',
                 background: 'linear-gradient(135deg, #2c3e50 0%, #376a7d 100%)',
@@ -242,126 +174,160 @@ const BankGroupBankBalanceIndex = () => {
                             </TableCell>
                         </TableRow>
                     </TableHead>
+                    {loading ? (
+                        <Box sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 10
+                        }}>
+                            <CircularProgress size={60} thickness={4} sx={{ color: '#376a7d' }} />
+                        </Box>
+                    ) : (
+                        <TableBody>
+                            {rows?.length > 0 ? (
+                                rows?.map((row, i) => {
+                                    const isTotal = row?.isTotal;
+                                    const isCashInHand = row?.isCashInHand;
+                                    const isCashCredit = row?.isCashCredit;
+                                    const isTermLoan = row?.isTermLoan;
 
-                    <TableBody>
-                        {rows.map((row, i) => {
-                            const name = row?.bank_group_name?.toLowerCase();
-                            const isCashInHand = name === 'cash in hand';
-                            const isTotal = name === 'total';
-                            const isCashCredit = name === 'cash credits';
-                            return isCashInHand || isTotal || isCashCredit ? (
-                                <TableRow
-                                    key={i}
-                                    sx={{
-                                        backgroundColor: isTotal ? '#f8f9fa' : '#e8f4ff',
-                                        '& .MuiTableCell-root': {
-                                            py: '4px',
-                                            height: '30px',
-                                            fontSize: '13px',
-                                        },
-                                        '&:hover': {
-                                            backgroundColor: isTotal ? '#f1f3f5' : '#e0ecfa'
-                                        }
-                                    }}
-                                >
-                                    <TableCell
-                                        sx={{
-                                            borderRight: "1px solid rgba(0,0,0,0.05)",
-                                            fontWeight: isTotal ? 'bold' : 600,
-                                            color: isTotal ? '#2c3e50' : '#376a7d',
-                                            fontSize: '14px',
-                                            py: 2,
-                                            borderBottom: i === rows.length - 1 ? 'none' : '1px solid rgba(0,0,0,0.05)'
-                                        }}
-                                    >
-                                        {row?.bank_group_name}
-                                    </TableCell>
-                                    <TableCell
-                                        align="right"
-                                        sx={{
-                                            fontWeight: isTotal ? 'bold' : 600,
-                                            color: isTotal ? '#2c3e50' : '#376a7d',
-                                            fontSize: '14px',
-                                            py: 2,
-                                            borderBottom: i === rows.length - 1 ? 'none' : '1px solid rgba(0,0,0,0.05)'
-                                        }}
-                                    >
-                                        {row?.total_balance}
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                <TableRow
-                                    key={i}
-                                    sx={{
-                                        '& .MuiTableCell-root': {
-                                            py: '4px',
-                                            height: '30px',
-                                            fontSize: '13px',
-                                        },
-                                        '&:hover': {
-                                            backgroundColor: 'rgba(55, 106, 125, 0.03)'
-                                        },
-                                        '&:last-child td': {
-                                            borderBottom: 'none'
-                                        }
-                                    }}
-                                >
-                                    <TableCell
-                                        sx={{
-                                            borderRight: "1px solid rgba(0,0,0,0.05)",
-                                            fontSize: '14px',
-                                            fontWeight: 500,
-                                            py: 2,
-                                            color: '#4a5568',
-                                            borderBottom: '1px solid rgba(0,0,0,0.05)'
-                                        }}
-                                    >
-                                        {row?.bank_group_name}
-                                    </TableCell>
-                                    <TableCell
-                                        align="right"
-                                        sx={{
-                                            py: 2,
-                                            borderBottom: '1px solid rgba(0,0,0,0.05)'
-                                        }}
-                                    >
-                                        <Box
-                                            onClick={() => handleCellClick(row?.id)}
+                                    const isSpecial = isTotal || isCashInHand || isCashCredit || isTermLoan;
+                                    return isSpecial ? (
+                                        <TableRow
+                                            key={i}
+                                            onClick={!isTotal ? () => handleCellClick(row?.id) : undefined}
                                             sx={{
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s ease',
-                                                //   px: 1.5,
-                                                py: 0.5,
-                                                borderRadius: '4px',
+                                                backgroundColor: isTotal ? '#f8f9fa' : '#e8f4ff',
+                                                cursor: !isTotal ? 'pointer' : 'default',
+                                                '& .MuiTableCell-root': {
+                                                    py: '4px',
+                                                    height: '30px',
+                                                    // fontSize: '13px',
+                                                },
                                                 '&:hover': {
-                                                    backgroundColor: 'rgba(55, 106, 125, 0.08)',
-                                                    transform: 'translateX(-2px)'
+                                                    backgroundColor: isTotal ? '#f1f3f5' : '#e0ecfa'
                                                 }
                                             }}
                                         >
-                                            <Typography
+                                            <TableCell
                                                 sx={{
-                                                    color: '#376a7d',
-                                                    fontWeight: '500',
-                                                    fontSize: '14px'
+                                                    borderRight: "1px solid rgba(0,0,0,0.05)",
+                                                    fontWeight: isTotal ? 'bold' : 600,
+                                                    color: isTotal ? '#2c3e50' : '#376a7d',
+                                                    fontSize: isTotal ? '14px' : '13px',
+                                                    py: 2,
+                                                    borderBottom: i === rows.length - 1 ? 'none' : '1px solid rgba(0,0,0,0.05)'
+                                                }}
+                                            >
+                                                {row?.bank_group_name}
+                                            </TableCell>
+                                            <TableCell
+                                                align="right"
+                                                sx={{
+                                                    fontWeight: isTotal ? 'bold' : 600,
+                                                    color: isTotal ? '#2c3e50' : '#376a7d',
+                                                    fontSize: '13px',
+                                                    py: 2,
+                                                    borderBottom: i === rows.length - 1 ? 'none' : '1px solid rgba(0,0,0,0.05)'
                                                 }}
                                             >
                                                 {row?.total_balance}
-                                            </Typography>
-                                            <Box sx={{
-                                                ml: 1,
-                                                display: 'flex',
-                                                color: 'rgba(55, 106, 125, 0.6)'
-                                            }}>
-                                            </Box>
-                                        </Box>
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })}
-                    </TableBody>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        <TableRow
+                                            key={i}
+                                            sx={{
+                                                '& .MuiTableCell-root': {
+                                                    py: '4px',
+                                                    height: '30px',
+                                                    fontSize: '13px',
+                                                },
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(55, 106, 125, 0.03)'
+                                                },
+                                                '&:last-child td': {
+                                                    borderBottom: 'none'
+                                                }
+                                            }}
+                                        >
+                                            <TableCell
+                                                sx={{
+                                                    borderRight: "1px solid rgba(0,0,0,0.05)",
+                                                    fontSize: '14px',
+                                                    fontWeight: 500,
+                                                    py: 2,
+                                                    color: '#4a5568',
+                                                    borderBottom: '1px solid rgba(0,0,0,0.05)'
+                                                }}
+                                            >
+                                                {row?.bank_group_name}
+                                            </TableCell>
+                                            <TableCell
+                                                align="right"
+                                                sx={{
+                                                    py: 2,
+                                                    borderBottom: '1px solid rgba(0,0,0,0.05)'
+                                                }}
+                                            >
+                                                <Box
+                                                    onClick={() => handleCellClick(row?.id)}
+                                                    sx={{
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.2s ease',
+                                                        //   px: 1.5,
+                                                        py: 0.5,
+                                                        borderRadius: '4px',
+                                                        '&:hover': {
+                                                            backgroundColor: 'rgba(55, 106, 125, 0.08)',
+                                                            transform: 'translateX(-2px)'
+                                                        }
+                                                    }}
+                                                >
+                                                    <Typography
+                                                        sx={{
+                                                            color: '#376a7d',
+                                                            fontWeight: '500',
+                                                            fontSize: '14px'
+                                                        }}
+                                                    >
+                                                        {row?.total_balance}
+                                                    </Typography>
+                                                    <Box sx={{
+                                                        ml: 1,
+                                                        display: 'flex',
+                                                        color: 'rgba(55, 106, 125, 0.6)'
+                                                    }}>
+                                                    </Box>
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })) : (
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    p: 4,
+                                    height: 200
+                                }}>
+                                    <Typography variant="h6" sx={{ color: '#78909c', mb: 1 }}>
+                                        No Data Available
+                                    </Typography>
+                                </Box>
+                            )}
+                        </TableBody>
+                    )}
                 </Table>
             </TableContainer>
         </Box>

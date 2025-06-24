@@ -28,6 +28,9 @@ import moment from 'moment';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import BRSTransactionDetailsPdf from './BRSTransactionDetailsPdf';
+import { BlobProvider } from '@react-pdf/renderer';
+import PrintIcon from '@mui/icons-material/Print';
 
 
 
@@ -170,26 +173,58 @@ const BRSTransactionDetail = () => {
         }
         return items.slice(startIndex, endIndex);
     };
-
+    
     return (
         <Box sx={{
             width: '100%',
-            p: 2,
-            //  backgroundColor: '#f5f5f5' // Light grey background for the entire page
+            p: 1,
         }}>
-            <CustomBreadCrumbs crumbs={breadCrumbs} />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <CustomBreadCrumbs crumbs={breadCrumbs} />
+                <BlobProvider
+                    document={
+                        <BRSTransactionDetailsPdf
+                            queryValues={queryValues}
+                            chqIssuedNotDebitData={chqIssuedNotDebitData}
+                            chqIssuedNotCreditData={chqIssuedNotCreditData}
+                            directCreditsData={directCreditsData}
+                        />
+                    }
+                >
+                    {({ url, loading, error }) => (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            disabled={loading}
+                            onClick={() => {
+                                if (url) {
+                                    // Open in new tab for printing
+                                    const pdfWindow = window.open(url, '_blank');
+                                    setTimeout(() => {
+                                        pdfWindow?.print();
+                                    }, 1000);
+                                }
+                            }}
+                            startIcon={<PrintIcon />}
+                            sx={{ mt: 2 }}
+                        >
+                            {loading ? 'Preparing PDF...' : 'Print PDF'}
+                        </Button>
+                    )}
+                </BlobProvider>
 
+            </Box>
             <Paper sx={{
                 p: 0,
                 backgroundColor: '#ffffff',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                 maxWidth: '800px',
-                margin: '30px auto',
+                margin: '10px auto',
             }}>
                 <Box sx={{
                     p: 1.5,
-                    backgroundColor: '#fff8e1', 
-                    borderLeft: '4px solid #ffc107', 
+                    backgroundColor: 'rgba(239, 83, 80, 0.08)',
+                    borderLeft: '4px solid #ff5252',
                     mt: 2,
                     mb: 1,
                     borderRadius: '0 4px 4px 0'
@@ -198,9 +233,9 @@ const BRSTransactionDetail = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: 1,
-                        color: '#5d4037'
+                        color: '#d32f2f'
                     }}>
-                        <InfoOutlinedIcon fontSize="small" />
+                        <InfoOutlinedIcon fontSize="small" color="error" /> 
                         <Box component="span" sx={{ fontWeight: 500 }}>
                             Note:
                         </Box>
@@ -256,16 +291,15 @@ const BRSTransactionDetail = () => {
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <Typography fontWeight={600}>{chqIssuedNotDebitData?.totalAmount?.toFixed(2) || 0}</Typography>
-                                {/* {expanded.chqIssued ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />} */}
-                                {chqIssuedNotDebitData?.paymentVouchers?.length > 100 ? (
-                                        <IconButton onClick={() => handleViewTransactionDetails(chqIssuedNotDebitData?.paymentVouchers, 'chqIssued')} size="small">
-                                            <VisibilityIcon fontSize="small" />
-                                        </IconButton>
-                                    ) : (
-                                        <IconButton size="small">
-                                            {expanded.chqIssued ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-                                        </IconButton>
-                                    )}
+                                {chqIssuedNotDebitData?.paymentVouchers?.length > 50 ? (
+                                    <IconButton onClick={() => handleViewTransactionDetails(chqIssuedNotDebitData?.paymentVouchers, 'chqIssued')} size="small">
+                                        <VisibilityIcon fontSize="small" />
+                                    </IconButton>
+                                ) : (
+                                    <IconButton size="small">
+                                        {expanded.chqIssued ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                                    </IconButton>
+                                )}
                             </Box>
                         </Box>
                         <Collapse in={expanded.chqIssued}>
@@ -286,7 +320,7 @@ const BRSTransactionDetail = () => {
                                                     {getPaginatedData('chqIssued').map((item) => (
                                                         <TableRow key={item?.id} hover>
                                                             <TableCell>{item?.vochar_no}</TableCell>
-                                                            <TableCell>{ item?.vochar_date ? moment(item?.vochar_date).format("DD-MM-YYYY"): ""}</TableCell>
+                                                            <TableCell>{item?.vochar_date ? moment(item?.vochar_date).format("DD-MM-YYYY") : ""}</TableCell>
                                                             <TableCell>{item?.pay_to}</TableCell>
                                                             <TableCell align="right">{item?.amount}</TableCell>
                                                         </TableRow>
@@ -311,10 +345,7 @@ const BRSTransactionDetail = () => {
                                             p: 2,
                                             textAlign: 'center',
                                             color: '#888',
-                                            fontStyle: 'italic',
-                                            // backgroundColor: '#fafafa',
-                                            // border: '1px dashed #ddd',
-                                            // borderRadius: 1
+                                            fontStyle: 'italic'
                                         }}
                                     >
                                         No transactions found.
@@ -344,16 +375,15 @@ const BRSTransactionDetail = () => {
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <Typography fontWeight={600}>{chqIssuedNotCreditData?.totalAmount?.toFixed(2) || 0}</Typography>
-                                {/* {expanded.chqDeposited ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />} */}
-                                {chqIssuedNotCreditData?.ddDetails?.length > 100 ? (
-                                        <IconButton onClick={() => handleViewTransactionDetails(chqIssuedNotCreditData?.ddDetails, 'chqDeposited')} size="small">
-                                            <VisibilityIcon fontSize="small" />
-                                        </IconButton>
-                                    ) : (
-                                        <IconButton size="small">
-                                            {expanded.chqDeposited ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-                                        </IconButton>
-                                    )}
+                                {chqIssuedNotCreditData?.ddDetails?.length > 50 ? (
+                                    <IconButton onClick={() => handleViewTransactionDetails(chqIssuedNotCreditData?.ddDetails, 'chqDeposited')} size="small">
+                                        <VisibilityIcon fontSize="small" />
+                                    </IconButton>
+                                ) : (
+                                    <IconButton size="small">
+                                        {expanded.chqDeposited ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                                    </IconButton>
+                                )}
                             </Box>
                         </Box>
                         <Collapse in={expanded.chqDeposited}>
@@ -374,7 +404,7 @@ const BRSTransactionDetail = () => {
                                                     {getPaginatedData('chqDeposited').map((item) => (
                                                         <TableRow key={item?.id} hover>
                                                             <TableCell>{item?.dd_number}</TableCell>
-                                                            <TableCell>{item?.dd_date ? moment(item?.dd_date).format("DD-MM-YYYY"):""}</TableCell>
+                                                            <TableCell>{item?.dd_date ? moment(item?.dd_date).format("DD-MM-YYYY") : ""}</TableCell>
                                                             <TableCell>{item?.bank_name}</TableCell>
                                                             <TableCell align="right">{item?.dd_amount}</TableCell>
                                                         </TableRow>
@@ -399,10 +429,7 @@ const BRSTransactionDetail = () => {
                                             p: 2,
                                             textAlign: 'center',
                                             color: '#888',
-                                            fontStyle: 'italic',
-                                            // backgroundColor: '#fafafa',
-                                            // border: '1px dashed #ddd',
-                                            // borderRadius: 1
+                                            fontStyle: 'italic'
                                         }}
                                     >
                                         No transactions found.
@@ -432,15 +459,15 @@ const BRSTransactionDetail = () => {
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <Typography fontWeight={600}>{directCreditsData?.totalAmount?.toFixed(2) || 0}</Typography>
-                                  {directCreditsData?.bankImportTransactions?.length > 100 ? (
-                                        <IconButton onClick={() => handleViewTransactionDetails(directCreditsData?.bankImportTransactions, 'directCredits')} size="small">
-                                            <VisibilityIcon fontSize="small" />
-                                        </IconButton>
-                                    ) : (
-                                        <IconButton size="small">
-                                            {expanded.directCredits ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-                                        </IconButton>
-                                    )}
+                                {directCreditsData?.bankImportTransactions?.length > 50 ? (
+                                    <IconButton onClick={() => handleViewTransactionDetails(directCreditsData?.bankImportTransactions, 'directCredits')} size="small">
+                                        <VisibilityIcon fontSize="small" />
+                                    </IconButton>
+                                ) : (
+                                    <IconButton size="small">
+                                        {expanded.directCredits ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                                    </IconButton>
+                                )}
                             </Box>
                         </Box>
                         <Collapse in={expanded.directCredits}>
@@ -450,7 +477,7 @@ const BRSTransactionDetail = () => {
                                         <Table size="small">
                                             <TableHead>
                                                 <TableRow sx={{ backgroundColor: '#f1f5f9' }}>
-                                                    <TableCell sx={{ width: 100,  minWidth: '100px' }} align="center">TRN Date</TableCell>
+                                                    <TableCell sx={{ width: 100, minWidth: '100px' }} align="center">TRN Date</TableCell>
                                                     <TableCell sx={{ width: 140, minWidth: '140px' }} align="center">TRN No</TableCell>
                                                     <TableCell sx={{ width: 140, minWidth: '140px' }} align="center">Order Id</TableCell>
                                                     <TableCell sx={{ width: 80, minWidth: '80px' }} align="center">AUID</TableCell>
@@ -487,10 +514,7 @@ const BRSTransactionDetail = () => {
                                         p: 2,
                                         textAlign: 'center',
                                         color: '#888',
-                                        fontStyle: 'italic',
-                                      //  backgroundColor: '#fafafa',
-                                        // border: '1px dashed #ddd',
-                                        // borderRadius: 1
+                                        fontStyle: 'italic'
                                     }}
                                 >
                                     No transactions found.
