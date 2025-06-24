@@ -9,6 +9,8 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CustomModal from "../../../components/CustomModal";
 
 const initValues = {
   courseName: "",
@@ -44,6 +46,14 @@ function SyllabusForm() {
   const [courseObjectiveId, setcourseObjectiveId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [courseOptions, setCourseOptions] = useState([]);
+
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -72,7 +82,6 @@ function SyllabusForm() {
         },
         { name: "Syllabus" },
         { name: "Update" },
-        // { name: res.data.data.syllabus_id },
       ]);
       getCourseObjectiveData();
     }
@@ -110,7 +119,7 @@ function SyllabusForm() {
           setValues({ courseId: Number(id), courseObjective: temp });
         }
         setcourseObjectiveId(res.data.data.syllabus_id);
-        if (state.toLowerCase() === "/courseassignmentemployeeindex") {
+        if (state?.toLowerCase() === "/courseassignmentemployeeindex") {
           setCrumbs([
             {
               name: "My Course",
@@ -183,6 +192,7 @@ function SyllabusForm() {
       }),
     }));
   };
+
   const remove = (index) => {
     const temp = values.courseObjective;
     temp.pop();
@@ -190,6 +200,30 @@ function SyllabusForm() {
       ...prev,
       ["courseObjective"]: temp,
     }));
+  };
+
+  const handleDelete = async (obj, i) => {
+    setModalOpen(true);
+    const handleToggle = async () => {
+      await axios
+        .delete(`/api/academic/syllabus/${obj.syllabus_id}`)
+        .then((res) => {
+          if (res.status === 200) {
+            getCourseObjectiveData();
+            setModalOpen(false);
+          }
+        })
+        .catch((err) => console.error(err));
+    };
+
+    setModalContent({
+      title: "",
+      message: `Are you sure yo want to delete Module-${i + 1}`,
+      buttons: [
+        { name: "Yes", color: "primary", func: handleToggle },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
   };
 
   const requiredFieldsValid = () => {
@@ -308,7 +342,7 @@ function SyllabusForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            if (state.toLowerCase() === "/courseassignmentemployeeindex") {
+            if (state?.toLowerCase() === "/courseassignmentemployeeindex") {
               navigate("/courseassignmentemployeeindex", { replace: true });
             } else {
               navigate("/CourseSubjectiveMaster/Syllabus", { replace: true });
@@ -323,6 +357,8 @@ function SyllabusForm() {
           setAlertOpen(true);
         })
         .catch((error) => {
+          console.log(error);
+
           setLoading(false);
           setAlertMessage({
             severity: "error",
@@ -334,122 +370,139 @@ function SyllabusForm() {
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
-      <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-start"
-          columnSpacing={2}
-          rowSpacing={2}
-        >
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="courseId"
-              label="Course"
-              value={values.courseId}
-              options={courseOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={8}></Grid>
-          {values.courseObjective.map((obj, i) => {
-            return (
-              <>
-                <Grid item xs={12} md={6} key={i}>
-                  <CustomTextField
-                    rows={2.5}
-                    multiline
-                    inputProps={{
-                      minLength: 1,
-                      maxLength: 500,
-                    }}
-                    label={"Module " + Number(i + 1)}
-                    name={"objective" + "-" + i}
-                    value={values.courseObjective[i]["objective"]}
-                    handleChange={handleChange}
-                    required
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomTextField
-                    rows={2.5}
-                    multiline
-                    inputProps={{
-                      minLength: 1,
-                      maxLength: 500,
-                    }}
-                    label={"Topics"}
-                    name={"topic_name" + "-" + i}
-                    value={values.courseObjective[i]["topic_name"]}
-                    handleChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomTextField
-                    inputProps={{
-                      minLength: 1,
-                      maxLength: 300,
-                    }}
-                    label={"Teaching-Learning Process " + Number(i + 1)}
-                    name={"learning" + "-" + i}
-                    value={values.courseObjective[i]["learning"]}
-                    handleChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomTextField
-                    name={"hours" + "-" + i}
-                    label="Duration (Hrs)"
-                    value={values.courseObjective[i]["hours"]}
-                    handleChange={handleChange}
-                    required
-                  />
-                </Grid>
-              </>
-            );
-          })}
-
-          <Grid item xs={12} mt={2.5} align="right">
-            <Button
-              variant="contained"
-              color="error"
-              onClick={remove}
-              disabled={values.courseObjective.length === 1}
-              style={{ marginRight: "10px" }}
-            >
-              <RemoveIcon />
-            </Button>
-
-            <Button variant="contained" color="success" onClick={add}>
-              <AddIcon />
-            </Button>
-          </Grid>
-
-          <Grid item xs={12} textAlign="right" mt={3}>
-            <Button
-              style={{ borderRadius: 7 }}
-              variant="contained"
-              color="primary"
-              disabled={loading}
-              onClick={isNew ? handleCreate : handleUpdate}
-            >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                <strong>{isNew ? "Create" : "Update"}</strong>
-              )}
-            </Button>
-          </Grid>
+    <FormWrapper>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Grid container spacing={1}>
+        <Grid item xs={12} md={4}>
+          <CustomAutocomplete
+            name="courseId"
+            label="Select Course"
+            value={values.courseId}
+            options={courseOptions}
+            handleChangeAdvance={handleChangeAdvance}
+            disabled={!isNew}
+            required
+          />
         </Grid>
-      </FormWrapper>
-    </Box>
+
+        {values.courseObjective.map((obj, i) => (
+          <Grid item xs={12} key={i}>
+            <Box
+              sx={{
+                border: "1px solid #e0e0e0",
+                borderRadius: 2,
+                p: 3,
+                backgroundColor: "#fafafa",
+              }}
+            >
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} sm={6}>
+                  <Box sx={{ fontWeight: "bold", fontSize: "1.1rem", mb: 1 }}>
+                    Module {i + 1}
+                  </Box>
+                </Grid>
+                <Grid item xs={12} sm={6} textAlign="right">
+                  {values.courseObjective.length > 1 && !isNew && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={() => handleDelete(obj, i)}
+                      startIcon={<DeleteIcon />}
+                    >
+                      Remove Module
+                    </Button>
+                  )}
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <CustomTextField
+                    multiline
+                    rows={3}
+                    inputProps={{ maxLength: 500 }}
+                    label="Objective"
+                    name={`objective-${i}`}
+                    value={obj.objective}
+                    handleChange={handleChange}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <CustomTextField
+                    multiline
+                    rows={3}
+                    inputProps={{ maxLength: 500 }}
+                    label="Topics"
+                    name={`topic_name-${i}`}
+                    value={obj.topic_name}
+                    handleChange={handleChange}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <CustomTextField
+                    inputProps={{ maxLength: 300 }}
+                    label="Teaching-Learning Process"
+                    name={`learning-${i}`}
+                    value={obj.learning}
+                    handleChange={handleChange}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <CustomTextField
+                    label="Duration (Hrs)"
+                    name={`hours-${i}`}
+                    value={obj.hours}
+                    handleChange={handleChange}
+                    required
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          </Grid>
+        ))}
+
+        <Grid item xs={12} textAlign="right">
+          <Button
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => remove()}
+            sx={{ marginRight: 2 }}
+          >
+            <RemoveIcon />
+          </Button>
+
+          <Button variant="contained" color="success" onClick={add}>
+            <AddIcon />
+          </Button>
+        </Grid>
+
+        <Grid item xs={12} textAlign="right" mt={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={isNew ? handleCreate : handleUpdate}
+            disabled={loading}
+            sx={{ borderRadius: 2, minWidth: 120 }}
+          >
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : (
+              <strong>{isNew ? "Create" : "Update"}</strong>
+            )}
+          </Button>
+        </Grid>
+      </Grid>
+    </FormWrapper>
   );
 }
 
