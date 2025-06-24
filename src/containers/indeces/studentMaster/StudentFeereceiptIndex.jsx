@@ -14,7 +14,8 @@ import {
   TableRow,
   tableCellClasses,
   tooltipClasses,
-  CircularProgress,Backdrop 
+  CircularProgress,
+  Backdrop,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
@@ -89,7 +90,7 @@ function StudentFeereceiptIndex() {
   const [loading, setLoading] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     fee_template_name: false,
-    inr1:false,
+    inr1: false,
     created_username: false,
     paid_year: false,
     transaction_no: false,
@@ -320,13 +321,17 @@ function StudentFeereceiptIndex() {
       flex: 0.8,
       hideable: false,
       type: "number",
-      renderCell:(params)=>(<div style={{textAlign:"right",width:"100%"}}>{params.row.transaction_type?.toLowerCase() == "cash"
-          ? Number(
-              params.row.inr_value % 1 !== 0
-                ? params.row.inr_value?.toFixed(2)
-                : params.row.inr_value
-            )
-          : 0}</div>),
+      renderCell: (params) => (
+        <div style={{ textAlign: "right", width: "100%" }}>
+          {params.row.transaction_type?.toLowerCase() == "cash"
+            ? Number(
+                params.row.inr_value % 1 !== 0
+                  ? params.row.inr_value?.toFixed(2)
+                  : params.row.inr_value
+              )
+            : 0}
+        </div>
+      ),
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "cash"
           ? Number(
@@ -343,13 +348,17 @@ function StudentFeereceiptIndex() {
       hideable: false,
       type: "number",
       type: "number",
-      renderCell: (params) => (<div style={{ textAlign: "right", width: "100%" }}>{params.row.transaction_type?.toLowerCase() == "dd"
-        ? Number(
-          params.row.inr_value % 1 !== 0
-            ? params.row.inr_value?.toFixed(2)
-            : params.row.inr_value
-        )
-        : 0}</div>),
+      renderCell: (params) => (
+        <div style={{ textAlign: "right", width: "100%" }}>
+          {params.row.transaction_type?.toLowerCase() == "dd"
+            ? Number(
+                params.row.inr_value % 1 !== 0
+                  ? params.row.inr_value?.toFixed(2)
+                  : params.row.inr_value
+              )
+            : 0}
+        </div>
+      ),
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "dd"
           ? Number(
@@ -365,15 +374,19 @@ function StudentFeereceiptIndex() {
       flex: 0.8,
       hideable: false,
       type: "number",
-      renderCell: (params) => (<div style={{ textAlign: "right", width: "100%" }}>{params.row.transaction_type?.toLowerCase() == "rtgs" ||
-        params.row.transaction_type?.toLowerCase() == "p_gateway" ||
-        params.row.transaction_type?.toLowerCase() == "online"
-          ? Number(
-              params.row.inr_value % 1 !== 0
-                ? params.row.inr_value?.toFixed(2)
-                : params.row.inr_value
-            )
-          : 0}</div>),
+      renderCell: (params) => (
+        <div style={{ textAlign: "right", width: "100%" }}>
+          {params.row.transaction_type?.toLowerCase() == "rtgs" ||
+          params.row.transaction_type?.toLowerCase() == "p_gateway" ||
+          params.row.transaction_type?.toLowerCase() == "online"
+            ? Number(
+                params.row.inr_value % 1 !== 0
+                  ? params.row.inr_value?.toFixed(2)
+                  : params.row.inr_value
+              )
+            : 0}
+        </div>
+      ),
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "rtgs" ||
         row.transaction_type?.toLowerCase() == "p_gateway" ||
@@ -390,13 +403,17 @@ function StudentFeereceiptIndex() {
       headerName: "INR1",
       flex: 0.8,
       type: "number",
-      renderCell: (params) => (<div style={{ textAlign: "right", width: "100%" }}>{params.row.received_in?.toLowerCase() == "usd"
-        ? Number(
-          params.row.paid_amount % 1 !== 0
-            ? params.row.paid_amount?.toFixed(2)
-            : params.row.paid_amount
-        )
-        : ""}</div>),
+      renderCell: (params) => (
+        <div style={{ textAlign: "right", width: "100%" }}>
+          {params.row.received_in?.toLowerCase() == "usd"
+            ? Number(
+                params.row.paid_amount % 1 !== 0
+                  ? params.row.paid_amount?.toFixed(2)
+                  : params.row.paid_amount
+              )
+            : ""}
+        </div>
+      ),
       valueGetter: (value, row) =>
         row.received_in?.toLowerCase() == "usd"
           ? Number(
@@ -407,15 +424,15 @@ function StudentFeereceiptIndex() {
           : "",
     },
     {
-      field: "bank_name",
+      field: "bank_short_name",
       headerName: "Bank",
       flex: 0.8,
       hideable: false,
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "cash"
-          ? "Cash"
-          : row.bank_name
-          ? row.bank_name
+          ? `Cash-${row.inter_school_short_name}`
+          : row.bank_short_name
+          ? `${row.bank_short_name}-${row.inter_school_short_name}`
           : null,
     },
     {
@@ -424,7 +441,9 @@ function StudentFeereceiptIndex() {
       flex: 2,
       hideable: false,
       valueGetter: (value, row) =>
-      (row?.cheque_dd_no || row?.dd_number || row?.dd_bank_name) ? row?.cheque_dd_no || row?.dd_number + "_" + row?.dd_bank_name : "",
+        row?.cheque_dd_no || row?.dd_number || row?.dd_bank_name
+          ? row?.cheque_dd_no || row?.dd_number + "_" + row?.dd_bank_name
+          : "",
     },
     {
       field: "transaction_no",
@@ -462,7 +481,7 @@ function StudentFeereceiptIndex() {
           params.row.receipt_type.toLowerCase() === "bulk fee") &&
         params.row.student_id !== null ? (
           <IconButton
-          disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/BulkFeeReceiptPdfV1`, {
                 state: {
@@ -471,8 +490,9 @@ function StudentFeereceiptIndex() {
                   transactionType: params.row.transaction_type,
                   financialYearId: params.row.financial_year_id,
                   linkStatus: true,
+                  repeatStatus: params.row.repeat_status,
                 },
-              }) 
+              })
             }
             color="primary"
           >
@@ -482,7 +502,7 @@ function StudentFeereceiptIndex() {
             params.row.receipt_type.toLowerCase() === "bulk fee") &&
           params.row.student_id === null ? (
           <IconButton
-           disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/BulkFeeReceiptPdfV1`, {
                 state: {
@@ -491,6 +511,7 @@ function StudentFeereceiptIndex() {
                   transactionType: params.row.transaction_type,
                   financialYearId: params.row.financial_year_id,
                   linkStatus: true,
+                  repeatStatus: params.row.repeat_status,
                 },
               })
             }
@@ -500,10 +521,14 @@ function StudentFeereceiptIndex() {
           </IconButton>
         ) : params.row.receipt_type.toLowerCase() === "hos" ? (
           <IconButton
-           disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/HostelFeePdfV1`, {
-                state: { feeReceiptId: params.row.id, linkStatus: true },
+                state: {
+                  feeReceiptId: params.row.id,
+                  linkStatus: true,
+                  repeatStatus: params.row.repeat_status,
+                },
               })
             }
             color="primary"
@@ -513,10 +538,14 @@ function StudentFeereceiptIndex() {
         ) : params.row.receipt_type.toLowerCase() === "exam" ||
           params.row.receipt_type.toLowerCase() === "exam fee" ? (
           <IconButton
-           disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/ExamReceiptPdfV1`, {
-                state: { feeReceiptId: params.row.id, linkStatus: true },
+                state: {
+                  feeReceiptId: params.row.id,
+                  linkStatus: true,
+                  repeatStatus: params.row.repeat_status,
+                },
               })
             }
             color="primary"
@@ -526,13 +555,14 @@ function StudentFeereceiptIndex() {
           </IconButton>
         ) : params.row.receipt_type.toLowerCase() === "hosb" ? (
           <IconButton
-           disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/HostelBulkFeeReceiptV1`, {
                 state: {
                   feeReceiptId: params.row.id,
                   studentId: params.row.student_id,
                   linkStatus: true,
+                  repeatStatus: params.row.repeat_status,
                 },
               })
             }
@@ -542,7 +572,7 @@ function StudentFeereceiptIndex() {
           </IconButton>
         ) : (
           <IconButton
-           disabled={!params.row.active}
+            disabled={!params.row.active}
             onClick={() =>
               navigate(`/FeeReceiptDetailsPDFV1`, {
                 state: {
@@ -553,6 +583,7 @@ function StudentFeereceiptIndex() {
                   feeReceiptId: params.row.id,
                   financialYearId: params.row.financial_year_id,
                   linkStatus: true,
+                  repeatStatus: params.row.repeat_status,
                 },
               })
             }
@@ -590,14 +621,20 @@ function StudentFeereceiptIndex() {
   };
 
   const getRowClassName = (params) => {
-    return !params.row?.active ? classes.redRow : params.row?.received_in == "USD" ? classes.blueRow : "";
+    return !params.row?.active
+      ? classes.redRow
+      : params.row?.received_in == "USD"
+      ? classes.blueRow
+      : "";
   };
 
   return (
     <Box>
-      {loading && <Backdrop open={true} style={{ zIndex: 1300 }}>
-        <CircularProgress color="primary" />
-      </Backdrop>}
+      {loading && (
+        <Backdrop open={true} style={{ zIndex: 1300 }}>
+          <CircularProgress color="primary" />
+        </Backdrop>
+      )}
       <Grid
         container
         sx={{

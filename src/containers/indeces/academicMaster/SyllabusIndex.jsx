@@ -80,8 +80,7 @@ function SyllabusIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-     // type: "date",
-       valueGetter: (value, row) =>
+      valueGetter: (value, row) =>
         moment(row.created_date).format("DD-MM-YYYY"),
     },
 
@@ -102,31 +101,8 @@ function SyllabusIndex() {
         </IconButton>,
       ],
     },
-
-    {
-      field: "active",
-      headerName: "Active",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        params.row.active === true ? (
-          <IconButton
-            style={{ color: "green" }}
-            onClick={() => handleActive(params)}
-          >
-            <Check />
-          </IconButton>
-        ) : (
-          <IconButton
-            style={{ color: "red" }}
-            onClick={() => handleActive(params)}
-          >
-            <HighlightOff />
-          </IconButton>
-        ),
-      ],
-    },
   ];
+
   useEffect(() => {
     getData();
   }, []);
@@ -134,7 +110,7 @@ function SyllabusIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllSyllabusDetail?page=${0}&page_size=${100000}&sort=created_date`
+        `/api/academic/fetchAllSyllabusDetail?page=${0}&page_size=${10000000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data);
@@ -156,12 +132,12 @@ function SyllabusIndex() {
   };
 
   const handleActive = async (params) => {
-    const id = params.row.id;
+    const id = params.row.course_assignment_id;
 
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/syllabus/${id}`)
+          .delete(`/api/academic/inactivesyllabusBasedOnCourseAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -170,7 +146,7 @@ function SyllabusIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/activatesyllabus/${id}`)
+          .delete(`/api/academic/activesyllabusBasedOnCourseAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

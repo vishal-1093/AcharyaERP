@@ -12,7 +12,7 @@ import {
 import { makeStyles } from "@mui/styles";
 import axios from "../../../services/Api.js";
 import moment from "moment";
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from "react-router-dom";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs.js";
 
@@ -44,9 +44,9 @@ function LedgerDebitReceiptDetail() {
     paid_year: false,
     cheque_dd_no: false,
     school_name_short: false,
-    bank_name: false
+    bank_name: false,
   });
-  const location = useLocation()
+  const location = useLocation();
   const queryValues = location.state;
   const classes = useStyles();
 
@@ -56,18 +56,19 @@ function LedgerDebitReceiptDetail() {
 
   const getData = async () => {
     setLoading(true);
-    const { voucherHeadId, fcYearId, schoolId, month, date, bankId } = queryValues
+    const { voucherHeadId, fcYearId, schoolId, month, date, bankId } =
+      queryValues;
     const params = {
       page: 0,
       page_size: 1000000,
-      sort: 'created_date',
-      date_range: 'custom',
+      sort: "created_date",
+      date_range: "custom",
       start_date: date,
       end_date: date,
       inter_school_id: schoolId,
-      bank_id: bankId
-    }
-    const baseUrl = 'api/finance/fetchAllFeeReceipt'
+      bank_id: bankId,
+    };
+    const baseUrl = "api/finance/fetchAllFeeReceipt";
     await axios
       .get(baseUrl, { params })
       .then((res) => {
@@ -90,14 +91,14 @@ function LedgerDebitReceiptDetail() {
         params.row.receipt_type == "HOS"
           ? "HOST"
           : params.row.receipt_type == "General"
-            ? "GEN"
-            : params.row.receipt_type == "Registration Fee"
-              ? "REGT"
-              : params.row.receipt_type == "Bulk Fee"
-                ? "BULK"
-                : params.row.receipt_type == "Exam Fee"
-                  ? "EXAM"
-                  : params.row.receipt_type?.toUpperCase(),
+          ? "GEN"
+          : params.row.receipt_type == "Registration Fee"
+          ? "REGT"
+          : params.row.receipt_type == "Bulk Fee"
+          ? "BULK"
+          : params.row.receipt_type == "Exam Fee"
+          ? "EXAM"
+          : params.row.receipt_type?.toUpperCase(),
     },
     {
       field: "student_name",
@@ -131,8 +132,8 @@ function LedgerDebitReceiptDetail() {
         row?.student_name
           ? row.student_name
           : row?.bulk_user_name
-            ? row.bulk_user_name
-            : "N/A",
+          ? row.bulk_user_name
+          : "N/A",
     },
     {
       field: "school_name_short",
@@ -179,8 +180,8 @@ function LedgerDebitReceiptDetail() {
       valueGetter: (value, row) => {
         return row.inr_value % 1 !== 0
           ? row.inr_value?.toFixed(2)
-          : row.inr_value
-      }
+          : row.inr_value;
+      },
     },
 
     {
@@ -191,31 +192,35 @@ function LedgerDebitReceiptDetail() {
       valueGetter: (value, row) =>
         row.received_in?.toLowerCase() == "usd"
           ? Number(
-            row.paid_amount % 1 !== 0
-              ? row.paid_amount?.toFixed(2)
-              : row.paid_amount
-          )
+              row.paid_amount % 1 !== 0
+                ? row.paid_amount?.toFixed(2)
+                : row.paid_amount
+            )
           : "",
     },
+
     {
-      field: "bank_name",
+      field: "bank_short_name",
       headerName: "Bank",
       flex: 1,
-      // hideable: false,
+
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "cash"
-          ? "Cash"
-          : row.bank_name
-            ? row.bank_name
-            : null,
+          ? `Cash-${row.inter_school_short_name}`
+          : row.bank_short_name
+          ? `${row.bank_short_name}-${row.inter_school_short_name}`
+          : null,
     },
+
     {
       field: "cheque_dd_no",
       headerName: "Transaction Ref",
       flex: 1,
       // hideable: false,
       valueGetter: (value, row) =>
-        (row?.cheque_dd_no || row?.dd_number || row?.dd_bank_name) ? row?.cheque_dd_no || row?.dd_number + "_" + row?.dd_bank_name : "",
+        row?.cheque_dd_no || row?.dd_number || row?.dd_bank_name
+          ? row?.cheque_dd_no || row?.dd_number + "_" + row?.dd_bank_name
+          : "",
     },
     {
       field: "transaction_no",
@@ -225,20 +230,20 @@ function LedgerDebitReceiptDetail() {
         row?.transaction_no
           ? row.transaction_no
           : row?.dd_number
-            ? row.dd_number
-            : "",
+          ? row.dd_number
+          : "",
     },
     {
       field: "transaction_date",
       headerName: "Trn Date",
       flex: 1,
-      align: 'center',
+      align: "center",
       valueGetter: (value, row) =>
         row?.transaction_date
           ? row.transaction_date
           : row?.dd_date
-            ? moment(row.dd_date).format("DD-MM-YYYY")
-            : null,
+          ? moment(row.dd_date).format("DD-MM-YYYY")
+          : null,
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
   ];
@@ -253,8 +258,8 @@ function LedgerDebitReceiptDetail() {
           columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel}
           getRowId={(row, index) => row?.id}
-           getRowClassName={(params) => {
-            return params.row.active === false ? `${classes.inactiveRow}` : '';
+          getRowClassName={(params) => {
+            return params.row.active === false ? `${classes.inactiveRow}` : "";
           }}
         />
       </Box>
@@ -263,5 +268,3 @@ function LedgerDebitReceiptDetail() {
 }
 
 export default LedgerDebitReceiptDetail;
-
-

@@ -39,6 +39,7 @@ const FeeReceiptDetailsPDFNew = () => {
     studentStatus,
     receiptStatus,
     reportStatus,
+    repeatStatus,
   } = location?.state;
 
   useEffect(() => {
@@ -400,7 +401,8 @@ const FeeReceiptDetailsPDFNew = () => {
                 </Grid>
                 <Grid item xs={7}>
                   <Typography variant="body1" sx={bookmanFont}>
-                    G - {feeReceipt}
+                    G - {feeReceipt}{" "}
+                    {repeatStatus > 0 ? `/${repeatStatus}` : ""}
                   </Typography>
                 </Grid>
 
