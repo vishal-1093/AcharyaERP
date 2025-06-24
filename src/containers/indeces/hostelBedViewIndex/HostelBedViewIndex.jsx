@@ -92,7 +92,7 @@ function HostelBedViewIndex({ tab }) {
       foodType: row.foodStatus || "",
     }));
   };
-  
+
   const handleChangeOccupied = (params) => {
     setOccupiedTypeOpen(true);
     setRowDetails(params?.row);
@@ -222,7 +222,7 @@ function HostelBedViewIndex({ tab }) {
       getActions: (params) => [
         params.row.fromDate !== null ? (
           <div
-            onClick={() => handleChangeOccupied(params)}
+          // onClick={() => handleChangeOccupied(params)}
           // style={{
           //   cursor: "pointer",
           // }}
@@ -387,7 +387,7 @@ function HostelBedViewIndex({ tab }) {
   const getData = async () => {
     try {
       setLoading(true)
-      const url = `/api/hostel/fetchAllHostelBedAssignment?page=0&pageSize=100000&sort=createdDate&active=true${values?.schoolId ? `&school_id=${values?.schoolId}` : ""
+      const url = `/api/hostel/fetchAllHostelBedAssignment?page=0&pageSize=100000&sort=createdDate&active=true${values?.schoolId ? `&schoolId=${values?.schoolId}` : ""
         }${values?.blockName ? `&blockId=${values?.blockName}` : ""}&acYearId=${values?.acyearId}&cancelledStatus=${tab === "Active Bed" ? "NOT CANCELLED" : "CANCELLED"
         }`;
 
@@ -432,7 +432,7 @@ function HostelBedViewIndex({ tab }) {
     temp.fromDate = rowDetails?.fromDate;
     temp.toDate = rowDetails?.toDate;
     temp.foodStatus = values?.foodType;
-    temp.vacateBy = 1;
+    // temp.vacateBy = 1;
     temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
     temp.active = true;
     const response = await axios.get(`/api/hostel/hostelBedAssignment/${rowDetails?.id}`);
