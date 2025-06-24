@@ -382,7 +382,7 @@ function PaidAtBoardReport() {
             },
             {
               field: "current_year",
-              headerName: "Year/Sem",
+              headerName: "Current Year/Sem",
               flex: 1,
               headerClassName: "header-bg",
               headerAlign: "center",
@@ -448,7 +448,7 @@ function PaidAtBoardReport() {
           <Grid
             item
             xs={12}
-            md={8}
+            md={9}
             sx={{
               "& .last-row": {
                 fontWeight: 700,

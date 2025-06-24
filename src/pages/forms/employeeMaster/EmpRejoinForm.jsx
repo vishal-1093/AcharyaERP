@@ -92,6 +92,8 @@ function EmpRejoinForm({
       });
       setReportOptions(optionData);
     } catch (err) {
+      console.log(err);
+
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to load data !!",
@@ -107,23 +109,30 @@ function EmpRejoinForm({
         `/api/employee/offerDetailsByJobId/${job_id}`
       );
       const jobData = jobResponse?.data?.[0];
-      const { offer_id: offerId } = jobData;
-      const { data: offerResponse } = await axios.get(
-        `/api/employee/Offer/${offerId}`
-      );
-      const responseData = offerResponse.data;
 
-      const { report_id, date_of_joining, comments } = responseData;
-      setValues((prev) => ({
-        ...prev,
-        reportId: report_id,
-        dateofJoining: date_of_joining
-          ? moment(date_of_joining, "DD-MM-YYYY")
-          : null,
-        comments: comments ?? "",
-      }));
-      setOfferDetailsData(responseData);
+      console.log("jobData", jobData);
+
+      if (jobData) {
+        const { offer_id: offerId } = jobData;
+        const { data: offerResponse } = await axios.get(
+          `/api/employee/Offer/${offerId}`
+        );
+        const responseData = offerResponse.data;
+
+        const { report_id, date_of_joining, comments } = responseData;
+        setValues((prev) => ({
+          ...prev,
+          reportId: report_id,
+          dateofJoining: date_of_joining
+            ? moment(date_of_joining, "DD-MM-YYYY")
+            : null,
+          comments: comments ?? "",
+        }));
+        setOfferDetailsData(responseData);
+      }
     } catch (err) {
+      console.log(err);
+
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to load data !!",

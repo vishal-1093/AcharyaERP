@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import AddIcon from "@mui/icons-material/Add";
-import { Check, HighlightOff } from "@mui/icons-material";
+import { Check, HighlightOff, Visibility } from "@mui/icons-material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
@@ -135,16 +135,29 @@ function PaidAtBoardIndex() {
       flex: 1,
       headerName: "Tag",
       getActions: (params) => [
-        <IconButton
-          onClick={() =>
-            navigate(`/paid-at-board-std-list`, {
-              state: { rowData: params.row },
-            })
-          }
-          color="primary"
-        >
-          <AddCircleRoundedIcon fontSize="small" />
-        </IconButton>,
+        params.row.remainingBalance > 0 ? (
+          <IconButton
+            onClick={() =>
+              navigate(`/paid-at-board-std-list`, {
+                state: { rowData: params.row },
+              })
+            }
+            color="primary"
+          >
+            <AddCircleRoundedIcon fontSize="small" />
+          </IconButton>
+        ) : (
+          <IconButton
+            onClick={() =>
+              navigate(`/paid-at-board-std-list`, {
+                state: { rowData: params.row },
+              })
+            }
+            color="primary"
+          >
+            <Visibility fontSize="small" />
+          </IconButton>
+        ),
       ],
     },
     {
