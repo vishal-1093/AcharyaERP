@@ -6,6 +6,12 @@ const styles = StyleSheet.create({
         padding: 30,
         fontFamily: 'Helvetica'
     },
+    headerContainer: {
+        backgroundColor: '#376a7d',
+        color: 'white',
+        padding: 15,
+        textAlign: 'center'
+    },
     section: {
         marginBottom: 20,
         fontSize: '12px',
@@ -25,17 +31,20 @@ const styles = StyleSheet.create({
     },
     cell: {
         flex: 1,
-        fontSize: 10
+        fontSize: 10,
+        textAlign: 'right'
     },
     headerRow: {
-        backgroundColor: '#376a7d',
-        color: 'white',
-        fontWeight: 'bold'
+        backgroundColor: '#f5f5f5',
+        color: 'rgba(0, 0, 0, 0.87)',
+        fontWeight: 'bold',
+        fontSize: '0.8125rem'
     },
     headerCell: {
         flex: 1,
         fontSize: 10,
-        color: 'white'
+        color: 'rgba(0, 0, 0, 0.87)',
+        textAlign: 'right'
     },
     totalRow: {
         backgroundColor: '#376a7d',
@@ -47,25 +56,37 @@ const styles = StyleSheet.create({
         fontStyle: 'italic !important',
         textAlign: 'left',
         color: '#376a7d',
-        fontWeight:'bold'
+        fontWeight: 'bold'
     }
 });
 
 const LedgerMasterIndexPdf = ({ data, filters }) => {
     const columns = data.columns
     const rows = data.rows;
-
     return (
         <Document>
             <Page size="A4" style={styles.page}>
-                <View style={styles.section}>
-                    <Text style={styles.subtitleText}>
-                        {`${filters.voucherHeadName} for Financial Year ${filters.fcYear} as on ${moment().format('DD-MM-YYYY')}`}
+                <View style={styles.headerContainer}>
+                    <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: '7px' }}>
+                        {filters.voucherHeadName}
+                    </Text>
+                    <Text style={{ fontSize: 12, marginBottom: '7px' }}>
+                        {`Financial Year ${filters?.fcYear}`}
+                    </Text>
+                    <Text style={{ fontSize: 12 }}>
+                        {`As on ${moment().format('DD-MM-YYYY')}`}
                     </Text>
                 </View>
                 <View style={[styles.row, styles.headerRow]}>
                     {columns.map((column) => (
-                        <Text key={column.field} style={styles.headerCell}>
+                        <Text
+                            key={column.field}
+                            //  style={styles.headerCell}
+                            style={[
+                                styles.headerCell,
+                                column.field === 'school_name_short' && { textAlign: 'center' }
+                            ]}
+                        >
                             {column.headerName}
                         </Text>
                     ))}
@@ -76,7 +97,14 @@ const LedgerMasterIndexPdf = ({ data, filters }) => {
                         style={row.isLastRow ? [styles.row, styles.totalRow] : styles.row}
                     >
                         {columns.map((column) => (
-                            <Text key={column.field} style={styles.cell}>
+                            <Text
+                                key={column.field}
+                                //  style={styles.cell}
+                                style={[
+                                    styles.cell,
+                                    column.field === 'school_name_short' && { textAlign: 'center' }
+                                ]}
+                            >
                                 {row[column.field]}
                             </Text>
                         ))}
