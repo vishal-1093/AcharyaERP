@@ -246,14 +246,9 @@ const InstituteBankBalance = () => {
     const [loading, setLoading] = useState(false)
     const [currFcYear, setCurrFcYear] = useState({})
     const [fcYearOption, setFcYearOption] = useState([])
-    const [breadCrumbs, setBreadCrumbs] = useState([]);
-    const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-        balanceUpdatedOn: false,
-        balanceUpdatedBy: false,
-    })
     const navigate = useNavigate();
     const location = useLocation()
-    const bankGroupId = location?.state?.id
+    const bankGroupId = location?.state?.bankGroupId
     const setCrumbs = useBreadcrumbs();
     const roleShortName = JSON.parse(
         sessionStorage.getItem("AcharyaErpUser")
@@ -261,67 +256,76 @@ const InstituteBankBalance = () => {
 
     useEffect(() => {
         setCrumbs([{ name: "Bank Balance", link: "/bank-balance" }, { name: "BRS" }])
+          getFinancialYearDetails()
     }, []);
 
 
     useEffect(() => {
         if (bankGroupId)
-            fetchDataInParallel()
-        getFinancialYearDetails()
+            getData()
+           // fetchDataInParallel()
     }, [bankGroupId]);
 
-    const fetchDataInParallel = async () => {
-        const params = {
-            bank_group_id: bankGroupId,
-            page: 0,
-            page_size: 10000,
-            sort: 'created_date'
-        };
+    // const fetchDataInParallel = async () => {
+    //     const params = {
+    //         bank_group_id: bankGroupId,
+    //         page: 0,
+    //         page_size: 10000,
+    //         sort: 'created_date'
+    //     };
 
-        try {
-            setLoading(true);
+    //     try {
+    //         setLoading(true);
 
-            const [detailsRes, ledgerRes] = await Promise.all([
-                axios.get("api/finance/fetchAllBanknDetailsByBankGroupId", { params }),
-                axios.get(`/api/finance/getLedgerByBankGroupId?bankGroupId=${bankGroupId}`)
-            ]);
+    //         const [detailsRes, ledgerRes] = await Promise.all([
+    //             axios.get("api/finance/fetchAllBanknDetailsByBankGroupId", { params }),
+    //             axios.get(`/api/finance/getLedgerByBankGroupId?bankGroupId=${bankGroupId}`)
+    //         ]);
 
-            const details = detailsRes?.data?.data?.Paginated_data?.content || [];
-            const ledger = ledgerRes?.data?.data || [];
-            const balanceMap = new Map();
+    //         const details = detailsRes?.data?.data?.Paginated_data?.content || [];
+    //         const ledger = ledgerRes?.data?.data || [];
+    //         const balanceMap = new Map();
+    //         ledger.forEach(item => {
+    //             const key = `${item.school_id}_${item.bankId}`;
+    //             balanceMap.set(key, {
+    //                 closing_balance: item.closingBalance || 0,
+    //                 brs_amount: item.brs_amount || 0
+    //             });
+    //         });
+    //         const mergedData = details.map(row => {
+    //             const key = `${row.school_id}_${row.id}`;
+    //             const match = balanceMap.get(key);
 
-            ledger.forEach(item => {
-                const schoolId = item?.school_id;
-                const bankId = item?.bankId;
-                const closingBalance = item?.closingBalance || 0;
+    //             return {
+    //                 ...row,
+    //                 closing_balance: match?.closing_balance ?? null,
+    //                 brs_amount: match?.brs_amount ?? null
+    //             };
+    //         });
+    //         setLoading(false)
+    //         setRows(mergedData);
+    //     } catch (error) {
+    //         console.error("Error fetching bank data:", error);
+    //         setLoading(false)
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
-                const key = `${schoolId}_${bankId}`;
-                if (balanceMap.has(key)) {
-                    const current = balanceMap.get(key);
-                    balanceMap.set(key, current + closingBalance);
-                } else {
-                    balanceMap.set(key, closingBalance);
-                }
-            });
-            const mergedData = details.map(row => {
-                const schoolId = row?.school_id;
-                const bankId = row?.id;
-                const key = `${schoolId}_${bankId}`;
-
-                return {
-                    ...row,
-                    closing_balance: balanceMap.get(key) || 0
-                };
-            });
-            setLoading(false)
-            setRows(mergedData);
-        } catch (error) {
-            console.error("Error fetching bank data:", error);
-            setLoading(false)
-        } finally {
-            setLoading(false);
-        }
-    };
+    const getData = async() =>{
+        setLoading(true);
+                await axios
+                    .get(`/api/finance/getLedgerByBankGroupId?bankGroupId=${bankGroupId}`)
+                    .then((res) => {
+                        const { data } = res?.data
+                        setRows(data || {})
+                        setLoading(false);
+                    })
+                    .catch((err) =>{
+                        setLoading(false);
+                        console.error(err)
+                    })
+                    }
 
     const getFinancialYearDetails = async () => {
         await axios
@@ -342,30 +346,30 @@ const InstituteBankBalance = () => {
             .catch((err) => console.error(err));
     };
 
-    const viewClosingBalanceDetails = (voucher_head_new_id, schoolId, schoolName, bankName) => {
-        const queryValues = { voucherHeadId: voucher_head_new_id, schoolId, voucherHeadName: bankName, fcYearOpt: fcYearOption, ...currFcYear }
+    const viewClosingBalanceDetails = (voucher_head_new_id, schoolId, schoolName, bankName, bankId) => {
+        const queryValues = { voucherHeadId: voucher_head_new_id, schoolId, voucherHeadName: bankName, fcYearOpt: fcYearOption, isBRSTrue: true, bankGroupId, bankId, ...currFcYear }
         navigate('/Accounts-ledger-monthly-detail', { state: queryValues })
     }
 
     const handleBRSAmount = (row) => {
-        const queryValues = {bankBalance: row?.bank_balance, closingBalance: row?.closing_balance, id: bankGroupId, schoolId: row?.school_id, bankId: row?.id, accountNo: row?.account_number, bankName: row?.bank_name, schoolName:row?.school_name }
+        const queryValues = { bankBalance: row?.bank_balance, closingBalance: row?.closingBalance, bankGroupId, schoolId: row?.school_id, bankId: row?.bankId, accountNo: row?.account_number, bankName: row?.bank_name, schoolName: row?.school_name }
         navigate('/institute-brs-transaction', { state: queryValues })
     }
 
     const headers = [
         { id: 'bank', label: 'Bank', width: '15%' },
         { id: 'institute', label: 'Institute', width: '20%' },
-        { id: 'book', label: 'Book Balance', width: '15%', align: 'right' },
+        { id: 'closing_balance', label: 'Book Balance', width: '15%', align: 'right' },
         { id: 'bank_balance', label: 'Bank Balance', width: '15%', align: 'right' },
-        { id: 'difference', label: 'BRS Difference', width: '15%', align: 'right' },
+        { id: 'brs_amount', label: 'BRS Difference', width: '15%', align: 'right' },
         { id: 'updated', label: 'BB updated date', width: '20%', align: 'center' }
     ];
 
     return (
         <Paper elevation={0} sx={{
-            width: "80%",
+            width: "90%",
             margin: "auto",
-            mt: 4,
+            mt: 2,
             borderRadius: '12px',
             border: '1px solid rgba(0, 0, 0, 0.08)',
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
@@ -373,23 +377,6 @@ const InstituteBankBalance = () => {
             position: 'relative',
             minHeight: '200px'
         }}>
-            {loading && (
-                <Box sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(255,255,255,0.7)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1
-                }}>
-                    <CircularProgress size={60} thickness={4} sx={{ color: '#376a7d' }} />
-                </Box>
-            )}
-
             <TableContainer>
                 <Table
                     size="small"
@@ -435,110 +422,120 @@ const InstituteBankBalance = () => {
                     </TableHead>
 
                     <TableBody>
-                        {rows.length > 0 ? (
-                            rows.map((row, index) => {
-                                const isBalanced = row?.brs_difference === 0;
-                                return <TableRow
-                                    key={index}
-                                   // hover
-                                    // sx={{
-                                    //     backgroundColor: isBalanced ? 'rgba(102, 187, 106, 0.08)' : 'rgba(239, 83, 80, 0.08)',
-                                    //     '&:hover': {
-                                    //         backgroundColor: isBalanced ? 'rgba(102, 187, 106, 0.12)' : 'rgba(239, 83, 80, 0.12)'
-                                    //     },
-                                    //     transition: 'background-color 0.3s ease'
-                                    // }}
-                                >
-                                    <TableCell align="left" sx={{ fontWeight: 500 }}>
-                                        {row.bank_name}
-                                    </TableCell>
-                                    <TableCell align="left" sx={{
-                                        width: '20%',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                    }}>
-                                        <Tooltip title={row.school_name} arrow>
-                                            <span>{row.school_name}</span>
-                                        </Tooltip>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <Button
-                                            variant="text"
-                                            onClick={() => viewClosingBalanceDetails(
-                                                row?.voucher_head_new_id,
-                                                row?.school_id,
-                                                row?.school_name,
-                                                row?.bank_name
-                                            )}
+                        {loading ? (
+                            <Box sx={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                backgroundColor: 'rgba(255,255,255,0.7)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex: 1
+                            }}>
+                                <CircularProgress size={60} thickness={4} sx={{ color: '#376a7d' }} />
+                            </Box>
+                        ) : (rows.length > 0 ? (
+                                    rows?.map((row, index) => {
+                                        const isBalanced = row?.brs_amount !== 0;
+                                        return <TableRow
+                                            key={index}
                                             sx={{
-                                                color: '#376a7d',
-                                                fontWeight: 500,
-                                                fontSize: '12px',
-                                                textTransform: 'none',
-                                                minWidth: 0,
-                                                padding: '4px 8px',
-                                                '&:hover': {
-                                                    backgroundColor: 'rgba(55, 106, 125, 0.1)'
-                                                }
+                                                '& .MuiTableCell-root': {
+                                                    py: '4px',
+                                                    height: '30px',
+                                                    backgroundColor: isBalanced ? 'rgba(239, 83, 80, 0.08)' : 'rgba(76, 175, 80, 0.15)',
+                                                    '&:hover': {
+                                                        backgroundColor: isBalanced ? 'rgba(239, 83, 80, 0.12)' : 'rgba(76, 175, 80, 0.25)'
+                                                    },
+                                                    transition: 'background-color 0.3s ease'
+                                                    // fontSize: '13px', 
+                                                },
                                             }}
                                         >
-                                            {formatCurrency(row?.closing_balance)}
-                                        </Button>
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 500 }}>
-                                        {formatCurrency(row?.bank_balance)}
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <Button
-                                            variant="text"
-                                            onClick={() => handleBRSAmount(row)}
-                                            sx={{
-                                                color: '#376a7d',
-                                                fontWeight: 500,
-                                                fontSize: '12px',
-                                                textTransform: 'none',
-                                                minWidth: 0,
-                                                padding: '4px 8px',
-                                                '&:hover': {
-                                                    backgroundColor: 'rgba(55, 106, 125, 0.1)'
-                                                }
-                                            }}
-                                        >
-                                            {formatCurrency(row?.brs_difference || 0)}
-                                        </Button>
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ color: '#666', fontSize: '12px' }}>
-                                        {row?.balanceUpdatedOn ?
-                                            moment(row?.balanceUpdatedOn).format("DD-MM-YYYY h:mm:ss a") :
-                                            ''}
-                                    </TableCell>
-                                </TableRow>
-                            })
-                        ) : (
-                            // No Data State
-                            <TableRow>
-                                <TableCell colSpan={headers.length} align="center" sx={{ py: 4 }}>
-                                    <Box sx={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        color: 'text.secondary'
-                                    }}>
-                                        <img
-                                            src="/images/no-data.svg"
-                                            alt="No data"
-                                            style={{ width: '120px', opacity: 0.6, marginBottom: '16px' }}
-                                        />
-                                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                            No reconciliation data available
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ mt: 1 }}>
-                                            {loading ? 'Loading data...' : 'Try adjusting your filters or check back later'}
-                                        </Typography>
-                                    </Box>
-                                </TableCell>
-                            </TableRow>
+                                            <TableCell align="left" sx={{ fontWeight: 500 }}>
+                                                {row.bank_name}
+                                            </TableCell>
+                                            <TableCell align="left" sx={{
+                                                width: '20%',
+                                            }}>
+                                                {row.school_name}
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <Button
+                                                    variant="text"
+                                                    onClick={() => viewClosingBalanceDetails(
+                                                        row?.voucher_head_new_id,
+                                                        row?.school_id,
+                                                        row?.school_name,
+                                                        row?.bank_name,
+                                                        row?.id
+                                                    )}
+                                                    sx={{
+                                                        color: '#376a7d',
+                                                        fontWeight: 500,
+                                                        fontSize: '12px',
+                                                        textTransform: 'none',
+                                                        minWidth: 0,
+                                                        padding: '4px 8px',
+                                                        '&:hover': {
+                                                            backgroundColor: 'rgba(55, 106, 125, 0.1)'
+                                                        }
+                                                    }}
+                                                >
+                                                    {/* {formatCurrency(row?.closing_balance)} */}
+                                                    {row?.closingBalance}
+                                                </Button>
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ fontWeight: 500 }}>
+                                                {/* {formatCurrency(row?.bank_balance)} */}
+                                                {row?.bank_balance}
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <Button
+                                                    variant="text"
+                                                    onClick={() => handleBRSAmount(row)}
+                                                    sx={{
+                                                        color: '#376a7d',
+                                                        fontWeight: 500,
+                                                        fontSize: '12px',
+                                                        textTransform: 'none',
+                                                        minWidth: 0,
+                                                        padding: '4px 8px',
+                                                        '&:hover': {
+                                                            backgroundColor: 'rgba(55, 106, 125, 0.1)'
+                                                        }
+                                                    }}
+                                                >
+                                                    {formatCurrency(row?.brs_amount || 0)}
+                                                </Button>
+                                            </TableCell>
+                                            <TableCell align="center" sx={{ color: '#666', fontSize: '12px' }}>
+                                                {row?.balanceUpdatedOn ?
+                                                    moment(row?.balanceUpdatedOn).format("DD-MM-YYYY h:mm:ss a") :
+                                                    ''}
+                                            </TableCell>
+                                        </TableRow>
+                                    })
+                                ) : (
+                                    // No Data State
+                                    <TableRow>
+                                        <TableCell colSpan={headers.length} align="center" sx={{ py: 4 }}>
+                                            <Box sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                color: 'text.secondary'
+                                            }}>
+                                                <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                                    No reconciliation data available
+                                                </Typography>
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                )
                         )}
                     </TableBody>
                 </Table>

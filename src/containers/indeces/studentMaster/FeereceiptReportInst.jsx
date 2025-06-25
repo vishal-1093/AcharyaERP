@@ -107,9 +107,13 @@ function FeereceiptReportInst() {
 
   useEffect(() => {
     getSchoolDetails();
-    getData(values.filterList[3].value);
+
     getEmployeeDetails();
-  }, []);
+  }, [values.schoolId]);
+
+  useEffect(() => {
+    getData(values.filterList[3].value);
+  }, [values.schoolId]);
 
   const getEmployeeDetails = async () => {
     try {
@@ -171,7 +175,7 @@ function FeereceiptReportInst() {
       }&date_range=custom&start_date=${moment(values.startDate).format(
         "YYYY-MM-DD"
       )}&end_date=${moment(value).format("YYYY-MM-DD")}`;
-    } else {
+    } else if (filterKey !== "custom" && values.schoolId) {
       params = `page=${0}&page_size=${1000000}&sort=created_date&date_range=${filterKey}&school_id=${
         values.schoolId
       }`;
@@ -183,7 +187,8 @@ function FeereceiptReportInst() {
         .then((res) => {
           const filterRowData = res.data.data.filter(
             (ele) =>
-              ele.receipt_type === "General" &&
+              (ele.receipt_type === "General" ||
+                ele.receipt_type === "Registration Fee") &&
               ele.paid_year === "1" &&
               ele.active
           );
@@ -379,15 +384,14 @@ function FeereceiptReportInst() {
           : "",
     },
     {
-      field: "bank_name",
+      field: "bank_short_name",
       headerName: "Bank",
-      flex: 0.8,
-      hideable: false,
+      flex: 1,
       valueGetter: (value, row) =>
         row.transaction_type?.toLowerCase() == "cash"
-          ? "Cash"
-          : row.bank_name
-          ? row.bank_name
+          ? `Cash-${row.inter_school_short_name}`
+          : row.bank_short_name
+          ? `${row.bank_short_name}-${row.inter_school_short_name}`
           : null,
     },
     {
@@ -445,6 +449,7 @@ function FeereceiptReportInst() {
                   transactionType: params.row.transaction_type,
                   financialYearId: params.row.financial_year_id,
                   linkStatus: true,
+                  repeatStatus: params.row.repeat_status,
                 },
               })
             }
@@ -465,6 +470,7 @@ function FeereceiptReportInst() {
                   transactionType: params.row.transaction_type,
                   financialYearId: params.row.financial_year_id,
                   linkStatus: true,
+                  repeatStatus: params.row.repeat_status,
                 },
               })
             }
@@ -477,7 +483,11 @@ function FeereceiptReportInst() {
             disabled={!params.row.active}
             onClick={() =>
               navigate(`/HostelFeePdfV1`, {
-                state: { feeReceiptId: params.row.id, linkStatus: true },
+                state: {
+                  feeReceiptId: params.row.id,
+                  linkStatus: true,
+                  repeatStatus: params.row.repeat_status,
+                },
               })
             }
             color="primary"
@@ -490,7 +500,11 @@ function FeereceiptReportInst() {
             disabled={!params.row.active}
             onClick={() =>
               navigate(`/ExamReceiptPdfV1`, {
-                state: { feeReceiptId: params.row.id, linkStatus: true },
+                state: {
+                  feeReceiptId: params.row.id,
+                  linkStatus: true,
+                  repeatStatus: params.row.repeat_status,
+                },
               })
             }
             color="primary"
@@ -507,6 +521,7 @@ function FeereceiptReportInst() {
                   feeReceiptId: params.row.id,
                   studentId: params.row.student_id,
                   linkStatus: true,
+                  repeatStatus: params.row.repeat_status,
                 },
               })
             }
@@ -527,6 +542,7 @@ function FeereceiptReportInst() {
                   feeReceiptId: params.row.id,
                   financialYearId: params.row.financial_year_id,
                   reportStatus: true,
+                  repeatStatus: params.row.repeat_status,
                 },
               })
             }

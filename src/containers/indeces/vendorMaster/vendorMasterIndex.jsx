@@ -321,7 +321,7 @@ function VendorMasterIndex() {
                                 }}
                                 sx={{ height:'36px' }}
                             >
-                                {loading ? 'Preparing PDF...' : 'Print PDF'}
+                                Print PDF
                             </Button>
                         )}
                     </BlobProvider> */}

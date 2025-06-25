@@ -322,6 +322,7 @@ function StudentPaymentReceipt() {
                                               financialYearId:
                                                 obj.financial_year_id,
                                               studentStatus: true,
+                                              repeatStatus: obj.repeat_status,
                                             },
                                           })
                                         }
@@ -346,6 +347,7 @@ function StudentPaymentReceipt() {
                                               financialYearId:
                                                 obj.financial_year_id,
                                               studentStatus: true,
+                                              repeatStatus: obj.repeat_status,
                                             },
                                           })
                                         }
@@ -362,6 +364,7 @@ function StudentPaymentReceipt() {
                                             state: {
                                               feeReceiptId: obj.fee_receipt_id,
                                               studentStatus: true,
+                                              repeatStatus: obj.repeat_status,
                                             },
                                           })
                                         }
@@ -378,6 +381,7 @@ function StudentPaymentReceipt() {
                                             state: {
                                               feeReceiptId: obj.fee_receipt_id,
                                               studentStatus: true,
+                                              repeatStatus: obj.repeat_status,
                                             },
                                           })
                                         }
@@ -396,6 +400,7 @@ function StudentPaymentReceipt() {
                                             state: {
                                               feeReceiptId: obj.fee_receipt_id,
                                               studentStatus: true,
+                                              repeatStatus: obj.repeat_status,
                                             },
                                           })
                                         }
@@ -448,6 +453,7 @@ function StudentPaymentReceipt() {
                                               financialYearId:
                                                 obj.financial_year_id,
                                               studentStatus: true,
+                                              repeatStatus: obj.repeat_status,
                                             },
                                           })
                                         }

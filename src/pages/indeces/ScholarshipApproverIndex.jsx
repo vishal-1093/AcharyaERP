@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy } from "react";
 import axios from "../../services/Api";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import { IconButton } from "@mui/material";
+import { Box, Grid, IconButton } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
@@ -10,42 +10,119 @@ import moment from "moment";
 import useAlert from "../../hooks/useAlert";
 import { Print } from "@mui/icons-material";
 import { GenerateScholarshipApplication } from "../forms/candidateWalkin/GenerateScholarshipApplication";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 
 const OverlayLoader = lazy(() => import("../../components/OverlayLoader"));
 
 const breadCrumbsList = [{ name: "Approve Scholarship" }];
-
+const initialValues = {
+  schoolId: null,
+  programId: null,
+  programSpeId: null,
+};
 function ScholarshipApproverIndex() {
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [values, setValues] = useState(initialValues);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [programOptions, setProgramOptions] = useState([]);
+  const [programData, setProgramData] = useState();
 
   useEffect(() => {
     getData();
+    getSchoolDetails()
     setCrumbs(breadCrumbsList);
   }, []);
 
+  useEffect(() => {
+    getProgram();
+    getData();
+  }, [values.schoolId]);
+
+  useEffect(() => {
+    getData();
+  }, [values.programId]);
+
   const getData = async () => {
+    const { schoolId, programId } = values;
     try {
+      setIsLoading(true)
       const response = await axios.get(
         "/api/student/getIsVerifiedDataForIndex",
         {
-          params: { page: 0, page_size: 10000, sort: "created_date" },
+          params: {
+            page: 0, page_size: 10000, sort: "created_date",
+            ...(schoolId && { school_id: schoolId }),
+            ...(programId && {
+              program_id: programData[values?.programId]?.program_id,
+            }),
+            ...(programId && { program_specialization_id: programId }),
+          },
         }
       );
       setRows(response.data.data);
+      setIsLoading(false)
     } catch (err) {
+      setIsLoading(false)
       setAlertMessage({
         severity: "error",
         message: "Failed to fetch the data !!",
       });
       setAlertOpen(true);
+    } finally {
+      setIsLoading(false)
     }
   };
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name_short,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getProgram = async () => {
+    const { schoolId } = values;
+    if (!schoolId) return null;
 
+    try {
+      const { data: response } = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`
+      );
+      const optionData = [];
+      const responseData = response.data;
+      response.data.forEach((obj) => {
+        optionData.push({
+          value: obj.program_specialization_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+        });
+      });
+      const programObject = responseData.reduce((acc, next) => {
+        acc[next.program_specialization_id] = next;
+        return acc;
+      }, {});
+      setProgramOptions(optionData);
+      setProgramData(programObject);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the programs data",
+      });
+      setAlertOpen(true);
+    }
+  };
   const handleDownload = async (obj) => {
     try {
       setIsLoading(true);
@@ -214,11 +291,47 @@ function ScholarshipApproverIndex() {
       ),
     },
   ];
-
+  const handleChangeAdvance = async (name, newValue, rowValues) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+      ...(name === "schoolId" && { programId: "", categoryId: "" }),
+      ...(name === "programId" && { categoryId: "" }),
+    }));
+  };
   return isLoading ? (
     <OverlayLoader />
   ) : (
-    <GridIndex rows={rows} columns={columns} />
+    <>
+      <Box>
+        <Grid container alignItems="center" justifyContent="flex-start" mb={2} sx={{ display: "flex", gap: "20px" }}>
+
+          <Grid item xs={12} md={2.5}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2.5}>
+            <CustomAutocomplete
+              name="programId"
+              label="Program"
+              options={programOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              value={values.programId}
+              disabled={!values.schoolId}
+            />
+          </Grid>
+
+
+        </Grid>
+      </Box>
+      <GridIndex rows={rows} columns={columns} />
+    </>
   );
 }
 

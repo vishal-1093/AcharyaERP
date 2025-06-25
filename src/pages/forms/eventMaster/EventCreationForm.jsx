@@ -29,6 +29,7 @@ const CustomAutocomplete = lazy(() =>
 const CustomDateTimePicker = lazy(() =>
   import("../../../components/Inputs/CustomDateTimePicker")
 );
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 const initialValues = {
   eventTitle: "",
@@ -555,8 +556,24 @@ function EventCreationForm() {
               errors={errorMessages.startTime}
               disablePast
               required
-              minDateTime={pathFrom !== "/EventMaster/Events" ? dayjs().add(24, "hour") : undefined} // At least 24 hours from now if not in '/EventMaster/Events'
-              maxDateTime={pathFrom !== "/EventMaster/Events" ? dayjs().add(10, "days") : undefined} // Max 10 days from today if not in '/EventMaster/Events'
+              // Allow full access (no restriction) if roleId is 16
+              // Otherwise, enforce 24 hours from now as minimum start time if not on '/EventMaster/Events'
+              minDateTime={
+                roleId === 16
+                  ? undefined
+                  : pathFrom !== "/EventMaster/Events"
+                    ? dayjs().add(24, "hour")
+                    : undefined
+              }
+              // Allow full access if roleId is 16
+              // Otherwise, restrict max start time to 10 days from now if not on '/EventMaster/Events'
+              maxDateTime={
+                roleId === 16
+                  ? undefined
+                  : pathFrom !== "/EventMaster/Events"
+                    ? dayjs().add(10, "days")
+                    : undefined
+              }
             />
           </Grid>
 
@@ -570,8 +587,26 @@ function EventCreationForm() {
               errors={errorMessages.endTime}
               disablePast
               required
-              minDateTime={values.startTime ? dayjs(values.startTime).add(1, "hour") : dayjs().add(24, "hour")} // Ensure endTime is after startTime
-              maxDateTime={pathFrom !== "/EventMaster/Events" ? dayjs().add(10, "days") : undefined} // Max 10 days from today if not in '/EventMaster/Events'
+              // If roleId is 16, no restriction
+              // Otherwise:
+              //   - if startTime is selected, enforce endTime to be at least 1 hour after
+              //   - otherwise default to 24 hours from now
+              minDateTime={
+                roleId === 16
+                  ? undefined
+                  : values.startTime
+                    ? dayjs(values.startTime).add(1, "hour")
+                    : dayjs().add(24, "hour")
+              }
+              // Allow full access if roleId is 16
+              // Otherwise, restrict endTime to be within 10 days from now if not on '/EventMaster/Events'
+              maxDateTime={
+                roleId === 16
+                  ? undefined
+                  : pathFrom !== "/EventMaster/Events"
+                    ? dayjs().add(10, "days")
+                    : undefined
+              }
             />
           </Grid>
           <Grid item xs={12} md={4}>
