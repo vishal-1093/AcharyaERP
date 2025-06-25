@@ -1,14 +1,18 @@
 import { useState, useEffect, lazy } from "react";
 import {
-  Box, Grid, Button, CircularProgress
+  Box, Grid, Button
 } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs.js";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import SmsIcon from '@mui/icons-material/Sms';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import FormGroup from "@mui/material/FormGroup";
 import useAlert from "../../hooks/useAlert.js";
 import axios from "../../services/Api.js";
+import moment from "moment";
+import DOMPurify from "dompurify";
+const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const CustomAutocomplete = lazy(() =>
   import("../../components/Inputs/CustomAutocomplete.jsx")
 );
@@ -46,6 +50,8 @@ const initialState = {
   acYear: null,
   acYearList: [],
   schoolId: null,
+  programId: null,
+  programmList: null,
   programSpecializationId: null,
   loading: false,
   schoolList: [],
@@ -61,22 +67,28 @@ const initialState = {
   programSpecilizationDetail: null,
   studentList: [],
   checked: false,
-  dateAndTemplateDetail: []
+  dateAndTemplateDetail: [],
+  isPreviewModalOpen: false,
+  content: "",
+  commencementId: null,
+  commencementList: []
 };
 
 const SendWhatsApp = () => {
-  const [{ acYear, acYearList, schoolId, loading, schoolList, programSpecializationId, programmeSpecializationList, yearSem, yearSemLists,
-    whatsappTemplate, whatsappTemplateList, feeAdmissionCategory, feeAdmissionCategoryList, studentList, checked, dateAndTemplateDetail
+  const [{ acYear, acYearList, schoolId, loading, schoolList, programId, programmList, programSpecializationId, programmeSpecializationList, yearSem, yearSemLists,
+    whatsappTemplate, whatsappTemplateList, feeAdmissionCategory, feeAdmissionCategoryList, studentList, checked, dateAndTemplateDetail, isPreviewModalOpen, commencementId, commencementList, content
   }, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
 
   useEffect(() => {
+    setCrumbs([]);
     getAcyear();
     getSchoolData();
     getWhatsappData();
     getFeeCategory();
+    getcommencementData();
   }, []);
 
   const columns = [
@@ -135,10 +147,11 @@ const SendWhatsApp = () => {
 
   const handleChangeAdvance = (name, newValue) => {
     if (name == "schoolId") {
-      getProgramSpecilization(newValue)
+      getProgramData(newValue)
     };
-    if (name == "programSpecializationId") {
-      getYearSemData(newValue)
+    if (name == "programId") {
+      getYearSemData(newValue);
+      getProgramSpecializationData(newValue)
     };
     setState((prevState) => ({
       ...prevState,
@@ -152,7 +165,7 @@ const SendWhatsApp = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          acYearList: res.data.data.map((ele) => ({ value: ele.ac_year_id, label: ele.ac_year }))?.filter((li)=>li.label >= "2025")
+          acYearList: res.data.data.map((ele) => ({ value: ele.ac_year_id, label: ele.ac_year }))
         }))
       }
     } catch (error) {
@@ -166,7 +179,7 @@ const SendWhatsApp = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          schoolList: res.data.data.map((ele) => ({ value: ele.school_id, label: ele.school_name_short }))
+          schoolList: res.data.data.map((ele) => ({ value: ele.school_id, label: ele.school_name }))
         }))
       }
     } catch (error) {
@@ -174,32 +187,52 @@ const SendWhatsApp = () => {
     }
   };
 
-  const getProgramSpecilization = async (schoolId = null) => {
+  const getProgramData = async (schoolId = null) => {
     try {
-      const res = await axios.get(`/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`);
+      const res = await axios.get(
+        `/api/otherFeeDetails/getProgramsDetails?schoolId=${schoolId}`
+      );
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          programmeSpecializationList: res.data.data.map((ele) => ({
-            value: ele.program_specialization_id,
-            label: ele.specialization_with_program,
-            programId: ele.program_id,
-            program_type_name: ele.program_type_name,
-            number_of_years: ele.number_of_years,
-            number_of_semester: ele.number_of_semester
-          }))
-        }))
+          programmList: res?.data?.data.map((el) => ({
+            label: el.programName,
+            value: el.programId,
+            numberOfSem: el.numberOfSem,
+            numberOfYear: el.numberOfYear,
+            programTypeName: el.programTypeName
+          })),
+        }));
       }
     } catch (error) {
-      console.log(error)
+      console.error(error);
     }
   };
 
-  const getYearSemData = (programSpecilizationId) => {
-    const programeSpecilizationDetails = programmeSpecializationList.find((ele) => ele.value == programSpecilizationId);
+  const getProgramSpecializationData = async (programValueId = null) => {
+    try {
+      const response = await axios.get(
+        `/api/academic/FetchProgramSpecialization/${schoolId}/${programValueId}`
+      );
+      if (response.status == 200 || response.status == 201) {
+        setState((prevState) => ({
+          ...prevState,
+          programmeSpecializationList: response.data.data.map((el) => ({
+            label: el.program_specialization_short_name,
+            value: el.program_specialization_id,
+          })),
+        }));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    const list = (programeSpecilizationDetails.program_type_name == "YEARLY") ? (yearLists.slice(0, programeSpecilizationDetails.number_of_years)) :
-      semLists.slice(0, programeSpecilizationDetails.number_of_semester);
+  const getYearSemData = (programValueId = null) => {
+    const programDetails = programmList.find((ele) => ele.value == programValueId);
+
+    const list = (programDetails.programTypeName == "YEARLY") ? (yearLists.slice(0, programDetails.numberOfYear)) :
+      semLists.slice(0, programDetails.numberOfSem);
 
     setState((prevState) => ({
       ...prevState,
@@ -207,6 +240,19 @@ const SendWhatsApp = () => {
     }))
   };
 
+  const getcommencementData = async () => {
+    try {
+      const res = await axios.get(`/api/academic/fetchAllCommencementTypeDetail?page=0&page_size=10000000&sort=id`);
+      if (res.status == 200 || res.status == 201) {
+        setState((prevState) => ({
+          ...prevState,
+          commencementList: res.data.data.Paginated_data.content.map((ele) => ({ value: ele.id, label: ele.commencement_type }))
+        }))
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  };
 
   const getWhatsappData = async () => {
     try {
@@ -214,7 +260,7 @@ const SendWhatsApp = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          whatsappTemplateList: res.data.data.map((ele) => ({ value: ele.whatsappTemplateId, label: ele.templateName }))
+          whatsappTemplateList: res.data.data.map((ele) => ({ value: ele.whatsappTemplateId, label: ele.templateName, content: ele.content }))
         }))
       }
     } catch (error) {
@@ -228,7 +274,7 @@ const SendWhatsApp = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          feeAdmissionCategoryList: res.data.data.map((ele) => ({ value: ele.fee_admission_category_id, label: ele.fee_admission_category_short_name }))
+          feeAdmissionCategoryList: res.data.data.map((ele) => ({ value: ele.fee_admission_category_id, label: ele.fee_admission_category_type }))
         }))
       }
     } catch (error) {
@@ -250,9 +296,10 @@ const SendWhatsApp = () => {
       const payload = {
         "schoolId": schoolId,
         "programSpecializationId": programSpecializationId,
-        "programId":programmeSpecializationList?.find((li)=>li.value == programSpecializationId)?.programId,
+        "programId": programId,
         "year": year,
-        "Sem": sem,
+        "sem": sem,
+        "commencementId": commencementId,
         "whatsappTemplateId": whatsappTemplate,
         "acYear": acYear,
         "feeAdmissionCategoryId": feeAdmissionCategory
@@ -306,6 +353,16 @@ const SendWhatsApp = () => {
     }
   };
 
+  const handlePreviewTemplate = () => {
+    const htmlContent = whatsappTemplateList.find((li) => li.value == whatsappTemplate)?.content;
+    const sanitizedHtmlContent = DOMPurify.sanitize(htmlContent);
+    setState((prevState) => ({
+      ...prevState,
+      isPreviewModalOpen: !isPreviewModalOpen,
+      content: sanitizedHtmlContent
+    }))
+  };
+
   return (
     <Box
       sx={{
@@ -313,53 +370,78 @@ const SendWhatsApp = () => {
       }}
     >
       <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
-        <Grid item xs={12} md={1.6}>
+        <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="acYear"
             value={acYear}
             label="Ac Year"
             handleChangeAdvance={handleChangeAdvance}
             options={acYearList || []}
+            required
           />
         </Grid>
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} md={3}>
           <CustomAutocomplete
             name="schoolId"
             value={schoolId}
             label="School"
             handleChangeAdvance={handleChangeAdvance}
             options={schoolList || []}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <CustomAutocomplete
+            name="programId"
+            value={programId}
+            label="Program"
+            disabled={!schoolId}
+            handleChangeAdvance={handleChangeAdvance}
+            options={programmList || []}
+            required
           />
         </Grid>
         <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="programSpecializationId"
             value={programSpecializationId}
-            label="Programme Specialization"
+            label="Program Specialization"
             disabled={!schoolId}
             handleChangeAdvance={handleChangeAdvance}
             options={programmeSpecializationList || []}
           />
         </Grid>
-        <Grid item xs={12} md={1.4}>
+        <Grid item xs={12} md={2}>
           <CustomAutocomplete
             name="yearSem"
             value={yearSem || ""}
             label="Year/Sem"
             handleChangeAdvance={handleChangeAdvance}
             options={yearSemLists}
+            required
           />
         </Grid>
-        <Grid item xs={12} md={1.8}>
+        <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="commencementId"
+            value={commencementId || ""}
+            label="Type"
+            handleChangeAdvance={handleChangeAdvance}
+            options={commencementList}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} md={3}>
           <CustomAutocomplete
             name="whatsappTemplate"
             value={whatsappTemplate || ""}
             label="Whatsapp Template"
             handleChangeAdvance={handleChangeAdvance}
             options={whatsappTemplateList}
+            required
           />
         </Grid>
-        <Grid item xs={12} md={1.2}>
+        <Grid item xs={12} md={3}>
           <CustomAutocomplete
             name="feeAdmissionCategory"
             value={feeAdmissionCategory || ""}
@@ -368,25 +450,25 @@ const SendWhatsApp = () => {
             options={feeAdmissionCategoryList}
           />
         </Grid>
-        <Grid item xs={12} md={1}>
+        <Grid item xs={12} md={2}>
           <Button
             variant="contained"
             disableElevation
             onClick={getStudentData}
-            disabled={!(acYear && schoolId && programSpecializationId && yearSem && whatsappTemplate && feeAdmissionCategory)}
+            disabled={!(acYear && schoolId && programId && yearSem && whatsappTemplate)}
           >
             Submit
           </Button>
         </Grid>
-        <Grid item xs={12} md={1}>
+        <Grid item xs={12} md={2} align="right">
           <Button
             variant="contained"
-            startIcon={<SmsIcon />}
+            startIcon={<VisibilityIcon />}
             disableElevation
             disabled={!studentList.some((obj) => obj.isSelected)}
-            onClick={InvokeWhatsappMSg}
+            onClick={handlePreviewTemplate}
           >
-            Send
+            Preview
           </Button>
         </Grid>
       </Grid>
@@ -397,6 +479,30 @@ const SendWhatsApp = () => {
           setColumnVisibilityModel={setColumnVisibilityModel}
           loading={loading} />
       </Box>
+      <ModalWrapper
+        title="WhatsApp Template"
+        maxWidth={500}
+        open={isPreviewModalOpen}
+        setOpen={handlePreviewTemplate}
+      >
+        <Box borderRadius={3}>
+          <Grid container>
+            <Grid item xs={12} sx={{textAlign:"justify"}}>
+              <div dangerouslySetInnerHTML={{ __html: content.replace('{{lastdate}}', moment(dateAndTemplateDetail?.find((obj) => obj.lastDateToPay)?.lastDateToPay).format("DD-MM-YYYY")) }}></div>
+            </Grid>
+            <Grid mt={1} item xs={12} align="right">
+              <Button
+                variant="contained"
+                startIcon={<WhatsAppIcon />}
+                disableElevation
+                onClick={InvokeWhatsappMSg}
+              >
+                Send
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
     </Box>
   );
 };
