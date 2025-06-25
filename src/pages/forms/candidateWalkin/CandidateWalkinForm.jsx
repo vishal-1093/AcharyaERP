@@ -116,7 +116,7 @@ function CandidateWalkinForm() {
 
       const acyearOptionData = [];
       const filteredAcyear = acyearResponse?.data.filter(
-        (obj) => obj.ac_year_id > 6
+        (obj) => obj.current_year >= 2024
       );
       filteredAcyear?.forEach((obj) => {
         acyearOptionData.push({
