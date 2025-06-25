@@ -1,14 +1,14 @@
-import ait from "../../../assets/student_id_card_template/AIT_new.jpg"; //new ait replaced
-import AIGS from "../../../assets/student_id_card_template/AIGS.jpg";
-import Physiotherapy from "../../../assets/student_id_card_template/Physiotherapy.jpg";
-import AP from "../../../assets/student_id_card_template/AP_new.jpg"; //new ap replaced
-import ABMRCP from "../../../assets/student_id_card_template/ABMRCP.jpg";
-import Architecture from "../../../assets/student_id_card_template/Architecture_new.jpg"; //new nrv replaced
-import Nursing from "../../../assets/student_id_card_template/Nursing.jpg";
-import ASD from "../../../assets/student_id_card_template/ASD_new.jpg"; //new design replaced
-import AIAHS from "../../../assets/student_id_card_template/AIAHS.jpg";
-import NR_college from "../../../assets/student_id_card_template/NR_college.jpg";
-import PU from "../../../assets/student_id_card_template/PU.jpg"; //new pre university replaced
+import ait from "../../../assets/student_id_card_template/AIT_2.0.jpg";
+import AIGS from "../../../assets/student_id_card_template/AGS_2.0.jpg";
+import Physiotherapy from "../../../assets/student_id_card_template/APS_2.0.jpg";
+import AP from "../../../assets/student_id_card_template/APT_2.0.jpg";
+import ABMRCP from "../../../assets/student_id_card_template/ACP_2.0.jpg";
+import Architecture from "../../../assets/student_id_card_template/ASA_2.0.jpg";
+import Nursing from "../../../assets/student_id_card_template/NRC_2.0.jpg";
+import ASD from "../../../assets/student_id_card_template/ASD_2.0.jpg";
+import AIAHS from "../../../assets/student_id_card_template/AHS_2.0.jpg";
+import NR_college from "../../../assets/student_id_card_template/NRC_2.0.jpg";
+import PU from "../../../assets/student_id_card_template/APU_2.0.jpg";
 
 const templateList = [
   {
