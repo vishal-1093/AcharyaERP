@@ -25,6 +25,7 @@ function VendorMasterIndex() {
     const [vendorOptions, setVendorOptions] = useState([]);
     const [fcYearOptions, setFCYearOptions] = useState([]);
     const [loading, setLoading] = useState(false)
+    const [ledgerType, setLedgerType] = useState(false)
     const [columnVisibilityModel, setColumnVisibilityModel] = useState({
         usn: false,
         collageWaiver: false,
@@ -84,16 +85,19 @@ function VendorMasterIndex() {
                         school_id: obj?.school_id,
                         bankId: obj?.bankId,
                         isLastRow: false,
-                         openingBalance: obj?.openingBalance < 0
-                            ? `${formatCurrency(Math.abs(obj?.openingBalance))} Cr`
-                            : obj?.openingBalance === 0
-                                ? 0
-                                : `${formatCurrency(obj?.openingBalance)} Dr`,
-                         closingBalance: obj?.closingBalance < 0
-                            ? `${formatCurrency(Math.abs(obj?.closingBalance?.toFixed(2)))} Cr`
-                            : obj?.closingBalance === 0
-                                ? 0
-                                : `${formatCurrency(obj?.closingBalance?.toFixed(2))} Dr`,
+                        ledgerType: obj?.ledgerType,
+                        //  openingBalance: obj?.openingBalance < 0
+                        //     ? `${formatCurrency(Math.abs(obj?.openingBalance))} Cr`
+                        //     : obj?.openingBalance === 0
+                        //         ? 0
+                        //         : `${formatCurrency(obj?.openingBalance)} Dr`,
+                        //  closingBalance: obj?.closingBalance < 0
+                        //     ? `${formatCurrency(Math.abs(obj?.closingBalance?.toFixed(2)))} Cr`
+                        //     : obj?.closingBalance === 0
+                        //         ? 0
+                        //         : `${formatCurrency(obj?.closingBalance?.toFixed(2))} Dr`,
+                        openingBalance: formatDrCr(obj?.openingBalance, obj?.ledgerType),
+                        closingBalance: formatDrCr(obj?.closingBalance, obj?.ledgerType),
                     })
                 })
                 if (data?.vendorDetails?.length > 0) {
@@ -114,6 +118,20 @@ function VendorMasterIndex() {
                 setLoading(false)
                 console.error(err)
             });
+    };
+
+    const formatDrCr = (value, ledgerType) => {
+        const absVal = Math.abs(value);
+        
+        if (value === 0) return "0";
+
+        if (ledgerType === "VENDOR") {
+            return value < 0 ? `${absVal} Dr` : `${absVal} Cr`;
+        } else if (ledgerType === "CASHORBANK") {
+            return value > 0 ? `${absVal} Dr` : `${absVal} Cr`;
+        } else {
+            return value;
+        }
     };
 
 
@@ -203,28 +221,41 @@ function VendorMasterIndex() {
     };
 
     const formatCurrency = (value, decimals = 2) => {
-  if (value === null || value === undefined || value === '') return `0.00`;
-  if (typeof value === 'string' && (value.includes('Cr') || value.includes('Dr'))) {
-    const parts = value.split(' ');
-    const numValue = parseFloat(parts[0]);
-    const suffix = parts[1] || '';
+        if (value === null || value === undefined || value === '') return `0.00`;
+        if (typeof value === 'string' && (value.includes('Cr') || value.includes('Dr'))) {
+            const parts = value.split(' ');
+            const numValue = parseFloat(parts[0]);
+            const suffix = parts[1] || '';
 
-    if (isNaN(numValue)) return `0.00`;
+            if (isNaN(numValue)) return `0.00`;
 
-    return `${numValue.toLocaleString('en-IN', {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals
-    })} ${suffix}`;
-  }
+            return `${numValue.toLocaleString('en-IN', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            })} ${suffix}`;
+        }
 
-  const numValue = typeof value === 'string' ? parseFloat(value) : value;
-  if (isNaN(numValue)) return `0.00`;
+        const numValue = typeof value === 'string' ? parseFloat(value) : value;
+        if (isNaN(numValue)) return `0.00`;
 
-  return numValue.toLocaleString('en-IN', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  });
-};
+        return numValue.toLocaleString('en-IN', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+    };
+
+    const handleRowClick = (params) => {
+        if (params?.row?.isLastRow) return;
+        const query = {
+                ...values,
+                schoolId: params.row.school_id,
+                schoolName: params.row.school_name_short,
+                bankId: params.row.bankId,
+                fcYearOpt: fcYearOptions || [],
+                ledgerType: params?.row.ledgerType
+            }
+        navigate('/Accounts-ledger-monthly-detail', {state: query })
+    }
 
 
     return (
@@ -338,7 +369,7 @@ function VendorMasterIndex() {
                     color: '#376a7d',
                     fontStyle: 'italic',
                     fontSize: '16px',
-                     textAlign: 'center'
+                    textAlign: 'center'
                 }}>
                     {values?.voucherHeadName ? (
                         `${values?.voucherHeadName} Ledger for FY ${values?.fcYear} as on ${moment().format('DD-MM-YYYY')}`
@@ -371,18 +402,7 @@ function VendorMasterIndex() {
                     columnVisibilityModel={columnVisibilityModel}
                     setColumnVisibilityModel={setColumnVisibilityModel}
                     isRowSelectable={(params) => !params.row.isLastRow}
-                    onRowClick={(params) => {
-                        if (params?.row?.isLastRow) return;
-                        navigate('/Accounts-ledger-monthly-detail', {
-                            state: {
-                                ...values,
-                                schoolId: params.row.school_id,
-                                schoolName: params.row.school_name_short,
-                                bankId: params.row.bankId,
-                                fcYearOpt: fcYearOptions || []
-                            }
-                        })
-                    }}
+                    onRowClick={(params) => handleRowClick(params)}
                     sx={{
                         border: 'none',
                         '& .MuiDataGrid-row:hover': {

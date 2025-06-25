@@ -105,7 +105,8 @@ const LedgerDayTransaction = () => {
                         month: el?.month,
                         month_name: el?.month_name,
                         created_date: el?.created_date,
-                        cumulativeBalance: runningBalance < 0 ? `${Math.abs(runningBalance.toFixed(2))} Cr` : runningBalance === 0 ? 0 : `${runningBalance.toFixed(2)} Dr`
+                       // cumulativeBalance: runningBalance < 0 ? `${Math.abs(runningBalance.toFixed(2))} Cr` : runningBalance === 0 ? 0 : `${runningBalance.toFixed(2)} Dr`
+                         cumulativeBalance: formatDrCr(runningBalance, queryValues?.ledgerType),
                     })
                 });
                 const totalCumulativeBalance = Number(data?.openingBalance) + Number(data?.totalCredit) - Number(data?.totalDebit)
@@ -113,7 +114,8 @@ const LedgerDayTransaction = () => {
                     vendorDetails: rowData,
                     totalCredit: data?.totalCredit,
                     totalDebit: data?.totalDebit,
-                    openingBalance: data?.openingBalance < 0 ? `${Math.abs(data?.openingBalance)} Cr` : data?.openingBalance === 0 ? 0 : `${data?.openingBalance} Dr`,
+                   // openingBalance: data?.openingBalance < 0 ? `${Math.abs(data?.openingBalance)} Cr` : data?.openingBalance === 0 ? 0 : `${data?.openingBalance} Dr`,
+                     openingBalance: formatDrCr(data?.openingBalance, queryValues?.ledgerType),
                     // totalCumulativeBalance: totalCumulativeBalance.toFixed(2),
                     schoolName: data?.schoolName
                 });
@@ -152,10 +154,18 @@ const LedgerDayTransaction = () => {
     const handleCellClick = (row, type) => {
         const selectedDate = moment(row?.created_date).format("DD-MM-YYYY")
         const queryParams = { ...queryValues, date: row?.created_date, month: currMonth?.month, month_name: currMonth?.month_name, selectedDate }
-        if (type === 'debit') {
-            navigate('/Accounts-ledger-day-transaction-debit', { state: queryParams })
-        } else {
-            navigate('/Accounts-ledger-day-credit-transaction', { state: queryParams })
+        if(queryValues?.ledgerType === "VENDOR"){
+               if (type === 'debit') {
+                navigate('/vendor-day-transaction-debit', { state: queryParams })
+            } else {
+                navigate('/vendor-day-transaction-credit', { state: queryParams })
+            }
+        }else{
+            if (type === 'debit') {
+                navigate('/Accounts-ledger-day-transaction-debit', { state: queryParams })
+            } else {
+                navigate('/Accounts-ledger-day-credit-transaction', { state: queryParams })
+            }
         }
     }
 
@@ -183,6 +193,21 @@ const LedgerDayTransaction = () => {
             maximumFractionDigits: decimals
         });
     };
+
+     const formatDrCr = (value, ledgerType) => {
+    const absVal = Math.abs(value);
+
+    if (value === 0) return "0";
+
+    if (ledgerType === "VENDOR") {
+      return value < 0 ? `${absVal} Dr` : `${absVal} Cr`;
+    } else if (ledgerType === "CASHORBANK") {
+      return value > 0 ? `${absVal} Dr` : `${absVal} Cr`;
+    } else {
+      return value;
+    }
+  };
+
 
     return (
         <Paper elevation={0} sx={{
