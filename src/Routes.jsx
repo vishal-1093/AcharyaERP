@@ -2033,6 +2033,12 @@ const LedgerDebitDayTransaction = lazy(() =>
 const LedgerDayCreditTransaction = lazy(() =>
   import("./containers/indeces/vendorMaster/LedgerDayTransaction-credit.jsx")
 );
+const VendorDayDebitTransaction = lazy(() =>
+  import("./containers/indeces/vendorMaster/vendorDayTransaction-debit.jsx")
+);
+const VendorDayCreditTransaction = lazy(() =>
+  import("./containers/indeces/vendorMaster/vendorDayTransaction-credit.jsx")
+);
 const BankGroupBankBalanceMaster = lazy(() =>
   import("./pages/masters/BankGroupBankBalanceMaster.jsx")
 );
@@ -10397,6 +10403,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <LedgerDayCreditTransaction />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/vendor-day-transaction-debit"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VendorDayDebitTransaction />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/vendor-day-transaction-credit"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VendorDayCreditTransaction />
               </Suspense>
             }
           />
