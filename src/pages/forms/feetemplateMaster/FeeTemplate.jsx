@@ -58,7 +58,7 @@ const initialValues = {
   approvedStatus: "",
   approvedDate: null,
   isRegular: true,
-  remarks:""
+  remarks: "",
 };
 
 const requiredFields = [
@@ -351,7 +351,9 @@ function FeeTemplate() {
         values.schoolId &&
         values.programId
       ) {
-        const resOne = await axios.get(`/api/finance/allFeeTemplateDetail/${values.acYearId}/${values.admcategoryId}/${values.admSubCategoryId}/${values.nationality}/${values.programTypeId}/${values.currencyTypeId}/${values.schoolId}/${values.programId}`);
+        const resOne = await axios.get(
+          `/api/finance/allFeeTemplateDetail/${values.acYearId}/${values.admcategoryId}/${values.admSubCategoryId}/${values.nationality}/${values.programTypeId}/${values.currencyTypeId}/${values.schoolId}/${values.programId}`
+        );
         if (resOne.status == 200 || resOne.status == 201) {
           const a = resOne.data.data.map(
             (obj) => obj.program_specialization_id
@@ -368,25 +370,24 @@ function FeeTemplate() {
                     .filter((obj) =>
                       resOne.data.data.length > 0
                         ? resOne.data.data[0].program_specialization_id
-                          .split(",")
-                          .includes(
+                            .split(",")
+                            .includes(
+                              obj.program_specialization_id.toString()
+                            ) === false
+                        : a.includes(
                             obj.program_specialization_id.toString()
                           ) === false
-                        : a.includes(
-                          obj.program_specialization_id.toString()
-                        ) === false
                     )
                     .map((obj) => ({
                       value: obj.program_specialization_id,
                       label: obj.program_specialization_short_name,
                     }))
                 );
-              })
-
+              });
         }
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
@@ -403,10 +404,10 @@ function FeeTemplate() {
           acYearId: res.data.data.ac_year_id,
           admcategoryId: res.data.data.fee_admission_category_id,
           admSubCategoryId: res.data.data.fee_admission_sub_category_id,
-          nri: res.data.data.is_nri ? "Yes" : "No",
+          nri: res.data.data.Is_nri ? "Yes" : "No",
           nationality: res.data.data.nationality,
           isSaarc: res.data.data.is_saarc,
-          paidAtBoard: res.data.data.is_paid_at_board ? "Yes" : "No",
+          paidAtBoard: res.data.data.Is_paid_at_board ? "Yes" : "No",
           programTypeId: res.data.data.program_type_id,
           currencyTypeId: res.data.data.currency_type_id,
           schoolId: res.data.data.school_id,
@@ -433,7 +434,7 @@ function FeeTemplate() {
           feeYearEleven: res.data.data.fee_year11_amt,
           feeYearTwelve: res.data.data.fee_year12_amt,
           feeYearTotal: res.data.data.fee_year_total_amount,
-          remarks: res.data.data.remarks
+          remarks: res.data.data.remarks,
         }));
 
         setFeetempId(res.data.data.fee_template_id);
