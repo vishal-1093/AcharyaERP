@@ -168,13 +168,11 @@ function AdvancePaymentVoucher({ rowData }) {
       const [
         { data: schoolResponse },
         { data: schoolResponse1 },
-        { data: bankResponse },
         { data: vendorResponse },
         { data: fcyearResponse },
       ] = await Promise.all([
         axios.get("/api/institute/school"),
         axios.get("/api/institute/school"),
-        axios.get("/api/finance/fetchVoucherHeadNewDetailsBasedOnCashOrBank"),
         axios.get("/api/finance/VoucherHeadNewDetailsWoJournal"),
         axios.get("/api/FinancialYear"),
       ]);
@@ -190,13 +188,6 @@ function AdvancePaymentVoucher({ rowData }) {
         schoolData.push({
           value: obj.school_id,
           label: obj.school_name,
-        });
-      });
-      const bankOptionaData = [];
-      bankResponse?.data?.forEach((obj) => {
-        bankOptionaData.push({
-          value: obj.voucher_head_new_id,
-          label: obj.voucher_head,
         });
       });
       const vendorOptionaData = [];
@@ -215,7 +206,6 @@ function AdvancePaymentVoucher({ rowData }) {
       });
       setSchoolOptions1(schoolData);
       setSchoolOptions(schoolOptionData);
-      setBankOptions(bankOptionaData);
       setVendorOptions(vendorOptionaData);
       setFcyearOptions(fcyearOptionaData);
     } catch (err) {
@@ -230,18 +220,29 @@ function AdvancePaymentVoucher({ rowData }) {
   const getDepartmentOptions = async () => {
     const { schoolId } = values;
     if (!schoolId) return;
+
     try {
-      const { data: deptResponse } = await axios.get(
-        `/api/fetchdept1/${schoolId}`
-      );
+      const [deptResponse, bankResponse] = await Promise.all([
+        axios.get(`/api/fetchdept1/${schoolId}`),
+        axios.get(`/api/finance/bankDetailsBasedOnSchoolId/${schoolId}`),
+      ]);
       const deptOptionData = [];
-      deptResponse?.data?.forEach((obj) => {
+      const bankOptionData = [];
+      deptResponse?.data?.data?.forEach((obj) => {
         deptOptionData.push({
           value: obj.dept_id,
           label: obj.dept_name,
         });
       });
+
+      bankResponse?.data?.data.forEach((obj) => {
+        bankOptionData.push({
+          value: obj.id,
+          label: obj.bank_name,
+        });
+      });
       setDeptOptions(deptOptionData);
+      setBankOptions(bankOptionData);
     } catch (err) {
       setAlertMessage({
         severity: "error",
