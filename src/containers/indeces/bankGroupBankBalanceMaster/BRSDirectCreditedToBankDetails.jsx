@@ -72,7 +72,7 @@ function BRSDirectCreditedToBankDetail() {
     const parseDate = (raw) => {
             if (!raw) return '';
             const f1 = moment(raw, 'YYYY-MM-DD HH:mm:ss.SSS', true);
-            if (f1.isValid()) return f1.format('DD-MM-YYYY');
+            if (f1.isValid()) return f1.format('DD-MM-YYYY HH:mm:ss');
     
             const f2 = moment(raw, 'DD/MM/YYYY', true);
             if (f2.isValid()) return f2.format('DD-MM-YYYY');

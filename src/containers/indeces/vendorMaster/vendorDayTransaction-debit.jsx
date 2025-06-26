@@ -152,18 +152,13 @@ function VendorDayDebitTransaction() {
         { field: "voucher_no", headerName: "Voucher No", flex: 1, align: 'center' },
         { field: "type", headerName: "Type", flex: 1 },
         {
-            field: "pay_to",
-            headerName: "Pay to",
-            flex: 1,
-            valueGetter: (row, value) => value.pay_to ?? value.school_name_short,
-        },
-        {
-            field: "debit_total",
+            field: "credit",
             headerName: "Amount",
             flex: 0.8,
             headerAlign: "right",
             align: "right",
         },
+         { field: "remarks", headerName: "Remarks", flex: 1 },
         { field: "dept_name", headerName: "Dept", flex: 1, hide: true },
         { field: "created_name", headerName: "Created By", flex: 1 },
         {
@@ -180,7 +175,12 @@ function VendorDayDebitTransaction() {
             flex: 1,
             valueGetter: (value, row) => (value == 1 ? "Online" : ""),
         },
-        { field: "remarks", headerName: "Remarks", flex: 1 },
+          {
+            field: "pay_to",
+            headerName: "Pay to",
+            flex: 1,
+            valueGetter: (row, value) => value.pay_to ?? value.school_name_short,
+        },
     ];
 
     return (
