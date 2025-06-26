@@ -158,16 +158,15 @@ function VendorDayCreditTransaction() {
       align:"center"
     },
     { field: "school_name_short", headerName: "School", flex: 1, align:"center" },
-    { field: "pay_to", headerName: "Vendor", flex: 1 },
-
     { field: "dept_name", headerName: "Dept", flex: 1 },
     {
-      field: "debit_total",
+      field: "credit",
       headerName: "Amount",
       flex: 0.8,
       headerAlign: "right",
       align: "right",
     },
+    { field: "remarks", headerName: "Remarks", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
     {
@@ -176,7 +175,7 @@ function VendorDayCreditTransaction() {
       flex: 1,
       valueGetter: (value, row) => row.verifierName ?? row.jvVerifier_name,
     },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
+    { field: "pay_to", headerName: "Vendor", flex: 1 },
   ];
 
   const handleGeneratePdf = async (
