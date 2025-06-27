@@ -10,7 +10,8 @@ import { PDFDownloadLink, BlobProvider } from '@react-pdf/renderer';
 import LedgerMasterIndexPdf from './LedgerMasterIndexPdf';
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-
+// import VendorFilterModal from "./VendorFilterModal";
+// import ModalWrapper from "../../../components/ModalWrapper";
 
 const initialValues = {
     voucherHeadId: "",
@@ -84,16 +85,9 @@ function VendorMasterIndex() {
                         school_id: obj?.school_id,
                         bankId: obj?.bankId,
                         isLastRow: false,
-                         openingBalance: obj?.openingBalance < 0
-                            ? `${formatCurrency(Math.abs(obj?.openingBalance))} Cr`
-                            : obj?.openingBalance === 0
-                                ? 0
-                                : `${formatCurrency(obj?.openingBalance)} Dr`,
-                         closingBalance: obj?.closingBalance < 0
-                            ? `${formatCurrency(Math.abs(obj?.closingBalance?.toFixed(2)))} Cr`
-                            : obj?.closingBalance === 0
-                                ? 0
-                                : `${formatCurrency(obj?.closingBalance?.toFixed(2))} Dr`,
+                        ledgerType: obj?.ledgerType,
+                        openingBalance: formatDrCr(obj?.openingBalance, obj?.ledgerType),
+                        closingBalance: formatDrCr(obj?.closingBalance, obj?.ledgerType),
                     })
                 })
                 if (data?.vendorDetails?.length > 0) {
@@ -114,6 +108,20 @@ function VendorMasterIndex() {
                 setLoading(false)
                 console.error(err)
             });
+    };
+
+    const formatDrCr = (value, ledgerType) => {
+        const absVal = Math.abs(value);
+
+        if (value === 0) return "0";
+
+        if (ledgerType === "VENDOR") {
+            return value < 0 ? `${absVal} Dr` : `${absVal} Cr`;
+        } else if (ledgerType === "CASHORBANK") {
+            return value > 0 ? `${absVal} Dr` : `${absVal} Cr`;
+        } else {
+            return value;
+        }
     };
 
 
@@ -203,102 +211,116 @@ function VendorMasterIndex() {
     };
 
     const formatCurrency = (value, decimals = 2) => {
-  if (value === null || value === undefined || value === '') return `0.00`;
-  if (typeof value === 'string' && (value.includes('Cr') || value.includes('Dr'))) {
-    const parts = value.split(' ');
-    const numValue = parseFloat(parts[0]);
-    const suffix = parts[1] || '';
+        if (value === null || value === undefined || value === '') return `0.00`;
+        if (typeof value === 'string' && (value.includes('Cr') || value.includes('Dr'))) {
+            const parts = value.split(' ');
+            const numValue = parseFloat(parts[0]);
+            const suffix = parts[1] || '';
 
-    if (isNaN(numValue)) return `0.00`;
+            if (isNaN(numValue)) return `0.00`;
 
-    return `${numValue.toLocaleString('en-IN', {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals
-    })} ${suffix}`;
-  }
+            return `${numValue.toLocaleString('en-IN', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            })} ${suffix}`;
+        }
 
-  const numValue = typeof value === 'string' ? parseFloat(value) : value;
-  if (isNaN(numValue)) return `0.00`;
+        const numValue = typeof value === 'string' ? parseFloat(value) : value;
+        if (isNaN(numValue)) return `0.00`;
 
-  return numValue.toLocaleString('en-IN', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  });
-};
+        return numValue.toLocaleString('en-IN', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+    };
+
+    const handleRowClick = (params) => {
+        if (params?.row?.isLastRow) return;
+        const query = {
+            ...values,
+            schoolId: params.row.school_id,
+            schoolName: params.row.school_name_short,
+            bankId: params.row.bankId,
+            fcYearOpt: fcYearOptions || [],
+            ledgerType: params?.row.ledgerType
+        }
+        navigate('/Accounts-ledger-monthly-detail', { state: query })
+    }
 
 
     return (
-        <Box sx={{ position: "relative" }}>
-            <Box sx={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 2,
-                mb: 2,
-                p: 2,
-                backgroundColor: 'rgba(245, 245, 245, 0.5)',
-                borderRadius: 1,
-                alignItems: 'flex-end',
-                width: '70%',
-                margin: 'auto',
-            }}>
-                <Box sx={{ flex: 1, minWidth: 250 }}>
-                    <CustomAutocomplete
-                        name="voucherHeadId"
-                        label="List Of Ledgers"
-                        value={values?.voucherHeadId}
-                        options={vendorOptions}
-                        handleChangeAdvance={handleChangeAdvance}
-                        size="small"
-                    />
-                </Box>
+        <>
+            <Box sx={{ position: "relative" }}>
+                <Box sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 2,
+                    mb: 2,
+                    p: 2,
+                    backgroundColor: 'rgba(245, 245, 245, 0.5)',
+                    borderRadius: 1,
+                    alignItems: 'flex-end',
+                    width: '70%',
+                    margin: 'auto',
+                }}>
+                    <Box sx={{ flex: 1, minWidth: 250 }}>
+                        <CustomAutocomplete
+                            name="voucherHeadId"
+                            label="List Of Ledgers"
+                            value={values?.voucherHeadId}
+                            options={vendorOptions}
+                            handleChangeAdvance={handleChangeAdvance}
+                            size="small"
+                        />
+                    </Box>
 
-                <Box sx={{ width: 200 }}>
-                    <CustomAutocomplete
-                        name="fcYearId"
-                        label="Financial Year"
-                        value={values?.fcYearId}
-                        options={fcYearOptions}
-                        handleChangeAdvance={handleChangeAdvance}
-                        disabled={true}
-                        size="small"
-                    />
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'end' }}>
-                    <Button
-                        variant="outlined"
-                        startIcon={<ArrowBackIcon />}
-                        onClick={handlePrevOBClick}
-                        disabled={values?.fcYearId === fcYearOptions[fcYearOptions?.length - 1]?.value}
-                        sx={{
-                            backgroundColor: '#f5f5f5',
-                            '&:hover': {
-                                backgroundColor: '#e0e0e0',
-                            },
-                            fontWeight: 500,
-                            color: '#424242',
-                            height: '36px'
-                        }}
-                    >
-                        Prev Year
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        endIcon={<ArrowForwardIcon />}
-                        onClick={handleNextOBClick}
-                        disabled={values?.fcYearId === fcYearOptions[0]?.value}
-                        sx={{
-                            backgroundColor: '#e3f2fd',
-                            '&:hover': {
-                                backgroundColor: '#bbdefb',
-                            },
-                            fontWeight: 500,
-                            color: '#1976d2',
-                            height: '36px'
-                        }}
-                    >
-                        Next Year
-                    </Button>
-                    {/* <BlobProvider
+                    <Box sx={{ width: 200 }}>
+                        <CustomAutocomplete
+                            name="fcYearId"
+                            label="Financial Year"
+                            value={values?.fcYearId}
+                            options={fcYearOptions}
+                            handleChangeAdvance={handleChangeAdvance}
+                            disabled={true}
+                            size="small"
+                        />
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'end' }}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<ArrowBackIcon />}
+                            onClick={handlePrevOBClick}
+                            disabled={values?.fcYearId === fcYearOptions[fcYearOptions?.length - 1]?.value}
+                            sx={{
+                                backgroundColor: '#f5f5f5',
+                                '&:hover': {
+                                    backgroundColor: '#e0e0e0',
+                                },
+                                fontWeight: 500,
+                                color: '#424242',
+                                height: '36px'
+                            }}
+                        >
+                            Prev Year
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            endIcon={<ArrowForwardIcon />}
+                            onClick={handleNextOBClick}
+                            disabled={values?.fcYearId === fcYearOptions[0]?.value}
+                            sx={{
+                                backgroundColor: '#e3f2fd',
+                                '&:hover': {
+                                    backgroundColor: '#bbdefb',
+                                },
+                                fontWeight: 500,
+                                color: '#1976d2',
+                                height: '36px'
+                            }}
+                        >
+                            Next Year
+                        </Button>
+                        {/* <BlobProvider
                         document={
                             <LedgerMasterIndexPdf
                                 data={{ columns, rows }}
@@ -321,79 +343,69 @@ function VendorMasterIndex() {
                                 }}
                                 sx={{ height:'36px' }}
                             >
-                                {loading ? 'Preparing PDF...' : 'Print PDF'}
+                                Print PDF
                             </Button>
                         )}
                     </BlobProvider> */}
+                    </Box>
+                </Box>
+                <Box sx={{
+                    width: '70%',
+                    margin: '20px auto 10px auto',
+                    textAlign: 'left',
+                    paddingRight: '12px'
+                }}>
+                    <Typography variant="subtitle2" sx={{
+                        fontWeight: 600,
+                        color: '#376a7d',
+                        fontStyle: 'italic',
+                        fontSize: '16px',
+                        textAlign: 'center'
+                    }}>
+                        {values?.voucherHeadName ? (
+                            `${values?.voucherHeadName} Ledger for FY ${values?.fcYear} as on ${moment().format('DD-MM-YYYY')}`
+                        ) : (
+                            <></>
+                        )}
+                    </Typography>
+                </Box>
+                <Box sx={{
+                    height: 'calc(100vh - 220px)',
+                    width: '70%',
+                    margin: 'auto',
+                    '& .last-row': {
+                        fontWeight: 700,
+                        backgroundColor: "#376a7d !important",
+                        color: "#fff"
+                    },
+                    '& .header-bg': {
+                        fontWeight: "bold",
+                        backgroundColor: "#376a7d !important",
+                        color: "#fff"
+                    },
+                }}>
+                    <GridIndex
+                        rows={rows}
+                        columns={columns}
+                        loading={loading}
+                        getRowClassName={(params) => params.row.isLastRow ? "last-row" : ""}
+                        getRowId={(row) => row?.school_id}
+                        columnVisibilityModel={columnVisibilityModel}
+                        setColumnVisibilityModel={setColumnVisibilityModel}
+                        isRowSelectable={(params) => !params.row.isLastRow}
+                        onRowClick={(params) => handleRowClick(params)}
+                        sx={{
+                            border: 'none',
+                            '& .MuiDataGrid-row:hover': {
+                                cursor: 'pointer',
+                                backgroundColor: 'rgba(55, 106, 125, 0.08)',
+                            },
+                            '& .MuiDataGrid-cell:focus': { outline: 'none' },
+                        }}
+                    />
                 </Box>
             </Box>
-            <Box sx={{
-                width: '70%',
-                margin: '20px auto 10px auto',
-                textAlign: 'left',
-                paddingRight: '12px'
-            }}>
-                <Typography variant="subtitle2" sx={{
-                    fontWeight: 600,
-                    color: '#376a7d',
-                    fontStyle: 'italic',
-                    fontSize: '16px',
-                     textAlign: 'center'
-                }}>
-                    {values?.voucherHeadName ? (
-                        `${values?.voucherHeadName} Ledger for FY ${values?.fcYear} as on ${moment().format('DD-MM-YYYY')}`
-                    ) : (
-                        <></>
-                    )}
-                </Typography>
-            </Box>
-            <Box sx={{
-                height: 'calc(100vh - 220px)',
-                width: '70%',
-                margin: 'auto',
-                '& .last-row': {
-                    fontWeight: 700,
-                    backgroundColor: "#376a7d !important",
-                    color: "#fff"
-                },
-                '& .header-bg': {
-                    fontWeight: "bold",
-                    backgroundColor: "#376a7d !important",
-                    color: "#fff"
-                },
-            }}>
-                <GridIndex
-                    rows={rows}
-                    columns={columns}
-                    loading={loading}
-                    getRowClassName={(params) => params.row.isLastRow ? "last-row" : ""}
-                    getRowId={(row) => row?.school_id}
-                    columnVisibilityModel={columnVisibilityModel}
-                    setColumnVisibilityModel={setColumnVisibilityModel}
-                    isRowSelectable={(params) => !params.row.isLastRow}
-                    onRowClick={(params) => {
-                        if (params?.row?.isLastRow) return;
-                        navigate('/Accounts-ledger-monthly-detail', {
-                            state: {
-                                ...values,
-                                schoolId: params.row.school_id,
-                                schoolName: params.row.school_name_short,
-                                bankId: params.row.bankId,
-                                fcYearOpt: fcYearOptions || []
-                            }
-                        })
-                    }}
-                    sx={{
-                        border: 'none',
-                        '& .MuiDataGrid-row:hover': {
-                            cursor: 'pointer',
-                            backgroundColor: 'rgba(55, 106, 125, 0.08)',
-                        },
-                        '& .MuiDataGrid-cell:focus': { outline: 'none' },
-                    }}
-                />
-            </Box>
-        </Box>
+        </>
     );
 }
 export default VendorMasterIndex;

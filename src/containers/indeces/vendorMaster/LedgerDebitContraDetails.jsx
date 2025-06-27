@@ -68,6 +68,7 @@ function LedgerDebitContraDetail() {
             field: "collection_date",
             headerName: "Collection Date",
             flex: 1,
+            align:"center",
             valueGetter: (row, value) => moment(row).format("DD-MM-YYYY"),
         },
          {

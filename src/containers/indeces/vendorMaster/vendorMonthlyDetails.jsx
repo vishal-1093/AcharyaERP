@@ -107,18 +107,18 @@ const VendorMonthlyDetails = () => {
   };
 
   useEffect(() => {
-   if(queryValues?.isBRSTrue){
-     setBreadCrumbs([
-            { name: "Bank Balance", link: "/bank-balance" },
-            { name: "BRS", link: "/institute-bank-balance", state: { bankGroupId: queryValues?.bankGroupId } },
-            { name: "Monthly Transaction" },
-        ]);
-  }else{
-    setBreadCrumbs([
-      { name: "Ledger", link: "/Accounts-ledger", state: queryValues },
-      { name: "Monthly Transaction" }
-    ])
-  }
+    if (queryValues?.isBRSTrue) {
+      setBreadCrumbs([
+        { name: "Bank Balance", link: "/bank-balance" },
+        { name: "BRS", link: "/institute-bank-balance", state: { bankGroupId: queryValues?.bankGroupId } },
+        { name: "Monthly Transaction" },
+      ]);
+    } else {
+      setBreadCrumbs([
+        { name: "Ledger", link: "/Accounts-ledger", state: queryValues },
+        { name: "Monthly Transaction" }
+      ])
+    }
     setCrumbs([])
   }, [])
 
@@ -142,24 +142,25 @@ const VendorMonthlyDetails = () => {
         const rowData = []
         data?.vendorDetails?.length > 0 && data?.vendorDetails?.forEach(el => {
           rowData.push({
-            //  closingBalance: el?.closingBalance < 0 ? `${el?.closingBalance} Cr` : el?.closingBalance === 0 ? 0 : `${el?.closingBalance} Dr`,
             credit: el?.credit,
             debit: el?.debit,
             month_name: el?.month_name,
             school_id: el?.school_id,
             month: el?.month,
             // openingBalance: el?.openingBalance < 0 ? `${el?.openingBalance} Cr` : el?.openingBalance === 0 ? 0 : `${el?.openingBalance} Dr`
-            openingBalance: el?.openingBalance < 0
-              ? `${Math.abs(el?.openingBalance)} Cr`
-              : el?.openingBalance === 0
-                ? 0
-                : `${el?.openingBalance} Dr`,
+            // openingBalance: el?.openingBalance < 0
+            //   ? `${Math.abs(el?.openingBalance)} Cr`
+            //   : el?.openingBalance === 0
+            //     ? 0
+            //     : `${el?.openingBalance} Dr`,
 
-            closingBalance: el?.closingBalance < 0
-              ? `${Math.abs(el?.closingBalance)} Cr`
-              : el?.closingBalance === 0
-                ? 0
-                : `${el?.closingBalance} Dr`,
+            // closingBalance: el?.closingBalance < 0
+            //   ? `${Math.abs(el?.closingBalance)} Cr`
+            //   : el?.closingBalance === 0
+            //     ? 0
+            //     : `${el?.closingBalance} Dr`,
+            openingBalance: formatDrCr(el?.openingBalance, queryValues?.ledgerType),
+            closingBalance: formatDrCr(el?.closingBalance, queryValues?.ledgerType),
           })
         });
         const financialYearOrder = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3];
@@ -188,7 +189,7 @@ const VendorMonthlyDetails = () => {
     const query = { ...queryValues, fcYear: currFcYear?.fcYear, fcYearId: currFcYear?.fcYearId, month, month_name }
     navigate('/Accounts-ledger-day-transaction', { state: query })
   };
-  
+
   const handlePreviousOpeningBalance = () => {
     const { fcYearOpt: fcYearOptions } = queryValues
     const currentIndex = fcYearOptions?.findIndex(
@@ -242,38 +243,6 @@ const VendorMonthlyDetails = () => {
     return `${monthMap[monthNumber]} ${yearSuffix}`;
   };
 
-  const handleDownloadPdf = () => {
-    setIsPrint(true)
-    const timer = setTimeout(() => {
-      const receiptElement = document.getElementById("ledger-monthly-transaction");
-      if (receiptElement) {
-        html2canvas(receiptElement, { scale: 3 }).then((canvas) => {
-          const imgData = canvas.toDataURL("image/png");
-          const pdf = new jsPDF("p", "mm", "a4");
-
-          const imgWidth = 190;
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-          pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
-
-          // Open in new window as Blob URL and trigger print
-          const pdfBlob = pdf.output("blob");
-          const pdfUrl = URL.createObjectURL(pdfBlob);
-
-          const printWindow = window.open(pdfUrl, "_blank");
-          if (printWindow) {
-            printWindow.addEventListener("load", () => {
-              printWindow.focus();
-              printWindow.print();
-            });
-          }
-        });
-      }
-      setIsPrint(false)
-      return () => clearTimeout(timer)
-    }, 100);
-
-  };
 
   const formatCurrency = (value, decimals = 2) => {
     if (value === null || value === undefined || value === '') return `0.00`;
@@ -299,8 +268,256 @@ const VendorMonthlyDetails = () => {
     });
   };
 
+  const formatDrCr = (value, ledgerType) => {
+    const absVal = Math.abs(value);
+
+    if (value === 0) return "0";
+
+    if (ledgerType === "VENDOR") {
+      return value < 0 ? `${absVal} Dr` : `${absVal} Cr`;
+    } else if (ledgerType === "CASHORBANK") {
+      return value > 0 ? `${absVal} Dr` : `${absVal} Cr`;
+    } else {
+      return value;
+    }
+  };
+
+  const handleSearch = () => {
+    console.log("asdd")
+  }
+
 
   return (
+
+    // <Box sx={{
+    //   width: '100%',
+    //   fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
+    // }}>
+    //   <Box sx={{
+    //     display: 'flex',
+    //     justifyContent: 'space-between',
+    //     alignItems: 'center',
+    //     mb: 2,
+    //     width: '100%'
+    //   }}>
+    //     <CustomBreadCrumbs crumbs={breadCrumbs} />
+    //     <Box sx={{
+    //       display: 'flex',
+    //       alignItems: 'center',
+    //       gap: 1,
+    //       justifyContent: 'end'
+    //     }}>
+    //       <Button
+    //         variant="outlined"
+    //         startIcon={<ArrowBackIcon />}
+    //         onClick={handlePreviousOpeningBalance}
+    //         disabled={currFcYear?.fcYearId === queryValues?.fcYearOpt[queryValues?.fcYearOpt?.length - 1]?.value}
+    //         sx={{
+    //           backgroundColor: '#f5f5f5',
+    //           '&:hover': { backgroundColor: '#e0e0e0' },
+    //           fontWeight: 500,
+    //           color: '#424242',
+    //           fontSize: '0.8125rem',
+    //           minWidth: '90px',
+    //           py: '6px'
+    //         }}
+    //       >
+    //         Prev
+    //       </Button>
+    //       <Button
+    //         variant="outlined"
+    //         endIcon={<ArrowForwardIcon />}
+    //         onClick={handleNextOpeningBalance}
+    //         disabled={currFcYear?.fcYearId === queryValues?.fcYearOpt[0]?.value}
+    //         sx={{
+    //           backgroundColor: '#e3f2fd',
+    //           '&:hover': { backgroundColor: '#bbdefb' },
+    //           fontWeight: 500,
+    //           color: '#1976d2',
+    //           fontSize: '0.8125rem',
+    //           minWidth: '90px',
+    //           py: '6px'
+    //         }}
+    //       >
+    //         Next
+    //       </Button>
+    //           <BlobProvider
+    //   document={
+    //     <LedgerMonthlyTransactionPdf
+    //       rows={rows}
+    //       currFcYear={currFcYear}
+    //       queryValues={queryValues}
+    //     />
+    //   }
+    // >
+    //   {({ url, loading }) => (
+    //     <Button
+    //       variant="contained"
+    //       color="primary"
+    //       disabled={rows?.length === 0}
+    //       onClick={() => {
+    //         if (url) {
+    //           window.open(url, '_blank');
+    //         }
+    //       }}
+    //     >
+    //      Print PDF
+    //     </Button>
+    //   )}
+    // </BlobProvider>
+    //     </Box>
+    //   </Box>
+    //   <Box sx={{
+    //     border: '1px solid #e0e0e0',
+    //     borderRadius: '4px',
+    //     overflow: 'hidden',
+    //     position: 'relative',
+    //     minHeight: 300,
+    //     width: '70%',
+    //     margin: "auto"
+    //   }}>
+    //      {loading ? (
+    //           <Box sx={{
+    //             position: 'absolute',
+    //             top: 56,
+    //             left: 0,
+    //             right: 0,
+    //             bottom: 0,
+    //             display: 'flex',
+    //             alignItems: 'center',
+    //             justifyContent: 'center',
+    //             backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    //             zIndex: 1
+    //           }}>
+    //             <CircularProgress size={24} thickness={4} sx={{ color: '#2c3e50' }} />
+    //           </Box>
+    //         ) : (
+    //           <>
+    //     <Box sx={{
+    //       p: 2,
+    //       backgroundColor: '#376a7d',
+    //       color: 'white',
+    //     }}>
+    //       <Typography variant="h5" sx={{ fontWeight: 600, textAlign: 'center' }}>
+    //         {rows?.schoolName}
+    //       </Typography>
+    //       <Typography variant="subtitle1" sx={{ textAlign: 'center' }}>
+    //         {`${queryValues?.voucherHeadName} Ledger for FY ${currFcYear?.fcYear}`}
+    //       </Typography>
+    //       <Typography variant="body1" sx={{ textAlign: 'center', opacity: 0.9 }}>
+    //         {`As on ${moment().format('DD-MM-YYYY')}`}
+    //       </Typography>
+    //     </Box>
+
+    //     <TableContainer>
+    //       <Table size="small" sx={{
+    //         '& .MuiTableCell-root': {
+    //           fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    //           fontSize: '0.8125rem',
+    //           lineHeight: '1.43',
+    //           padding: '6px 16px',
+    //           borderRight: '1px solid rgba(224, 224, 224, 0.5)',
+    //           '&:last-child': { borderRight: 'none' }
+    //         }
+    //       }}>
+    //             <TableHead>
+    //               <TableRow sx={{
+    //                 backgroundColor: '#f5f5f5',
+    //                 '& th': {
+    //                   color: 'rgba(0, 0, 0, 0.87)',
+    //                   fontWeight: 'bold',
+    //                   fontSize: '0.8125rem',
+    //                   borderBottom: '1px solid rgba(224, 224, 224, 1)',
+    //                   borderTop: '1px solid rgba(224, 224, 224, 1)'
+    //                 }
+    //               }}>
+    //                 <TableCell sx={{ width: '20%' }} align="left">Month</TableCell>
+    //                 <TableCell sx={{ width: '20%' }} align="right">Opening Balance</TableCell>
+    //                 <TableCell sx={{ width: '20%' }} align="right">Debit</TableCell>
+    //                 <TableCell sx={{ width: '20%' }} align="right">Credit</TableCell>
+    //                 <TableCell sx={{ width: '20%' }} align="right">Closing Balance</TableCell>
+    //               </TableRow>
+    //             </TableHead>
+    //             <TableBody>
+    //               {rows?.vendorDetails?.length > 0 ? (<>
+    //                 {rows?.vendorDetails?.map((row, index) => (
+    //                   <TableRow
+    //                     key={index}
+    //                     hover
+    //                     sx={{
+    //                       cursor: 'pointer',
+    //                       '&:nth-of-type(even)': { backgroundColor: 'rgba(0, 0, 0, 0.02)' },
+    //                       '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+    //                     }}
+    //                     onClick={() => handleRowClick(row)}
+    //                   >
+    //                     <TableCell align="left" sx={{
+    //                       fontWeight: 400,
+    //                       color: 'rgba(0, 0, 0, 0.87)'
+    //                     }}>
+    //                       {getFormattedMonthYear(row.month, currFcYear.fcYear)}
+    //                     </TableCell>
+    //                     <TableCell align="right">
+    //                       {formatCurrency(row.openingBalance)}
+    //                     </TableCell>
+    //                     <TableCell align="right">
+    //                       {formatCurrency(row.debit)}
+    //                     </TableCell>
+    //                     <TableCell align="right">
+    //                       {formatCurrency(row.credit)}
+    //                     </TableCell>
+    //                     <TableCell align="right" sx={{
+    //                       fontWeight: 500,
+    //                       color: 'rgba(0, 0, 0, 0.87)'
+    //                     }}>
+    //                       {formatCurrency(row.closingBalance)}
+    //                     </TableCell>
+    //                   </TableRow>
+    //                 ))}
+    //                 <TableRow sx={{
+    //                   backgroundColor: 'rgba(0, 0, 0, 0.04)',
+    //                   '& td': {
+    //                     fontWeight: 600,
+    //                     borderTop: '1px solid rgba(0, 0, 0, 0.12)'
+    //                   }
+    //                 }}>
+    //                   <TableCell align="left">Total</TableCell>
+    //                   <TableCell align="right"></TableCell>
+    //                   <TableCell align="right">
+    //                     {formatCurrency(rows?.totalDebit)}
+    //                   </TableCell>
+    //                   <TableCell align="right">
+    //                     {formatCurrency(rows?.totalCredit)}
+    //                   </TableCell>
+    //                   <TableCell align="right">
+    //                   </TableCell>
+    //                 </TableRow>
+    //               </>) : (
+    //                 <TableRow>
+    //                   <TableCell colSpan={5} align="center" sx={{ py: 4, border: 'none' }}>
+    //                     <Box sx={{
+    //                       display: 'flex',
+    //                       flexDirection: 'column',
+    //                       alignItems: 'center',
+    //                       color: 'text.secondary',
+    //                       height: '200px',
+    //                       border: 'none'
+    //                     }}>
+
+    //                       <Typography variant="body1" sx={{ fontWeight: 500, margin: "auto" }}>
+    //                         No data available
+    //                       </Typography>
+    //                     </Box>
+    //                   </TableCell>
+    //                 </TableRow>
+    //               )}
+    //             </TableBody>
+    //       </Table>
+    //     </TableContainer>
+    //     </>)}
+    //   </Box>
+    // </Box>
+
     <Paper elevation={0} sx={{
       p: 1,
       width: '100%',
@@ -352,30 +569,46 @@ const VendorMonthlyDetails = () => {
           >
             Next
           </Button>
-          {/* <BlobProvider
-            document={
-              <LedgerMonthlyTransactionPdf
-                rows={rows}
-                currFcYear={currFcYear}
-                queryValues={queryValues}
-              />
-            }
+          <Button
+            variant="outlined"
+            endIcon={<ArrowForwardIcon />}
+            onClick={handleSearch}
+            // disabled={currFcYear?.fcYearId === queryValues?.fcYearOpt[0]?.value}
+            sx={{
+              backgroundColor: '#e3f2fd',
+              '&:hover': {
+                backgroundColor: '#bbdefb',
+              },
+              fontWeight: 500,
+              color: '#1976d2',
+            }}
           >
-            {({ url, loading }) => (
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={rows?.length === 0}
-                onClick={() => {
-                  if (url) {
-                    window.open(url, '_blank');
-                  }
-                }}
-              >
-                {loading ? 'Preparing PDF...' : 'Print PDF'}
-              </Button>
-            )}
-          </BlobProvider> */}
+            Search
+          </Button>
+          {/* <BlobProvider
+      document={
+        <LedgerMonthlyTransactionPdf
+          rows={rows}
+          currFcYear={currFcYear}
+          queryValues={queryValues}
+        />
+      }
+    >
+      {({ url, loading }) => (
+        <Button
+          variant="contained"
+          color="primary"
+          disabled={rows?.length === 0}
+          onClick={() => {
+            if (url) {
+              window.open(url, '_blank');
+            }
+          }}
+        >
+          {loading ? 'Preparing PDF...' : 'Print PDF'}
+        </Button>
+      )}
+    </BlobProvider> */}
 
         </Box>
       </Box >

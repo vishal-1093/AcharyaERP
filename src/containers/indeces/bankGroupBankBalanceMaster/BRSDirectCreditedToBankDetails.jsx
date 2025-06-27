@@ -27,10 +27,6 @@ function BRSDirectCreditedToBankDetail() {
     const [directCreditsData, setDirectCreditsData] = useState([]);
     const [loading, setLoading] = useState(false)
     const [breadCrumbs, setBreadCrumbs] = useState([])
-    const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-        balanceUpdatedOn: false,
-        balanceUpdatedBy: false,
-    })
     const navigate = useNavigate();
     const location = useLocation()
     const queryValues = location?.state
@@ -45,18 +41,18 @@ function BRSDirectCreditedToBankDetail() {
             { name: "Bank Balance", link: "/bank-balance" },
             { name: "BRS", link: "/institute-bank-balance", state: { id: queryValues?.id } },
             { name: "BRS Transactions", link:"/institute-brs-transaction", state:queryValues },
-            { name: "Direct Credit to Bank"},
+            { name: "Direct Electronic Credits"},
         ]);
         setCrumbs([]);
-    }, []);
-
-
-    useEffect(() => {
-            getDirectCreditToBankData();
+        getDirectCreditToBankData();
     }, []);
 
     const columns = [
-        { field: "transaction_date", headerName: "TRN Date", flex: 1, headerClassName: "header-bg", headerAlign: 'center', align: 'center' },
+        { field: "transaction_date", headerName: "TRN Date", flex: 1, headerClassName: "header-bg", headerAlign: 'center', align: 'center',
+            renderCell : (params) => {
+                return parseDate(params?.row?.transaction_date)
+            }
+         },
          { field: "cheque_dd_no", headerName: "TRN No", flex: 1, headerClassName: "header-bg", headerAlign: 'center', align: 'left' },
         { field: "order_id", headerName: "Order Id", flex: 1, headerClassName: "header-bg", align: 'left', headerAlign: 'center' },
         { field: "auid", headerName: "AUID", flex: 1, headerClassName: "header-bg", align: 'center', headerAlign: 'center' },
@@ -73,6 +69,18 @@ function BRSDirectCreditedToBankDetail() {
             })
             .catch((err) => console.error(err));
     };
+    const parseDate = (raw) => {
+            if (!raw) return '';
+            const f1 = moment(raw, 'YYYY-MM-DD HH:mm:ss.SSS', true);
+            if (f1.isValid()) return f1.format('DD-MM-YYYY HH:mm:ss');
+    
+            const f2 = moment(raw, 'DD/MM/YYYY', true);
+            if (f2.isValid()) return f2.format('DD-MM-YYYY');
+    
+            const f3 = moment(raw);
+            return f3.isValid() ? f3.format('DD-MM-YYYY') : '';
+        };
+    
 
     return (
 
@@ -91,10 +99,7 @@ function BRSDirectCreditedToBankDetail() {
                     rows={directCreditsData}
                     columns={columns}
                     loading={loading}
-                    getRowClassName={(params) => params.row.isLastRow ? "last-row" : ""}
                     getRowId={(row) => row?.bank_import_transaction_id}
-                    // columnVisibilityModel={columnVisibilityModel}
-                    // setColumnVisibilityModel={setColumnVisibilityModel}
                 />
             </Box>
         </Box>

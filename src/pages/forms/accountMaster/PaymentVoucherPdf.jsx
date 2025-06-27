@@ -59,12 +59,15 @@ const PaymentVoucherPdf = () => {
 
   useEffect(() => {
     getPaymentVoucherData();
-     if(queryValues?.date){
+     if(queryValues?.ledgerType === "VENDOR"){
+      setCrumbs([])
+      setBreadCrumb([
+        { name: "Payment Tracker", link: "/vendor-day-transaction-debit", state: queryValues }]);
+    }else if(queryValues?.ledgerType === "CASHORBANK"){
       setCrumbs([])
       setBreadCrumb([
         { name: "Payment Tracker", link: "/Accounts-ledger-day-credit-transaction", state: queryValues }]);
-    }else{
-    if(pathfrom){
+    }else if(pathfrom){
       setCrumbs([{ name: "PO Payment History", link: pathfrom }]);
     }else if (grnPdfStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/journalmaster/grn" }]);
@@ -77,7 +80,6 @@ const PaymentVoucherPdf = () => {
     } else {
       setCrumbs([{ name: "Payment Tracker", link: "/VoucherMaster/Payment" }]);
     }
-  }
   }, []);
 
   const getPaymentVoucherData = async () => {
