@@ -133,7 +133,7 @@ const PdfUploadModal = ({ imageOpen, setImageUploadOpen, rowData }) => {
     });
 
     try {
-      await axios.post("/api/student/uploadStudentAttachment", formData, {
+      await axios.post("/api/student/uploadStudentAttachmentForStaff", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setAlertMessage({ severity: "success", message: "Upload successful" });

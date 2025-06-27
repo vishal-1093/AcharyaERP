@@ -157,15 +157,18 @@ const StudentDocumentUpload = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
+
     if (!selectedMainCategory || Object.keys(mappedFiles).length === 0) {
       setAlertMessage({ severity: "error", message: "Category & files required" });
       setAlertOpen(true);
       setLoading(false);
       return;
     }
+
     const formData = new FormData();
     formData.append("attachments_category_id", selectedMainCategory.attachments_category_id);
     formData.append("student_id", Id);
+
     const subcats = subCategoriesMap[selectedMainCategory.attachments_category_id] || [];
     subcats.forEach((sub) => {
       const name = sub.attachments_subcategory_name;
@@ -174,11 +177,33 @@ const StudentDocumentUpload = () => {
         formData.append(short, mappedFiles[name].file);
       }
     });
+
     try {
-      await axios.post("/api/student/uploadStudentAttachment", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setAlertMessage({ severity: "success", message: "Upload successful" });
+      const response = await axios.post(
+        "/api/student/uploadStudentAttachmentForStudent",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      const { success, status, message, data } = response.data || {};
+      const { already_uploaded = [], successful_uploads = [], failed_uploads = [] } = data || {};
+
+      if (already_uploaded.length > 0) {
+        const formatted = already_uploaded.map(item => item.split(":")[0]).join(", ");
+        setAlertMessage({
+          severity: "warning",
+          message: `${formatted} already uploaded.`,
+        });
+      } else if (status === 206) {
+        setAlertMessage({ severity: "warning", message: message });
+      } else if (successful_uploads.length > 0) {
+        setAlertMessage({ severity: "success", message: "Upload successful." });
+      } else {
+        setAlertMessage({ severity: "info", message: "No new files uploaded." });
+      }
+
       setAlertOpen(true);
       setSelectedSubCategories({});
       setMappedFiles({});
@@ -192,6 +217,8 @@ const StudentDocumentUpload = () => {
       setLoading(false);
     }
   };
+
+
 
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
