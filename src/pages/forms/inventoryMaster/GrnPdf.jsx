@@ -33,8 +33,10 @@ Font.register({
 
 const styles = StyleSheet.create({
   viewer: {
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: "100%",
+    height: "90vh",
+    border: "none",
+    margin: "auto",
   },
   pageLayout: { margin: 25 },
 
@@ -291,13 +293,14 @@ function GrnPdf() {
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
   const fromPath = location?.state?.path;
+  const path = location?.state?.fromPath;
 
   useEffect(() => {
-    if (fromPath) {
-      setCrumbs([{ name: "Po Payment History", link: fromPath }]);
-    } else {
-      setCrumbs([{ name: "GRN Index", link: "/GRNIndex" }]);
-
+    if (path === "/create-grn") {
+      setCrumbs([{ name: "GRN Index", link: "/grnIndex-user" }]);
+    }
+    else if (path) {
+      setCrumbs([{ name: "Po Master", link: "/Pomaster/Active" }]);
     }
     getPdfData();
   }, []);
