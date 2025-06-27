@@ -5925,6 +5925,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/grnIndex-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <GrnIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/GrnPdf/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
