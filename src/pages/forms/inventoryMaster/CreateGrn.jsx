@@ -9,7 +9,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const initialValues = {
   isLibrary: "false",
@@ -40,6 +40,7 @@ const initialValuesTwo = {
 let type = null;
 
 const CreateGrn = () => {
+  const location = useLocation();
   const [values, setValues] = useState(initialValues);
   const [valuesTwo, setValuesTwo] = useState([initialValuesTwo]);
   const [StoreOptions, setStoreOptions] = useState([]);
@@ -48,8 +49,10 @@ const CreateGrn = () => {
   const [loading, setLoading] = useState(false);
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
+  const fromPath = location?.state?.fromPath;
 
   useEffect(() => {
+
     getPoData();
   }, []);
 
@@ -125,7 +128,12 @@ const CreateGrn = () => {
 
         setValuesTwo(temp);
         console.log(type, "values?.requestType");
-        setCrumbs([{ name: type === "SRN" ? "SRN" : "GRN", link: "/PoMaster" }]);
+        if (fromPath) {
+          setCrumbs([{ name: "Create GRN", link: fromPath }, { name: type === "SRN" ? "SRN" : "GRN" }]);
+        } else {
+          setCrumbs([{ name: "Po Master", link: "/PoMaster" }, { name: type === "SRN" ? "SRN" : "GRN" }]);
+
+        }
       })
       .catch((err) => console.error(err));
   };
@@ -397,7 +405,8 @@ const CreateGrn = () => {
                 message: "Form Updated Successfully",
               });
               setLoading(false);
-              navigate("/CreatedGRN", { state: { StockNo: grn_no, type: type } });
+              navigate(`/GRNPdf/${grn_no.replace(/\//g, "_")}`, { state: { StockNo: grn_no, type: type, fromPath: fromPath } });
+              // navigate("/CreatedGRN", { state: { StockNo: grn_no, type: type } });
             })
             .catch((err) => {
               setLoading(false);
@@ -549,6 +558,7 @@ const CreateGrn = () => {
               label="Invoice Date*"
               value={values.invoiceDate ? values.invoiceDate : null}
               handleChangeAdvance={handleChangeDate}
+              maxDate={new Date()}
             />
           </Grid>
           <Grid item xs={12} md={3}>
