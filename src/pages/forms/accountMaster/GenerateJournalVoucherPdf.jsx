@@ -27,27 +27,26 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles((theme) => ({
-   breadcrumbsContainer: {
-        position: "relative",
-        marginBottom: 10,
-        width: "fit-content",
-        zIndex: theme.zIndex.drawer - 1,
-        marginLeft: '-130px'
-    },
-    link: {
-        color: '#4A57A9',
-        textDecoration: "none",
-        cursor: "pointer",
-        "&:hover": { textDecoration: "underline" },
-    },
+  breadcrumbsContainer: {
+    position: "relative",
+    marginBottom: 10,
+    width: "fit-content",
+    zIndex: theme.zIndex.drawer - 1,
+    marginLeft: "-130px",
+  },
+  link: {
+    color: "#4A57A9",
+    textDecoration: "none",
+    cursor: "pointer",
+    "&:hover": { textDecoration: "underline" },
+  },
 }));
-
 
 const JournalVoucherPdf = () => {
   const [voucherData, setVoucherData] = useState([]);
   const [hideButtons, setHideButtons] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
-   const [breadCrumb, setBreadCrumb] = useState([])
+  const [breadCrumb, setBreadCrumb] = useState([]);
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
   const pathname = useLocation();
@@ -56,16 +55,20 @@ const JournalVoucherPdf = () => {
   const grnIndexStatus = location?.state?.grnIndexStatus;
   const indexStatus = location?.state?.indexStatus;
   const fromPath = location?.state?.path;
-  const queryValues = location?.state
+  const queryValues = location?.state;
 
   useEffect(() => {
     getPaymentVoucherData();
-    if(queryValues?.ledgerType === 'VENDOR'){
-      setCrumbs([])
+    if (queryValues?.ledgerType === "VENDOR") {
+      setCrumbs([]);
       setBreadCrumb([
-        { name: "Payment Tracker", link: "/vendor-day-transaction-credit", state: queryValues }]);
-    }
-    else if (fromPath) {
+        {
+          name: "Payment Tracker",
+          link: "/vendor-day-transaction-credit",
+          state: queryValues,
+        },
+      ]);
+    } else if (fromPath) {
       setCrumbs([{ name: "Po Payment History", link: fromPath }]);
     } else if (grnIndexStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/journalmaster/grn" }]);
@@ -98,6 +101,22 @@ const JournalVoucherPdf = () => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
   }
+
+  const convertToRupeesAndPaise = (amount) => {
+    const [rupees, paise] = Number(amount)?.toFixed(2)?.split(".");
+
+    let result = "";
+    if (parseInt(rupees) > 0) {
+      result += numberToWords.toWords(parseInt(rupees)) + " rupees";
+    }
+    if (parseInt(paise) > 0) {
+      if (result) result += " and ";
+      result += numberToWords.toWords(parseInt(paise)) + " paise";
+    }
+    if (!result) result = "zero rupees";
+
+    return result;
+  };
 
   const handleDownloadPdf = () => {
     setHideButtons(true);
@@ -150,9 +169,11 @@ const JournalVoucherPdf = () => {
 
   return (
     <Container>
-       {queryValues?.ledgerType === 'VENDOR' ? (
-           <CustomBreadCrumbs crumbs={breadCrumb} />
-         ): <></>}
+      {queryValues?.ledgerType === "VENDOR" ? (
+        <CustomBreadCrumbs crumbs={breadCrumb} />
+      ) : (
+        <></>
+      )}
       <Paper
         id="receipt"
         elevation={3}
@@ -453,11 +474,10 @@ const JournalVoucherPdf = () => {
                     >
                       {" "}
                       {toUpperCamelCaseWithSpaces(
-                        numberToWords.toWords(
-                          Number(voucherData?.[0]?.debit_total ?? "")
+                        convertToRupeesAndPaise(
+                          Number(voucherData?.[0]?.debit_total ?? 0)
                         )
                       )}{" "}
-                      rupees
                     </Typography>
                   </TableCell>
                   <TableCell
@@ -516,30 +536,30 @@ const JournalVoucherPdf = () => {
 export default JournalVoucherPdf;
 
 const CustomBreadCrumbs = ({ crumbs = [] }) => {
-    const navigate = useNavigate()
-    const classes = useStyles()
-    if (crumbs.length <= 0) return null
+  const navigate = useNavigate();
+  const classes = useStyles();
+  if (crumbs.length <= 0) return null;
 
-    return (
-        <Box className={classes.breadcrumbsContainer}>
-            <Breadcrumbs
-                style={{ fontSize: "1.15rem" }}
-                separator={<NavigateNextIcon fontSize="small" />}
-            >
-                {crumbs?.map((crumb, index) => {
-                    return (
-                        <span key={index}>
-                                <Typography
-                                    onClick={() => navigate(crumb.link, { state: crumb.state })}
-                                    className={classes.link}
-                                    fontSize="inherit"
-                                >
-                                    {crumb.name}
-                                </Typography>
-                        </span>
-                    );
-                })}
-            </Breadcrumbs>
-        </Box>
-    )
-}
+  return (
+    <Box className={classes.breadcrumbsContainer}>
+      <Breadcrumbs
+        style={{ fontSize: "1.15rem" }}
+        separator={<NavigateNextIcon fontSize="small" />}
+      >
+        {crumbs?.map((crumb, index) => {
+          return (
+            <span key={index}>
+              <Typography
+                onClick={() => navigate(crumb.link, { state: crumb.state })}
+                className={classes.link}
+                fontSize="inherit"
+              >
+                {crumb.name}
+              </Typography>
+            </span>
+          );
+        })}
+      </Breadcrumbs>
+    </Box>
+  );
+};

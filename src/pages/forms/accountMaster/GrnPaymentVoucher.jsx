@@ -121,7 +121,7 @@ function GrnPaymentVoucher({ paymentData, data }) {
         jvSchoolId: null,
         poOptions: [],
         jvFcyear: null,
-        debit: Math.round(obj.credit),
+        debit: obj.credit,
         reference_number: obj.reference_number,
       });
     });
@@ -255,7 +255,7 @@ function GrnPaymentVoucher({ paymentData, data }) {
     const { name, value } = e.target;
     const [field, index] = name.split("-");
     const parsedIndex = parseInt(index);
-    if (!/^\d*$/.test(value)) return;
+    // if (!/^\d*$/.test(value)) return;
     setValues((prev) => ({
       ...prev,
       voucherData: prev.voucherData.map((obj, i) => {
@@ -429,6 +429,7 @@ function GrnPaymentVoucher({ paymentData, data }) {
 
       const postData = [];
       voucherData.forEach((obj) => {
+        const maindebit = parseFloat(Number(obj?.debit).toFixed(2));
         const {
           vendorId,
           debit,
@@ -449,8 +450,8 @@ function GrnPaymentVoucher({ paymentData, data }) {
           active: true,
           remarks,
           cheque_dd_no: chequeNo,
-          debit,
-          debit_total: totalDebit,
+          debit: maindebit,
+          debit_total: parseFloat(Number(totalDebit).toFixed(2)),
           inter_school_id: interSchoolId,
           jv_school_id: jvSchoolId,
           jv_financial_year_id: jvFcyear,
