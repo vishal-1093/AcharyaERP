@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import { HighlightOff, Visibility } from "@mui/icons-material";
 import axios from "../../../services/Api";
@@ -34,7 +34,7 @@ const filterLists = [
   { label: "Today", value: "TODAY" },
   { label: "1 Week", value: "WEEK" },
   { label: "1 Month", value: "MONTH" },
-  { label: "6 Months", value: "6MONTHS"},
+  { label: "6 Months", value: "6MONTHS" },
   { label: "Current Year", value: "1YEAR" },
   { label: "Custom Date", value: "custom" },
 ];
@@ -60,6 +60,7 @@ function AllPoList() {
   const [{ printModalOpen, modalPrintContent }, setState] = useState([initialState]);
   const [modalPreview, setModalPreview] = useState(false);
   const [modalSRNPreview, setModalSRNPreview] = useState(false);
+  const { pathname } = useLocation();
 
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -143,7 +144,7 @@ function AllPoList() {
       });
       setAlertOpen(true);
     } else {
-      navigate(`/CreateGrn/${purchaseOrderId}`)
+      navigate(`/CreateGrn/${purchaseOrderId}`, { state: { fromPath: pathname } })
     }
   }
   const handleClickUpdate = (params) => {
@@ -187,6 +188,7 @@ function AllPoList() {
     {
       field: "Print",
       headerName: "Print PO",
+      type: "actions",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -224,6 +226,7 @@ function AllPoList() {
       field: "GRN",
       headerName: "Create GRN",
       flex: 1,
+      type: "actions",
       renderCell: (params) => {
         const { grnCreationStatus, status, purchaseOrderId, requestType, amount, approverStatus } = params.row;
         if (grnCreationStatus !== null && status === "COMPLETED") {
@@ -249,6 +252,7 @@ function AllPoList() {
       field: "cancel",
       headerName: "Cancel",
       flex: 1,
+      type: "actions",
       renderCell: (params) => {
         if (params.row.grnCreationStatus) {
           return <IconButton>

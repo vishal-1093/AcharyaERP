@@ -21,7 +21,7 @@ function GRNCreationForm() {
   const [values, setValues] = useState(initialValues);
   const [facilityNameOptions, setFacilityNameOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { pathname } = useLocation();
+  const { pathname, state } = useLocation();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -37,6 +37,7 @@ function GRNCreationForm() {
   useEffect(() => {
     if (pathname.toLowerCase() === "/create-grn") {
       setCrumbs([
+        { link: "/grnIndex-user", name: "GRN-Index" },
         { name: "GRN-Create" },
       ]);
     }
@@ -87,7 +88,7 @@ function GRNCreationForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      navigate(`/CreateGrn/${values?.poNumber}`);
+      navigate(`/CreateGrn/${values?.poNumber}`, { state: { fromPath: pathname, prvPath : state?.fromPath } });
     }
   };
 
@@ -122,7 +123,7 @@ function GRNCreationForm() {
                 style={{ margin: "2px 13px" }}
               />
             ) : (
-              <strong>{ "Create" }</strong>
+              <strong>{"Create"}</strong>
             )}
           </Button>
         </Grid>
