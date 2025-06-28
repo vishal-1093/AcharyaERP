@@ -131,7 +131,7 @@ function AdvancePaymentVoucher({ rowData }) {
           jvSchoolId: null,
           poOptions: [],
           jvFcyear: null,
-          debit: Math.round(rowData?.poTotalAmount),
+          debit: parseFloat(Number(rowData?.poTotalAmount).toFixed(2)),
           reference_number: null,
         });
         setValues((prev) => ({
@@ -266,7 +266,7 @@ function AdvancePaymentVoucher({ rowData }) {
     const { name, value } = e.target;
     const [field, index] = name.split("-");
     const parsedIndex = parseInt(index);
-    if (!/^\d*$/.test(value)) return;
+    // if (!/^\d*$/.test(value)) return;
     setValues((prev) => ({
       ...prev,
       voucherData: prev.voucherData.map((obj, i) => {
@@ -440,6 +440,8 @@ function AdvancePaymentVoucher({ rowData }) {
 
       const postData = [];
       voucherData.forEach((obj) => {
+        const maindebit = parseFloat(Number(obj?.debit).toFixed(2));
+
         const {
           vendorId,
           debit,
@@ -460,8 +462,9 @@ function AdvancePaymentVoucher({ rowData }) {
           active: true,
           remarks,
           cheque_dd_no: chequeNo,
-          debit,
-          debit_total: totalDebit,
+
+          debit: maindebit,
+          debit_total: parseFloat(Number(totalDebit).toFixed(2)),
           inter_school_id: interSchoolId,
           jv_school_id: jvSchoolId,
           jv_financial_year_id: jvFcyear,

@@ -262,7 +262,7 @@ function PaymentVoucherForm() {
     const { name, value } = e.target;
     const [field, index] = name.split("-");
     const parsedIndex = parseInt(index);
-    if (!/^\d*$/.test(value)) return;
+    // if (!/^\d*$/.test(value)) return;
     setValues((prev) => ({
       ...prev,
       voucherData: prev.voucherData.map((obj, i) => {
@@ -429,6 +429,7 @@ function PaymentVoucherForm() {
       setLoading(true);
       const postData = [];
       voucherData.forEach((obj) => {
+        const maindebit = parseFloat(Number(obj?.debit).toFixed(2));
         const {
           vendorId,
           debit,
@@ -448,8 +449,8 @@ function PaymentVoucherForm() {
           active: true,
           remarks,
           cheque_dd_no: chequeNo,
-          debit,
-          debit_total: totalDebit,
+          debit: maindebit,
+          debit_total: parseFloat(Number(totalDebit).toFixed(2)),
           inter_school_id: interSchoolId,
           jv_school_id: jvSchoolId,
           jv_financial_year_id: jvFcyear,

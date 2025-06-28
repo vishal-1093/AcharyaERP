@@ -90,6 +90,22 @@ function DraftJournalView({ draftJournalId }) {
     </Typography>
   );
 
+  const convertToRupeesAndPaise = (amount) => {
+    const [rupees, paise] = Number(amount)?.toFixed(2)?.split(".");
+
+    let result = "";
+    if (parseInt(rupees) > 0) {
+      result += numberToWords.toWords(parseInt(rupees)) + " rupees";
+    }
+    if (parseInt(paise) > 0) {
+      if (result) result += " and ";
+      result += numberToWords.toWords(parseInt(paise)) + " paise";
+    }
+    if (!result) result = "zero rupees";
+
+    return result;
+  };
+
   return (
     <Box sx={{ border: "2px solid grey", padding: 2 }}>
       <Grid container rowSpacing={1}>
@@ -136,9 +152,7 @@ function DraftJournalView({ draftJournalId }) {
                         borderBottom: "hidden !important",
                       }}
                     >
-                      <DisplayText
-                        label={obj.debit > 0 ? Math.round(obj.debit) : ""}
-                      />
+                      <DisplayText label={obj.debit > 0 ? obj.debit : ""} />
                     </TableCell>
                     <TableCell
                       sx={{
@@ -146,9 +160,7 @@ function DraftJournalView({ draftJournalId }) {
                         borderBottom: "hidden !important",
                       }}
                     >
-                      <DisplayText
-                        label={obj.credit > 0 ? Math.round(obj.credit) : ""}
-                      />
+                      <DisplayText label={obj.credit > 0 ? obj.credit : ""} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -185,15 +197,15 @@ function DraftJournalView({ draftJournalId }) {
                   <TableCell>
                     <Box sx={{ display: "flex", gap: 1 }}>
                       <DisplayBoldText
-                        label={numberToWords.toWords(data.debitTotal || 0)}
+                        label={convertToRupeesAndPaise(data.debitTotal || 0)}
                       />
                     </Box>
                   </TableCell>
                   <TableCell sx={{ textAlign: "right" }}>
-                    <DisplayBoldText label={Math.round(data.debitTotal)} />
+                    <DisplayBoldText label={data.debitTotal} />
                   </TableCell>
                   <TableCell sx={{ textAlign: "right" }}>
-                    <DisplayBoldText label={Math.round(data.creditTotal)} />
+                    <DisplayBoldText label={data.creditTotal} />
                   </TableCell>
                 </TableRow>
               </TableBody>
