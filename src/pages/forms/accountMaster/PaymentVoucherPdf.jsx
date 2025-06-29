@@ -27,25 +27,25 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles((theme) => ({
-   breadcrumbsContainer: {
-        position: "relative",
-        marginBottom: 10,
-        width: "fit-content",
-        zIndex: theme.zIndex.drawer - 1,
-        marginLeft: '-130px'
-    },
-    link: {
-        color: '#4A57A9',
-        textDecoration: "none",
-        cursor: "pointer",
-        "&:hover": { textDecoration: "underline" },
-    },
+  breadcrumbsContainer: {
+    position: "relative",
+    marginBottom: 10,
+    width: "fit-content",
+    zIndex: theme.zIndex.drawer - 1,
+    marginLeft: "-130px",
+  },
+  link: {
+    color: "#4A57A9",
+    textDecoration: "none",
+    cursor: "pointer",
+    "&:hover": { textDecoration: "underline" },
+  },
 }));
 
 const PaymentVoucherPdf = () => {
   const [voucherData, setVoucherData] = useState([]);
   const [hideButtons, setHideButtons] = useState(false);
-  const [breadCrumb, setBreadCrumb] = useState([])
+  const [breadCrumb, setBreadCrumb] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -55,21 +55,31 @@ const PaymentVoucherPdf = () => {
   const directPdfStatus = location?.state?.directPdfStatus;
   const advancePdfStatus = location?.state?.advancePdfStatus;
   const pathfrom = location?.state?.path;
-  const queryValues = location?.state?.query
+  const queryValues = location?.state?.query;
 
   useEffect(() => {
     getPaymentVoucherData();
-     if(queryValues?.ledgerType === "VENDOR"){
-      setCrumbs([])
+    if (queryValues?.ledgerType === "VENDOR") {
+      setCrumbs([]);
       setBreadCrumb([
-        { name: "Payment Tracker", link: "/vendor-day-transaction-debit", state: queryValues }]);
-    }else if(queryValues?.ledgerType === "CASHORBANK"){
-      setCrumbs([])
+        {
+          name: "Payment Tracker",
+          link: "/vendor-day-transaction-debit",
+          state: queryValues,
+        },
+      ]);
+    } else if (queryValues?.ledgerType === "CASHORBANK") {
+      setCrumbs([]);
       setBreadCrumb([
-        { name: "Payment Tracker", link: "/Accounts-ledger-day-credit-transaction", state: queryValues }]);
-    }else if(pathfrom){
+        {
+          name: "Payment Tracker",
+          link: "/Accounts-ledger-day-credit-transaction",
+          state: queryValues,
+        },
+      ]);
+    } else if (pathfrom) {
       setCrumbs([{ name: "PO Payment History", link: pathfrom }]);
-    }else if (grnPdfStatus) {
+    } else if (grnPdfStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/journalmaster/grn" }]);
     } else if (directPdfStatus) {
       setCrumbs([{ name: "Payment Tracker", link: "/JournalMaster/Demand" }]);
@@ -160,6 +170,22 @@ const PaymentVoucherPdf = () => {
         });
       }
     }, 100);
+  };
+
+  const convertToRupeesAndPaise = (amount) => {
+    const [rupees, paise] = Number(amount)?.toFixed(2)?.split(".");
+
+    let result = "";
+    if (parseInt(rupees) > 0) {
+      result += numberToWords.toWords(parseInt(rupees)) + " rupees";
+    }
+    if (parseInt(paise) > 0) {
+      if (result) result += " and ";
+      result += numberToWords.toWords(parseInt(paise)) + " paise";
+    }
+    if (!result) result = "zero rupees";
+
+    return result;
   };
 
   const bookmanFont = {
@@ -533,9 +559,7 @@ const PaymentVoucherPdf = () => {
 
   return (
     <Container>
-      {queryValues?.date ? (
-           <CustomBreadCrumbs crumbs={breadCrumb} />
-        ): <></>}
+      {queryValues?.date ? <CustomBreadCrumbs crumbs={breadCrumb} /> : <></>}
       <Paper
         id="receipt"
         elevation={3}
@@ -859,11 +883,10 @@ const PaymentVoucherPdf = () => {
                     >
                       {" "}
                       {toUpperCamelCaseWithSpaces(
-                        numberToWords.toWords(
-                          Number(voucherData?.[0]?.debit_total ?? "")
+                        convertToRupeesAndPaise(
+                          Number(voucherData?.[0]?.debit_total ?? 0)
                         )
                       )}{" "}
-                      rupees
                     </Typography>
                   </TableCell>
                   <TableCell
@@ -928,32 +951,31 @@ const PaymentVoucherPdf = () => {
 
 export default PaymentVoucherPdf;
 
-
 const CustomBreadCrumbs = ({ crumbs = [] }) => {
-    const navigate = useNavigate()
-    const classes = useStyles()
-    if (crumbs.length <= 0) return null
+  const navigate = useNavigate();
+  const classes = useStyles();
+  if (crumbs.length <= 0) return null;
 
-    return (
-        <Box className={classes.breadcrumbsContainer}>
-            <Breadcrumbs
-                style={{ fontSize: "1.15rem" }}
-                separator={<NavigateNextIcon fontSize="small" />}
-            >
-                {crumbs?.map((crumb, index) => {
-                    return (
-                        <span key={index}>
-                                <Typography
-                                    onClick={() => navigate(crumb.link, { state: crumb.state })}
-                                    className={classes.link}
-                                    fontSize="inherit"
-                                >
-                                    {crumb.name}
-                                </Typography>
-                        </span>
-                    );
-                })}
-            </Breadcrumbs>
-        </Box>
-    )
-}
+  return (
+    <Box className={classes.breadcrumbsContainer}>
+      <Breadcrumbs
+        style={{ fontSize: "1.15rem" }}
+        separator={<NavigateNextIcon fontSize="small" />}
+      >
+        {crumbs?.map((crumb, index) => {
+          return (
+            <span key={index}>
+              <Typography
+                onClick={() => navigate(crumb.link, { state: crumb.state })}
+                className={classes.link}
+                fontSize="inherit"
+              >
+                {crumb.name}
+              </Typography>
+            </span>
+          );
+        })}
+      </Breadcrumbs>
+    </Box>
+  );
+};

@@ -270,7 +270,7 @@ function JournalVoucherForm() {
     const { name, value } = e.target;
     const [field, index] = name.split("-");
     const parsedIndex = parseInt(index);
-    if (!/^\d*$/.test(value)) return;
+    // if (!/^\d*$/.test(value)) return;
     setValues((prev) => ({
       ...prev,
       voucherData: prev.voucherData.map((obj, i) => {
@@ -410,14 +410,16 @@ function JournalVoucherForm() {
       setLoading(true);
       const postData = [];
       voucherData.forEach((obj) => {
+        const maindebit = parseFloat(Number(obj?.debit).toFixed(2));
+        const maincredit = parseFloat(Number(obj?.credit).toFixed(2));
         const { vendorId, credit, debit, interSchoolId, poReference } = obj;
         const valueObj = {
           active: true,
-          credit,
-          credit_total: total.credit,
+          credit: maincredit,
+          credit_total: parseFloat(Number(total.credit).toFixed(2)),
           date,
-          debit,
-          debit_total: total.debit,
+          debit: maindebit,
+          debit_total: parseFloat(Number(total.debit).toFixed(2)),
           dept_id: deptId,
           purchase_ref_number: poReference,
           remarks,
