@@ -334,7 +334,7 @@ const StudentDocumentUpload = () => {
                     icon="⚠️"
                     color="#f44336"
                     label="Upload Guideline"
-                    text="All documents must be uploaded in JPEG, PNG or PDF and less than 200 KB."
+                    text="All documents must be uploaded in JPEG, PNG and less than 200 KB."
                   />
                 </Box>
 
