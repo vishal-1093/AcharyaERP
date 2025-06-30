@@ -470,7 +470,7 @@ function HostelBedViewIndex({ tab }) {
     temp.fromDate = moment(values?.occupiedDate).format("YYYY-MM-DD");
     temp.toDate = rowDetails?.toDate;
     temp.foodStatus = rowDetails?.foodStatus;
-    temp.vacateBy = 1;
+    // temp.vacateBy = 1;
     temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
     temp.bedStatus = "Occupied";
     temp.active = true;
