@@ -207,6 +207,7 @@ function PaymentVoucherApprove() {
       credit: obj.debit,
       created_name: obj.created_username,
       date: moment(new Date()).format("DD-MM-YYYY"),
+      purchase_order_id: obj.po_reference,
     }));
 
     try {
