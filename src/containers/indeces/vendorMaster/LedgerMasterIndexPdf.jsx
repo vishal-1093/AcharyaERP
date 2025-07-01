@@ -32,7 +32,9 @@ const styles = StyleSheet.create({
     cell: {
         flex: 1,
         fontSize: 10,
-        textAlign: 'right'
+        textAlign: 'right',
+        padding: '0 10px 0 0px',
+        overflow: 'hidden'
     },
     headerRow: {
         backgroundColor: '#f5f5f5',
@@ -44,7 +46,8 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 10,
         color: 'rgba(0, 0, 0, 0.87)',
-        textAlign: 'right'
+        textAlign: 'right',
+         padding: '0 10px 0 0px',
     },
     totalRow: {
         backgroundColor: '#376a7d',

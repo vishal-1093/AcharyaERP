@@ -19,22 +19,6 @@ import PrintIcon from "@mui/icons-material/Print";
 import { makeStyles } from "@mui/styles";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-
-const HtmlTooltip = styled(({ className, ...props }) => (
-    <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-    [`& .${tooltipClasses.tooltip}`]: {
-        backgroundColor: "white",
-        color: "rgba(0, 0, 0, 0.6)",
-        maxWidth: 300,
-        fontSize: 12,
-        boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-        padding: "10px",
-        textAlign: "justify",
-    },
-}));
-
 const useStyles = makeStyles((theme) => ({
     table: {
         width: "100%",
@@ -73,29 +57,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const filterLists = [
-    { label: "Today", value: "today" },
-    { label: "1 Week", value: "week" },
-    { label: "1 Month", value: "month" },
-    { label: "Custom Date", value: "custom" },
-];
-
-const initialValues = {
-    filterList: filterLists,
-    filter: filterLists[1].value,
-    startDate: "",
-    endDate: "",
-    schoolList: [],
-    schoolId: "",
-    cancelledRemarks: "",
-};
-
-const modalContents = {
-    title: "",
-    message: "",
-    buttons: [],
-}
-
 function LedgerCreditPaymentDetail() {
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -107,16 +68,12 @@ function LedgerCreditPaymentDetail() {
         created_username: false,
         created_name: false
     });
-   // const [breadCrumbs, setBreadCrumbs] = useState()
-
-    const setCrumbs = useBreadcrumbs();
+ 
     const { setAlertMessage, setAlertOpen } = useAlert();
     const classes = useStyles();
     const navigate = useNavigate();
     const location = useLocation()
     const queryValues = location.state;
-
-    const maxLength = 200;
 
     useEffect(() => {
         getData();
@@ -151,6 +108,11 @@ function LedgerCreditPaymentDetail() {
             })
             .catch((err) => {
                 setLoading(false);
+                 setAlertMessage({
+                    severity: "error",
+                    message: "Something went wrong.",
+                });
+                setAlertOpen(true);
                 console.error(err);
             });
     };
