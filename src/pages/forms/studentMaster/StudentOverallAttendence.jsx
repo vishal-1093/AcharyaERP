@@ -11,9 +11,13 @@ import {
   Typography,
   Paper,
   Box,
+  Grid,
 } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import axios from "../../../services/Api";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
+import useAlert from "../../../hooks/useAlert";
 
 // Color logic
 const getColor = (percentage) => {
@@ -135,15 +139,115 @@ const Row = ({ student }) => {
 
 const AttendanceTable = () => {
   const [data, setData] = useState([]);
+  const [acYearOptions, setAcyearOptions] = useState([]);
+  const [SectionOptions, setSectionOptions] = useState([]);
+  const [batchOptions, setBatchOptions] = useState([]);
+  const [programOptions, setprogramOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [values, setValues] = useState({
+    schoolId: null,
+    academicYear: "",
+    program: "",
+    sem: "",
+    section: "",
+    batch: "",
+    batchSec: "Section",
+  });
+
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     getData();
   }, []);
 
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj?.school_id,
+            label: obj?.school_name,
+            school_name_short: obj?.school_name_short,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getacyear = async (params) => {
+    await axios
+      .get(`/api/academic/academic_year`)
+      .then((res) => {
+        setAcyearOptions(
+          res.data.data.map((obj) => ({
+            value: obj.ac_year_id,
+            label: obj.ac_year,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const getPrograms = async () => {
+    if (!values.schoolId) return null;
+
+    try {
+      const { data: response } = await axios.get(
+        `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+      );
+      const optionData = [];
+      const responseData = response.data;
+      response.data.forEach((obj) => {
+        optionData.push({
+          value: obj.program_specialization_id,
+          label: `${obj.program_short_name} - ${obj.program_specialization_name}`,
+          program_assignment_id: obj.program_assignment_id,
+          program_id: obj.program_id,
+        });
+      });
+      const programObject = responseData.reduce((acc, next) => {
+        acc[next.program_specialization_id] = next;
+        return acc;
+      }, {});
+
+      setprogramOptions(optionData);
+      // setProgramData(programObject);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to load the programs data",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prevValues) => ({
+      ...prevValues,
+      [name]: newValue,
+    }));
+  };
+
   const getData = async () => {
+    const selectedProgram = programOptions.find(
+      (program) => program.value === values.program
+    );
+
     try {
       const response = await axios.get(
-        `/api/student/overallAttendanceInYearOrSem/6/1/1/52/1/6`
+        `/api/student/overallAttendanceInYearOrSem/${values.academicYear}/${selectedProgram.program_assignment_id}/${selectedProgram.program_id}/${selectedProgram.value}/${values.section}/${values.sem}`
       );
 
       if (response.data.data.length > 0) {
@@ -156,6 +260,89 @@ const AttendanceTable = () => {
 
   return (
     <Box padding={2}>
+      <Grid container rowSpacing={1.5} columnSpacing={2}>
+        {/* <Grid item xs={12} md={2.4}>
+              <CustomSelect
+                name="batchSec"
+                value={values.batchSec}
+                label="Batch/Section"
+                items={[
+                  { label: "Batch", value: "Batch" },
+                  { label: "Section", value: "Section" },
+                ]}
+                handleChange={handleChange}
+                disabled={Data.length > 0}
+              />
+            </Grid> */}
+
+        <Grid item xs={12} md={2.4}>
+          <CustomSelect
+            name="academicYear"
+            label="Academic Year*"
+            value={values.academicYear}
+            items={acYearOptions}
+            handleChange={handleChange}
+          />
+        </Grid>
+
+        <>
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School*"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="program"
+              label="Program Major*"
+              value={values.program}
+              options={programOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+            {/* <CustomSelect
+                  name="program"
+                  label="Program Major*"
+                  value={values.program}
+                  items={programOptions}
+                  handleChange={handleChange}
+                  disabled={Data.length > 0}
+                /> */}
+          </Grid>
+        </>
+
+        <Grid item xs={12} md={2.4}>
+          <CustomSelect
+            name="sem"
+            value={values.sem}
+            label="Sem*"
+            items={[
+              { label: 1, value: 1 },
+              { label: 2, value: 2 },
+              { label: 3, value: 3 },
+              { label: 4, value: 4 },
+              { label: 5, value: 5 },
+              { label: 6, value: 6 },
+            ]}
+            handleChange={handleChange}
+          />
+        </Grid>
+
+        <Grid item xs={12} md={2.4}>
+          <CustomSelect
+            name="section"
+            label="Section"
+            value={values.section}
+            items={SectionOptions}
+            handleChange={handleChange}
+          />
+        </Grid>
+      </Grid>
+
       <TableContainer
         component={Paper}
         sx={{
