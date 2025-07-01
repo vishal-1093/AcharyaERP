@@ -53,7 +53,6 @@ import BRSChqNotIssuedDebitedDetail from "./containers/indeces/bankGroupBankBala
 import BRSDirectCreditedToBankDetail from "./containers/indeces/bankGroupBankBalanceMaster/BRSDirectCreditedToBankDetails.jsx";
 import BRSChqDepositedNotCreditedDetail from "./containers/indeces/bankGroupBankBalanceMaster/BrsChqDepositedNotCreditedDetails.jsx";
 
-
 const PaysliplockIndex = lazy(() =>
   import("./containers/indeces/restrictwindowMaster/paysliplock")
 );
@@ -90,9 +89,7 @@ const EmpDocumentCollection = lazy(() =>
 const StudentDocumentUpload = lazy(() =>
   import("./components/StudentDocumentUpload")
 );
-const StudentDocument = lazy(() =>
-  import("./components/StudentDocument")
-);
+const StudentDocument = lazy(() => import("./components/StudentDocument"));
 const PoPaymentList = lazy(() =>
   import("./containers/indeces/inventoryMaster/PoPaymentList.jsx")
 );
@@ -1645,6 +1642,10 @@ const DetailedAttendancefilter = lazy(() =>
   import("./pages/forms/studentMaster/DetailedAttendancefilter")
 );
 
+const StudentOverallAttendance = lazy(() =>
+  import("./pages/forms/studentMaster/StudentOverallAttendence.jsx")
+);
+
 const FacultyDetails = lazy(() => import("./pages/masters/FacultyDetails.jsx"));
 
 const FacultyDetailsAttendaceReport = lazy(() =>
@@ -1873,23 +1874,24 @@ const StudentOnlineClass = lazy(() =>
   import("./pages/forms/academicMaster/StudentOnlineClass")
 );
 
-const LedgerDayWiseTransactionDetail = lazy(()=>
-import("./containers/indeces/vendorMaster/LedgerDebitReceiptTransaction.jsx")
-) 
+const LedgerDayWiseTransactionDetail = lazy(() =>
+  import("./containers/indeces/vendorMaster/LedgerDebitReceiptTransaction.jsx")
+);
 
-const LedgerDayTransaction = lazy(()=>
+const LedgerDayTransaction = lazy(() =>
   import("./containers/indeces/vendorMaster/LedgerDayTransaction.jsx")
-)
+);
 
-const VendorMonthlyDetails = lazy(()=>
+const VendorMonthlyDetails = lazy(() =>
   import("./containers/indeces/vendorMaster/vendorMonthlyDetails.jsx")
 )
 const InflowDayCreditTransaction = lazy(()=>
   import("./containers/indeces/vendorMaster/LedgerInflowDayTransaction-credit.jsx")
 )
-const VendorDetailMaster = lazy(()=>
+
+const VendorDetailMaster = lazy(() =>
   import("./pages/masters/VendorHeadMaster.jsx")
-)
+);
 
 //  Vacation Leave
 const VacationLeaveIndex = lazy(() =>
@@ -2069,13 +2071,9 @@ const LaptopIssueForm = lazy(() =>
   import("./containers/indeces/laptopIssue/LaptopIssueForm.jsx")
 );
 
-const SendWhatsApp = lazy(() =>
-  import("./pages/indeces/SendWhatsApp.jsx")
-);
+const SendWhatsApp = lazy(() => import("./pages/indeces/SendWhatsApp.jsx"));
 
-const EmployeeReport = lazy(() =>
-  import("./pages/indeces/EmployeeReport.jsx")
-);
+const EmployeeReport = lazy(() => import("./pages/indeces/EmployeeReport.jsx"));
 
 const Health = lazy(() => import("./pages/Health.jsx"));
 const SalarySheetMaster = lazy(() =>
@@ -2625,7 +2623,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
             path="/StudentDocumentUpload"
             element={
@@ -2634,7 +2632,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-              <Route
+          <Route
             exact
             path="/StudentDocument"
             element={
@@ -5937,6 +5935,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/grnIndex-user"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <GrnIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/GrnPdf/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -8745,6 +8752,16 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/student-overall-attendence"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentOverallAttendance />
+              </Suspense>
+            }
+          />
           {/* ID Card */}
           <Route
             exact
@@ -10376,7 +10393,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path={"/Accounts-ledger"}
             element={
@@ -10412,7 +10429,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path={"/Accounts-ledger-day-credit-transaction"}
             element={
@@ -10457,7 +10474,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path={"/institute-bank-balance"}
             element={
@@ -10466,7 +10483,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path={"/institute-brs-transaction"}
             element={
@@ -10475,7 +10492,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path={"/brs-cheque-issued-not-debit-detail"}
             element={
@@ -10483,8 +10500,8 @@ function RouteConfig() {
                 <BRSChqNotIssuedDebitedDetail />
               </Suspense>
             }
-          />    
-           <Route
+          />
+          <Route
             exact
             path={"/brs-cheque-issued-not-credit-detail"}
             element={
@@ -10493,7 +10510,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path={"/brs-direct-credit-to-bank-detail"}
             element={

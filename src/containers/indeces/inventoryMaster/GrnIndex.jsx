@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import PrintIcon from "@mui/icons-material/Print";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+
+const empID = JSON.parse(sessionStorage.getItem("userData"))?.emp_id;
 
 function GrnIndex() {
   const [rows, setRows] = useState([]);
@@ -16,6 +19,8 @@ function GrnIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
 
   const navigate = useNavigate();
 
@@ -37,9 +42,9 @@ function GrnIndex() {
       headerAlign: "right",
       renderCell: (params) => {
         const value = Number(params.value);
-        return  Math.round(value) ?? ""
+        return Math.round(value) ?? ""
       },
-    },    
+    },
     {
       field: "vendorName",
       headerName: "Vendor",
@@ -61,7 +66,7 @@ function GrnIndex() {
       headerName: "Invoice Date",
       flex: 1,
       hide: true,
-       valueGetter: (value, row) =>
+      valueGetter: (value, row) =>
         moment(row.invoiceDate).format("DD-MM-YYYY"),
     },
     {
@@ -96,13 +101,15 @@ function GrnIndex() {
 
   useEffect(() => {
     getData();
-  }, []);
+    setCrumbs([{}]);
+  }, [pathname]);
 
   const getData = async () => {
     const payload = {
       pageNo: 0,
       pageSize: 10000,
       sort: "createdDate",
+      empId: pathname === "/grnIndex-user" && empID ? empID : null
     };
     await axios
       .post(`/api/purchase/getListofDirectGRN`, payload)
@@ -122,9 +129,26 @@ function GrnIndex() {
 
   return (
     <>
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 2, pt: 7 }}>
+        {pathname === "/grnIndex-user" && <Button
+          onClick={() => navigate("/create-grn", { state: { fromPath: pathname } })}
+          variant="contained"
+          disableElevation
+          sx={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            borderRadius: 2,
+          }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>}
+
         <GridIndex rows={rows} columns={columns} />
       </Box>
+
+
     </>
   );
 }
