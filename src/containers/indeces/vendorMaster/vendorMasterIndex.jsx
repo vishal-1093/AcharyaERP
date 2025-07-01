@@ -10,6 +10,7 @@ import { PDFDownloadLink, BlobProvider } from '@react-pdf/renderer';
 import LedgerMasterIndexPdf from './LedgerMasterIndexPdf';
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import useAlert from "../../../hooks/useAlert";
 // import VendorFilterModal from "./VendorFilterModal";
 // import ModalWrapper from "../../../components/ModalWrapper";
 
@@ -34,6 +35,7 @@ function VendorMasterIndex() {
     const navigate = useNavigate();
     const location = useLocation()
     const setCrumbs = useBreadcrumbs();
+    const { setAlertMessage, setAlertOpen } = useAlert();
 
     const columns = [
         { field: "school_name_short", headerName: "Institute", flex: 1, headerClassName: "header-bg", headerAlign: 'center', align: 'center' },
@@ -106,6 +108,11 @@ function VendorMasterIndex() {
             })
             .catch((err) => {
                 setLoading(false)
+                setAlertMessage({
+                    severity: "error",
+                    message: "Something went wrong.",
+                });
+                setAlertOpen(true);
                 console.error(err)
             });
     };
@@ -115,9 +122,9 @@ function VendorMasterIndex() {
 
         if (value === 0) return "0";
 
-        if (ledgerType === "VENDOR") {
+        if (ledgerType === "VENDOR" || ledgerType === "INFLOW") {
             return value < 0 ? `${absVal} Dr` : `${absVal} Cr`;
-        } else if (ledgerType === "CASHORBANK") {
+        } else if (ledgerType === "CASHORBANK" || ledgerType === 'EARNINGS') {
             return value > 0 ? `${absVal} Dr` : `${absVal} Cr`;
         } else {
             return value;
@@ -139,7 +146,14 @@ function VendorMasterIndex() {
                 });
                 setVendorOptions(optionData);
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                setAlertMessage({
+                    severity: "error",
+                    message: "Something went wrong.",
+                });
+                setAlertOpen(true);
+                console.error(err)
+            })
     };
 
     const getFinancialYearDetails = async () => {
@@ -162,7 +176,14 @@ function VendorMasterIndex() {
                     }));
                 }
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                setAlertMessage({
+                    severity: "error",
+                    message: "Something went wrong.",
+                });
+                setAlertOpen(true);
+                console.error(err)
+            });
     };
 
     const handleChangeAdvance = (name, newValue, valueLabel) => {
@@ -247,7 +268,6 @@ function VendorMasterIndex() {
         navigate('/Accounts-ledger-monthly-detail', { state: query })
     }
 
-
     return (
         <>
             <Box sx={{ position: "relative" }}>
@@ -320,33 +340,33 @@ function VendorMasterIndex() {
                         >
                             Next Year
                         </Button>
-                        {/* <BlobProvider
-                        document={
-                            <LedgerMasterIndexPdf
-                                data={{ columns, rows }}
-                                filters={{
-                                    voucherHeadName: values?.voucherHeadName,
-                                    fcYear: values?.fcYear
-                                }}
-                            />
-                        }
-                    >
-                        {({ url, loading }) => (
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                disabled={rows?.length === 0}
-                                onClick={() => {
-                                    if (url) {
-                                        window.open(url, '_blank');
-                                    }
-                                }}
-                                sx={{ height:'36px' }}
-                            >
-                                Print PDF
-                            </Button>
-                        )}
-                    </BlobProvider> */}
+                        <BlobProvider
+                            document={
+                                <LedgerMasterIndexPdf
+                                    data={{ columns, rows }}
+                                    filters={{
+                                        voucherHeadName: values?.voucherHeadName,
+                                        fcYear: values?.fcYear
+                                    }}
+                                />
+                            }
+                        >
+                            {({ url, loading }) => (
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    disabled={rows?.length === 0}
+                                    onClick={() => {
+                                        if (url) {
+                                            window.open(url, '_blank');
+                                        }
+                                    }}
+                                    sx={{ height: '36px' }}
+                                >
+                                    Print PDF
+                                </Button>
+                            )}
+                        </BlobProvider>
                     </Box>
                 </Box>
                 <Box sx={{
