@@ -18,6 +18,7 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import GridIndex from "../../../components/GridIndex";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
+import BlockDetails from "./BlockDetails";
 
 const initialValues = { acYearId: "", currentYear: true };
 
@@ -28,6 +29,8 @@ function HostelBlockView() {
   const [values, setValues] = useState(initialValues);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [blockOpen, setBlockOpen] = useState(false);
+  const [blockData, setBlockData] = useState({});
   const [historyData, setHistoryData] = useState([]);
   const navigate = useNavigate();
 
@@ -72,7 +75,7 @@ function HostelBlockView() {
 
       const mapped = response.data.data.map((row, index) => ({
         ...row,
-        id: row.hostel_block_id || index,
+        id: row.hostel_block_id || row.id,
       }));
 
       if (mapped.length > 0) {
@@ -124,6 +127,10 @@ function HostelBlockView() {
       console.error(err);
     }
   };
+  const handleBlock = (rowData) => {
+    setBlockData(rowData)
+    setBlockOpen(true)
+  }
 
   const callHistoryColumns = [
     {
@@ -170,18 +177,18 @@ function HostelBlockView() {
       align: "center",
       headerAlign: "center",
     },
-    {
-      field: "occupied_date",
-      headerName: "Occupied Date",
-      flex: 1,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params) => (
-        <Typography sx={{ width: "100%", textAlign: "center" }}>
-          {moment(params.row.occupied_date).format("DD-MM-YYYY")}
-        </Typography>
-      ),
-    },
+    // {
+    //   field: "occupied_date",
+    //   headerName: "Occupied Date",
+    //   flex: 1,
+    //   align: "center",
+    //   headerAlign: "center",
+    //   renderCell: (params) => (
+    //     <Typography sx={{ width: "100%", textAlign: "center" }}>
+    //       {moment(params.row.occupied_date).format("DD-MM-YYYY")}
+    //     </Typography>
+    //   ),
+    // },
     {
       field: "paid",
       headerName: "Paid",
@@ -200,12 +207,14 @@ function HostelBlockView() {
       headerAlign: "center",
       renderCell: (params) => (
         <Typography
+          onClick={() => handleBlock(params.row)}
           variant="body1"
           sx={{
             fontWeight: "bold",
             color: "#1976d2",
             width: "100%",
             textAlign: "center",
+            cursor: "pointer",
           }}
         >
           {params.row.block_name}
@@ -332,7 +341,7 @@ function HostelBlockView() {
               <Typography
                 onClick={() =>
                   navigate("/AllHostelBedViewMaster/AllHostelBedView/New", {
-                    state: params.row.hostel_block_id,
+                    state: params.row,
                   })
                 }
                 sx={{
@@ -408,6 +417,7 @@ function HostelBlockView() {
       <ModalWrapper open={historyOpen} setOpen={setHistoryOpen} title="Student Details">
         <GridIndex rows={historyData} columns={callHistoryColumns} />
       </ModalWrapper>
+      {blockOpen && <BlockDetails acYearId={values?.acYearId} blockData={blockData} blockOpen={blockOpen} setBlockOpen={setBlockOpen} />}
     </>
   );
 }
