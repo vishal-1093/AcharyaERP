@@ -1884,7 +1884,10 @@ const LedgerDayTransaction = lazy(() =>
 
 const VendorMonthlyDetails = lazy(() =>
   import("./containers/indeces/vendorMaster/vendorMonthlyDetails.jsx")
-);
+)
+const InflowDayCreditTransaction = lazy(()=>
+  import("./containers/indeces/vendorMaster/LedgerInflowDayTransaction-credit.jsx")
+)
 
 const VendorDetailMaster = lazy(() =>
   import("./pages/masters/VendorHeadMaster.jsx")
@@ -10450,6 +10453,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <VendorDayCreditTransaction />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/ledger-inflow-day-transaction-credit"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InflowDayCreditTransaction />
               </Suspense>
             }
           />

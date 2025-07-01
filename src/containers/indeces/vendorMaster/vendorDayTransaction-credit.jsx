@@ -48,17 +48,17 @@ const useStyles = makeStyles((theme) => ({
     background: "#ffcdd2 !important",
   },
   link: {
-        color: theme.palette.primary.main,
-        textDecoration: "none",
-        cursor: "pointer",
-        "&:hover": { textDecoration: "none" },
-    },
-     breadcrumbsContainer: {
-        position: "relative",
-        marginBottom: 10,
-        width: "fit-content",
-        zIndex: theme.zIndex.drawer - 1,
-    }
+    color: theme.palette.primary.main,
+    textDecoration: "none",
+    cursor: "pointer",
+    "&:hover": { textDecoration: "none" },
+  },
+  breadcrumbsContainer: {
+    position: "relative",
+    marginBottom: 10,
+    width: "fit-content",
+    zIndex: theme.zIndex.drawer - 1,
+  }
 }));
 
 function VendorDayCreditTransaction() {
@@ -66,8 +66,8 @@ function VendorDayCreditTransaction() {
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     dept_name: false,
     school_name_short: false,
-    created_username:false,
-    verifierName:false
+    created_username: false,
+    verifierName: false
   });
 
   const [loading, setLoading] = useState(false);
@@ -80,7 +80,7 @@ function VendorDayCreditTransaction() {
   const navigate = useNavigate();
 
   useEffect(() => {
-     setCrumbs([{ name: "" }]);
+    setCrumbs([{ name: "" }]);
     if (queryValues?.isBRSTrue) {
       setBreadCrumbs([
         { name: "Bank Balance", link: "/bank-balance" },
@@ -97,7 +97,7 @@ function VendorDayCreditTransaction() {
         { name: `${queryValues?.voucherHeadName || ""} FY ${queryValues?.fcYear} as on ${moment().format('DD-MMMM-YYYY')}` },
       ])
     }
-      getData()
+    getData()
   }, []);
 
 
@@ -119,6 +119,11 @@ function VendorDayCreditTransaction() {
       })
       .catch((err) => {
         setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: "Something went wrong.",
+        });
+        setAlertOpen(true);
         console.error(err);
       });
   };
@@ -149,15 +154,15 @@ function VendorDayCreditTransaction() {
       ),
     },
 
-    { field: "journal_voucher_number", headerName: "JV No.", flex: 1, align:"center" },
+    { field: "journal_voucher_number", headerName: "JV No.", flex: 1, align: "center" },
     {
       field: "created_date",
       headerName: "Date",
       flex: 1,
       valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
-      align:"center"
+      align: "center"
     },
-    { field: "school_name_short", headerName: "School", flex: 1, align:"center" },
+    { field: "school_name_short", headerName: "School", flex: 1, align: "center" },
     { field: "dept_name", headerName: "Dept", flex: 1 },
     {
       field: "credit",
@@ -184,13 +189,13 @@ function VendorDayCreditTransaction() {
     fcYearId
   ) => {
     navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
-      state: { schoolId, fcYearId, isLedger:true, ...queryValues },
+      state: { schoolId, fcYearId, isLedger: true, ...queryValues },
     });
   };
 
   return (
     <>
-       <Box sx={{ position: "relative", width: "100%" }}>
+      <Box sx={{ position: "relative", width: "100%" }}>
         <CustomBreadCrumbs crumbs={breadCrumbs} />
         <Box sx={{ position: "absolute", width: "100%", marginTop: "10px" }}>
           <GridIndex
@@ -200,11 +205,11 @@ function VendorDayCreditTransaction() {
             columnVisibilityModel={columnVisibilityModel}
             setColumnVisibilityModel={setColumnVisibilityModel}
             getRowClassName={getRowClassName}
-            getRowId={(row)=> row?.journal_voucher_id}
+            getRowId={(row) => row?.journal_voucher_id}
           />
         </Box>
 
-       </Box>
+      </Box>
     </>
   );
 }
@@ -212,37 +217,37 @@ function VendorDayCreditTransaction() {
 export default VendorDayCreditTransaction;
 
 const CustomBreadCrumbs = ({ crumbs = [] }) => {
-    const navigate = useNavigate()
-    const classes = useStyles()
-    if (crumbs.length <= 0) return null
+  const navigate = useNavigate()
+  const classes = useStyles()
+  if (crumbs.length <= 0) return null
 
-    return (
-        <Box className={classes.breadcrumbsContainer}>
-            <Breadcrumbs
-                style={{ fontSize: "1.15rem" }}
-                separator={<NavigateNextIcon fontSize="small" />}
-            >
-                {crumbs?.map((crumb, index) => {
-                    const isLast = index === crumbs.length - 1;
-                    return (
-                        <span key={index}>
-                            {!isLast ? (
-                                <Typography
-                                    onClick={() => navigate(crumb.link, { state: crumb.state })}
-                                    className={classes.link}
-                                    fontSize="inherit"
-                                >
-                                    {crumb.name}
-                                </Typography>
-                            ) : (
-                                <Typography color="text.primary" fontSize="inherit">
-                                    {crumb.name}
-                                </Typography>
-                            )}
-                        </span>
-                    );
-                })}
-            </Breadcrumbs>
-        </Box>
-    )
+  return (
+    <Box className={classes.breadcrumbsContainer}>
+      <Breadcrumbs
+        style={{ fontSize: "1.15rem" }}
+        separator={<NavigateNextIcon fontSize="small" />}
+      >
+        {crumbs?.map((crumb, index) => {
+          const isLast = index === crumbs.length - 1;
+          return (
+            <span key={index}>
+              {!isLast ? (
+                <Typography
+                  onClick={() => navigate(crumb.link, { state: crumb.state })}
+                  className={classes.link}
+                  fontSize="inherit"
+                >
+                  {crumb.name}
+                </Typography>
+              ) : (
+                <Typography color="text.primary" fontSize="inherit">
+                  {crumb.name}
+                </Typography>
+              )}
+            </span>
+          );
+        })}
+      </Breadcrumbs>
+    </Box>
+  )
 }

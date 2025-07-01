@@ -12,6 +12,7 @@ import {
 import axios from "../../../services/Api.js";
 import moment from "moment";
 import { useLocation, useNavigate } from 'react-router-dom';
+import useAlert from "../../../hooks/useAlert.js";
 
 function LedgerDebitContraDetail() {
     const [rows, setRows] = useState([]);
@@ -21,6 +22,7 @@ function LedgerDebitContraDetail() {
     });
     const location = useLocation()
     const queryValues = location.state;
+     const { setAlertMessage, setAlertOpen } = useAlert();
 
     useEffect(() => {
         getData();
@@ -45,6 +47,11 @@ function LedgerDebitContraDetail() {
             })
             .catch((err) => {
                 setLoading(false);
+                 setAlertMessage({
+                    severity: "error",
+                    message: "Something went wrong.",
+                });
+                setAlertOpen(true);
                 console.error(err);
             });
     };

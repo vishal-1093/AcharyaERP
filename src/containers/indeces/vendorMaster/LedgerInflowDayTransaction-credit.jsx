@@ -1,49 +1,40 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import {
-    IconButton,
-    Typography,
-    Breadcrumbs,
     Box,
+    IconButton,
+    Tooltip,
+    Typography,
+    styled,
+    tooltipClasses,
+    Breadcrumbs,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
-import PrintIcon from "@mui/icons-material/Print";
-import { makeStyles } from "@mui/styles";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { makeStyles } from "@mui/styles";
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: "white",
+        color: "rgba(0, 0, 0, 0.6)",
+        maxWidth: 300,
+        fontSize: 12,
+        boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+        padding: "10px",
+        textAlign: "justify",
+    },
+}));
+
 
 const useStyles = makeStyles((theme) => ({
-    table: {
-        width: "100%",
-        borderCollapse: "collapse",
-        marginTop: 20,
-    },
-    th: {
-        border: "1px solid black",
-        padding: "10px",
-        textAlign: "center",
-    },
-    td: {
-        border: "1px solid black",
-        padding: "8px",
-        textAlign: "center",
-    },
-    yearTd: {
-        border: "1px solid black",
-        padding: "8px",
-        textAlign: "right",
-    },
     cancelled: {
         background: "#ffcdd2 !important",
-    },
-    breadcrumbsContainer: {
-        position: "relative",
-        marginBottom: 10,
-        width: "fit-content",
-        zIndex: theme.zIndex.drawer - 1,
     },
     link: {
         color: theme.palette.primary.main,
@@ -59,31 +50,26 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function VendorDayDebitTransaction() {
+function InflowDayCreditTransaction() {
     const [rows, setRows] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-        approved_by: false,
         dept_name: false,
-        // created_date: false,
-        shool_short_name:false,
-        online: false,
+        school_name_short: false,
         created_username: false,
-        created_name: false
+        verifierName: false
     });
+
+    const [loading, setLoading] = useState(false);
     const [breadCrumbs, setBreadCrumbs] = useState([])
     const setCrumbs = useBreadcrumbs();
+    const location = useLocation()
+    const queryValues = location.state;
     const { setAlertMessage, setAlertOpen } = useAlert();
     const classes = useStyles();
     const navigate = useNavigate();
-    const location = useLocation()
-    const queryValues = location.state;
-
-    const maxLength = 200;
 
     useEffect(() => {
-        getData();
-        setCrumbs([])
+        setCrumbs([{ name: "" }]);
         if (queryValues?.isBRSTrue) {
             setBreadCrumbs([
                 { name: "Bank Balance", link: "/bank-balance" },
@@ -100,13 +86,9 @@ function VendorDayDebitTransaction() {
                 { name: `${queryValues?.voucherHeadName || ""} FY ${queryValues?.fcYear} as on ${moment().format('DD-MMMM-YYYY')}` },
             ])
         }
+        getData()
     }, []);
 
-    const getRowClassName = (params) => {
-        if (!params.row.active) {
-            return classes.cancelled;
-        }
-    };
 
     const getData = async () => {
         setLoading(true);
@@ -117,17 +99,17 @@ function VendorDayDebitTransaction() {
             ...(schoolId && { schoolId }),
             ...(date && { date })
         }
-        const baseUrl = '/api/finance/getAllDebitDetailsOfVendor'
+        const baseUrl = '/api/finance/getAllCreditDetailsOfInFlow'
         await axios
             .get(baseUrl, { params })
             .then((response) => {
-                const filteredData = response?.data?.data
-                setRows(filteredData || []);
                 setLoading(false);
+                console.log("response", response?.data)
+                setRows(response?.data?.data);
             })
             .catch((err) => {
                 setLoading(false);
-                 setAlertMessage({
+                setAlertMessage({
                     severity: "error",
                     message: "Something went wrong.",
                 });
@@ -136,51 +118,118 @@ function VendorDayDebitTransaction() {
             });
     };
 
+    const getRowClassName = (params) => {
+        if (!params.row.active) {
+            return classes.cancelled;
+        }
+    };
+
     const columns = [
         {
-            field: "Print",
-            headerName: "Print",
+            field: "receipt_type",
+            headerName: "Type",
+            flex: 1,
+            hideable: false,
             renderCell: (params) =>
-                    <IconButton
-                        color="primary"
-                        onClick={() => navigate(`/payment-voucher-pdf/${params?.row?.payment_voucher_id}`, { state: { query: queryValues } })}
-                    >
-                        <PrintIcon sx={{ fontSize: 17 }} />
-                    </IconButton>
+                params.row.receipt_type == "HOS"
+                    ? "HOST"
+                    : params.row.receipt_type == "General"
+                        ? "GEN"
+                        : params.row.receipt_type == "Registration Fee"
+                            ? "REGT"
+                            : params.row.receipt_type == "Bulk Fee"
+                                ? "BULK"
+                                : params.row.receipt_type == "Exam Fee"
+                                    ? "EXAM"
+                                    : params.row.receipt_type?.toUpperCase(),
         },
-        { field: "shool_short_name", headerName: "School", flex: 1, align: 'center' },
-        { field: "voucher_no", headerName: "Voucher No", flex: 1, align: 'center' },
-        { field: "type", headerName: "Type", flex: 1 },
         {
-            field: "credit",
-            headerName: "Amount",
-            flex: 0.8,
-            headerAlign: "right",
-            align: "right",
+            field: "student_name",
+            headerName: "Name",
+            flex: 1,
+            hideable: false,
+            renderCell: (params) => {
+                return params.row.student_name && params.row.student_name ? (
+                    <HtmlTooltip title={params.row.student_name}>
+                        <Typography
+                            variant="subtitle2"
+                            color="textSecondary"
+                            sx={{ fontSize: 13, cursor: "pointer" }}
+                        >
+                            {params.row.student_name ? params.row.student_name : ""}
+                        </Typography>
+                    </HtmlTooltip>
+                ) : (
+                    <HtmlTooltip title={params.row.bulk_user_name}>
+                        <Typography
+                            variant="subtitle2"
+                            color="textSecondary"
+                            sx={{ fontSize: 13, cursor: "pointer" }}
+                        >
+                            {params.row.bulk_user_name ? params.row.bulk_user_name : ""}
+                        </Typography>
+                    </HtmlTooltip>
+                );
+            },
+            valueGetter: (value, row) =>
+                row?.student_name
+                    ? row.student_name
+                    : row?.bulk_user_name
+                        ? row.bulk_user_name
+                        : "",
         },
-         { field: "remarks", headerName: "Remarks", flex: 1 },
-        { field: "dept_name", headerName: "Dept", flex: 1, hide: true },
-        { field: "created_name", headerName: "Created By", flex: 1 },
+        {
+            field: "school_name_short",
+            headerName: "School",
+            flex: 1,
+            // hideable: false,
+            valueGetter: (value, row) =>
+                row.school_name_short ? row.school_name_short : "",
+        },
+        {
+            field: "fee_receipt",
+            headerName: "Receipt No",
+            flex: 1,
+            hideable: false,
+            align: "center",
+        },
         {
             field: "created_date",
-            headerName: "Created Date",
+            headerName: "Receipt Date",
             flex: 1,
-            valueGetter: (value, row) => moment(value).format("DD-MM-YYYY"),
+            valueGetter: (row, value) => moment(row).format("DD-MM-YYYY"),
+            align: "center",
         },
-        { field: "created_username", headerName: "Approved By", flex: 1 },
-
         {
-            field: "online",
-            headerName: "Online",
+            field: "auid",
+            headerName: "AUID",
             flex: 1,
-            valueGetter: (value, row) => (value == 1 ? "Online" : ""),
+            hideable: false,
+            align: "center",
+            valueGetter: (value, row) => (row.auid ? row.auid : ""),
         },
-          {
-            field: "pay_to",
-            headerName: "Pay to",
+        {
+            field: "fee_template_name",
+            headerName: "Template",
             flex: 1,
-            valueGetter: (row, value) => value.pay_to ?? value.school_name_short,
+            valueGetter: (value, row) =>
+                row.fee_template_name ? row.fee_template_name : "",
+            align: "center",
         },
+        {
+            field: "inr_value",
+            headerName: "Amount",
+            flex: 1,
+            hideable: false,
+            type: "number",
+            valueGetter: (value, row) => {
+                return row.inr_value % 1 !== 0
+                    ? row.inr_value?.toFixed(2)
+                    : row.inr_value;
+            },
+        },
+        { field: "remarks", headerName: "Remarks", flex: 1 },
+        { field: "created_username", headerName: "Created By", flex: 1 },
     ];
 
     return (
@@ -195,15 +244,16 @@ function VendorDayDebitTransaction() {
                         columnVisibilityModel={columnVisibilityModel}
                         setColumnVisibilityModel={setColumnVisibilityModel}
                         getRowClassName={getRowClassName}
-                        getRowId={(row, index) => row?.payment_voucher_id}
+                        getRowId={(row) => row?.fee_receipt}
                     />
                 </Box>
+
             </Box>
         </>
     );
 }
 
-export default VendorDayDebitTransaction;
+export default InflowDayCreditTransaction;
 
 const CustomBreadCrumbs = ({ crumbs = [] }) => {
     const navigate = useNavigate()
