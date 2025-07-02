@@ -86,7 +86,7 @@ function CounterSummarySchoolIndex() {
       const res = await axios.get(`/api/institute/fetchAllOrgDetail?page=0&page_size=10000&sort=org_type`);
       if (res.status == 200 || res.status == 201) {
         const orgNameLists = res.data.data.Paginated_data.content?.reverse()?.map(li => li.org_name);
-        //Make hostel obj in last
+        //Make hostel element in last
         const hostelObj = orgNameLists.find(obj => obj?.toLowerCase()?.includes("hostel"));
         orgNameLists[orgNameLists.length - 2] = orgNameLists[orgNameLists.length - 1];
         orgNameLists[orgNameLists.length - 1] = hostelObj;
@@ -106,10 +106,9 @@ function CounterSummarySchoolIndex() {
         }
       })
     });
+
     setLoading(false);
-
     const aitOrgNameSchoolList = schoolList.filter((obj) => obj.orgName.toLowerCase().includes("acharya institutes"));
-
     const totalCash = aitOrgNameSchoolList.reduce((sum, acc) => sum + acc.INRCASH, 0);
     const totalUsdCash = aitOrgNameSchoolList.reduce((sum, acc) => sum + acc.USDCASH, 0);
     const totalDD = aitOrgNameSchoolList.reduce((sum, acc) => sum + acc.INRDD, 0);
@@ -128,14 +127,14 @@ function CounterSummarySchoolIndex() {
     };
 
     if (aitOrgNameSchoolList.length > 1) {
-      schoolList.splice(schoolList.length - 2, 0, totalRow)
+      schoolList.splice(aitOrgNameSchoolList.length, 0, totalRow)
     };
 
-    const grandTotalCash = schoolList?.filter((li)=>li.schoolName !== "TOTAL")?.reduce((sum, acc) => sum + acc.INRCASH, 0);
-    const grandTotalUsdCash = schoolList?.filter((li)=>li.schoolName !== "TOTAL")?.reduce((sum, acc) => sum + acc.USDCASH, 0);
-    const grandTotalDD = schoolList?.filter((li)=>li.schoolName !== "TOTAL")?.reduce((sum, acc) => sum + acc.INRDD, 0);
-    const grandTotalOnline = schoolList?.filter((li)=>li.schoolName !== "TOTAL")?.reduce((sum, acc) => sum + acc.INRONLINE, 0);
-    const grandTotalPayment = schoolList?.filter((li)=>li.schoolName !== "TOTAL")?.reduce((sum, acc) => sum + acc.payment, 0);
+    const grandTotalCash = schoolList?.filter((li) => li.schoolName !== "TOTAL")?.reduce((sum, acc) => sum + acc.INRCASH, 0);
+    const grandTotalUsdCash = schoolList?.filter((li) => li.schoolName !== "TOTAL")?.reduce((sum, acc) => sum + acc.USDCASH, 0);
+    const grandTotalDD = schoolList?.filter((li) => li.schoolName !== "TOTAL")?.reduce((sum, acc) => sum + acc.INRDD, 0);
+    const grandTotalOnline = schoolList?.filter((li) => li.schoolName !== "TOTAL")?.reduce((sum, acc) => sum + acc.INRONLINE, 0);
+    const grandTotalPayment = schoolList?.filter((li) => li.schoolName !== "TOTAL")?.reduce((sum, acc) => sum + acc.payment, 0);
     const grandTotalClosing = (grandTotalCash) - (grandTotalPayment);
 
     const grandTotalRow = {
@@ -169,18 +168,22 @@ function CounterSummarySchoolIndex() {
       field: "schoolName", headerName: "Inst", flex: 1,
       hideable: false,
       renderCell: (params) => {
-        if (params.row.id === "last-row") {
+        if (params.row.schoolName == "TOTAL") {
           return (
-            <Typography color="#fff" variant="subtitle2" sx={{textAlign:"center",width:"100%"}}>{params.row.schoolName ? params.row.schoolName : "N/A"}</Typography>
+            <Typography variant="subtitle2" sx={{ textAlign: "center", width: "100%" }}>{params.row.schoolName ? params.row.schoolName : "N/A"}</Typography>
+          );
+        } else if (params.row.schoolName == "NRC") {
+          return (
+            <Typography variant="subtitle2" sx={{ textAlign: "center", width: "100%" }}>{params.row.schoolName ? params.row.schoolName : "N/A"}</Typography>
           );
         } else if (params.row.schoolName !== "HOS") {
           return (
-            <Typography variant="p" sx={{textAlign:"center",width:"100%" }}>{params.row.schoolName ? params.row.schoolName : "N/A"}</Typography>
+            <Typography variant="p" sx={{ textAlign: "center", width: "100%" }}>{params.row.schoolName ? params.row.schoolName : "N/A"}</Typography>
           );
         } else {
           return (
             <HtmlTooltip title="View Hostel School's Detail">
-              <Typography color="primary" variant="subtitle2" sx={{textAlign:"center",width:"100%", cursor: "pointer" }} onClick={handleHostelRow}>{params.row.schoolName ? params.row.schoolName : "N/A"}</Typography>
+              <Typography color="primary" variant="subtitle2" sx={{ textAlign: "center", width: "100%", cursor: "pointer" }} onClick={handleHostelRow}>{params.row.schoolName ? params.row.schoolName : "N/A"}</Typography>
             </HtmlTooltip>
           )
         }
@@ -190,20 +193,25 @@ function CounterSummarySchoolIndex() {
       field: "Receipt_Total", headerName: "Receipt_Total", flex: 1,
       hideable: false,
       renderCell: (params) => {
-        if (params.row.id === "last-row") {
+        if (params.row.schoolName == "TOTAL") {
           return (
-            <Typography color="#fff" variant="subtitle2" sx={{textAlign:"center",width:"100%"}}>{Number((params.row.INRDD % 1 !== 0 || (params.row.INRONLINE % 1 !== 0) || 
-                (params.row.INRCASH % 1 !== 0) || (params.row.USDCASH % 1 !== 0)) ? (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH)?.toFixed(2) : (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH) || 0)}</Typography>
+            <Typography variant="subtitle2" sx={{ textAlign: "center", width: "100%" }}>{Number((params.row.INRDD % 1 !== 0 || (params.row.INRONLINE % 1 !== 0) ||
+              (params.row.INRCASH % 1 !== 0) || (params.row.USDCASH % 1 !== 0)) ? (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH)?.toFixed(2) : (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH) || 0)}</Typography>
+          );
+        } else if (params.row.schoolName == "NRC") {
+          return (
+            <Typography variant="subtitle2" sx={{ textAlign: "center", width: "100%" }}>{Number((params.row.INRDD % 1 !== 0 || (params.row.INRONLINE % 1 !== 0) ||
+              (params.row.INRCASH % 1 !== 0) || (params.row.USDCASH % 1 !== 0)) ? (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH)?.toFixed(2) : (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH) || 0)}</Typography>
           );
         } else if (params.row.schoolName !== "HOS") {
           return (
-            <Typography variant="p" sx={{textAlign:"center",width:"100%" }}>{Number((params.row.INRDD % 1 !== 0 || (params.row.INRONLINE % 1 !== 0) || 
-                (params.row.INRCASH % 1 !== 0) || (params.row.USDCASH % 1 !== 0)) ? (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH)?.toFixed(2) : (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH) || 0)}</Typography>
+            <Typography variant="p" sx={{ textAlign: "center", width: "100%" }}>{Number((params.row.INRDD % 1 !== 0 || (params.row.INRONLINE % 1 !== 0) ||
+              (params.row.INRCASH % 1 !== 0) || (params.row.USDCASH % 1 !== 0)) ? (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH)?.toFixed(2) : (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH) || 0)}</Typography>
           );
         } else {
           return (
             <HtmlTooltip title="View Hostel School's Detail">
-              <Typography color="primary" variant="subtitle2" sx={{textAlign:"center",width:"100%", cursor: "pointer" }} onClick={handleHostelRow}>{Number((params.row.INRDD % 1 !== 0 || (params.row.INRONLINE % 1 !== 0) || 
+              <Typography color="primary" variant="subtitle2" sx={{ textAlign: "center", width: "100%", cursor: "pointer" }} onClick={handleHostelRow}>{Number((params.row.INRDD % 1 !== 0 || (params.row.INRONLINE % 1 !== 0) ||
                 (params.row.INRCASH % 1 !== 0) || (params.row.USDCASH % 1 !== 0)) ? (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH)?.toFixed(2) : (params.row.INRDD + params.row.INRONLINE + params.row.INRCASH + params.row.USDCASH) || 0)}</Typography>
             </HtmlTooltip>
           )
@@ -217,9 +225,13 @@ function CounterSummarySchoolIndex() {
       type: 'number',
       valueGetter: (value, row) => (Number(row?.INRDD % 1 !== 0 ? row?.INRDD?.toFixed(2) : row?.INRDD) || 0),
       renderCell: (params) => {
-        if (params.row.id === "last-row") {
+        if (params.row.schoolName == "TOTAL") {
           return (
-            <Typography color="#fff" variant="subtitle2">{(Number(params.row?.INRDD % 1 !== 0 ? params.row?.INRDD?.toFixed(2) : params.row?.INRDD) || 0)}</Typography>
+            <Typography variant="subtitle2">{(Number(params.row?.INRDD % 1 !== 0 ? params.row?.INRDD?.toFixed(2) : params.row?.INRDD) || 0)}</Typography>
+          );
+        } else if (params.row.schoolName == "NRC") {
+          return (
+            <Typography variant="subtitle2">{(Number(params.row?.INRDD % 1 !== 0 ? params.row?.INRDD?.toFixed(2) : params.row?.INRDD) || 0)}</Typography>
           );
         } else if (params.row.schoolName !== "HOS") {
           return (
@@ -244,9 +256,13 @@ function CounterSummarySchoolIndex() {
       type: 'number',
       valueGetter: (value, row) => (Number(row?.INRONLINE % 1 !== 0 ? row?.INRONLINE?.toFixed(2) : row?.INRONLINE) || 0),
       renderCell: (params) => {
-        if (params.row.id === "last-row") {
+        if (params.row.schoolName == "TOTAL") {
           return (
-            <Typography color="#fff" variant="subtitle2">{(Number(params.row?.INRONLINE % 1 !== 0 ? params.row?.INRONLINE?.toFixed(2) : params.row?.INRONLINE) || 0)}</Typography>
+            <Typography variant="subtitle2">{(Number(params.row?.INRONLINE % 1 !== 0 ? params.row?.INRONLINE?.toFixed(2) : params.row?.INRONLINE) || 0)}</Typography>
+          );
+        } else if (params.row.schoolName == "NRC") {
+          return (
+            <Typography variant="subtitle2">{(Number(params.row?.INRONLINE % 1 !== 0 ? params.row?.INRONLINE?.toFixed(2) : params.row?.INRONLINE) || 0)}</Typography>
           );
         } else if (params.row.schoolName !== "HOS") {
           return (
@@ -271,9 +287,13 @@ function CounterSummarySchoolIndex() {
       type: 'number',
       valueGetter: (value, row) => (Number(row?.INRCASH % 1 !== 0 ? row?.INRCASH?.toFixed(2) : row?.INRCASH) || 0),
       renderCell: (params) => {
-        if (params.row.id === "last-row") {
+        if (params.row.schoolName == "TOTAL") {
           return (
-            <Typography color="#fff" variant="subtitle2">{(Number(params.row?.INRCASH % 1 !== 0 ? params.row?.INRCASH?.toFixed(2) : params.row?.INRCASH) || 0)}</Typography>
+            <Typography variant="subtitle2">{(Number(params.row?.INRCASH % 1 !== 0 ? params.row?.INRCASH?.toFixed(2) : params.row?.INRCASH) || 0)}</Typography>
+          );
+        } else if (params.row.schoolName == "NRC") {
+          return (
+            <Typography variant="subtitle2">{(Number(params.row?.INRCASH % 1 !== 0 ? params.row?.INRCASH?.toFixed(2) : params.row?.INRCASH) || 0)}</Typography>
           );
         } else if (params.row.schoolName !== "HOS") {
           return (
@@ -298,9 +318,13 @@ function CounterSummarySchoolIndex() {
       type: 'number',
       valueGetter: (value, row) => (Number(row?.USDCASH % 1 !== 0 ? row?.USDCASH?.toFixed(2) : row?.USDCASH) || 0),
       renderCell: (params) => {
-        if (params.row.id === "last-row") {
+        if (params.row.schoolName == "TOTAL") {
           return (
-            <Typography color="#fff" variant="subtitle2">{(Number(params.row?.USDCASH % 1 !== 0 ? params.row?.USDCASH?.toFixed(2) : params.row?.USDCASH) || 0)}</Typography>
+            <Typography variant="subtitle2">{(Number(params.row?.USDCASH % 1 !== 0 ? params.row?.USDCASH?.toFixed(2) : params.row?.USDCASH) || 0)}</Typography>
+          );
+        } else if (params.row.schoolName == "NRC") {
+          return (
+            <Typography variant="subtitle2">{(Number(params.row?.USDCASH % 1 !== 0 ? params.row?.USDCASH?.toFixed(2) : params.row?.USDCASH) || 0)}</Typography>
           );
         } else if (params.row.schoolName !== "HOS") {
           return (
@@ -326,9 +350,13 @@ function CounterSummarySchoolIndex() {
       renderCell: (params) => <div sx={{ textAlign: 'right', width: '100%' }}></div>,
       valueGetter: (value, row) => (Number(row?.payment % 1 !== 0 ? row?.payment?.toFixed(2) : row?.payment) || 0),
       renderCell: (params) => {
-        if (params.row.id === "last-row") {
+        if (params.row.schoolName == "TOTAL") {
           return (
-            <Typography color="#fff" variant="subtitle2">{(Number(params.row?.payment % 1 !== 0 ? params.row?.payment?.toFixed(2) : params.row?.payment) || 0)}</Typography>
+            <Typography variant="subtitle2">{(Number(params.row?.payment % 1 !== 0 ? params.row?.payment?.toFixed(2) : params.row?.payment) || 0)}</Typography>
+          );
+        } else if (params.row.schoolName == "NRC") {
+          return (
+            <Typography variant="subtitle2">{(Number(params.row?.payment % 1 !== 0 ? params.row?.payment?.toFixed(2) : params.row?.payment) || 0)}</Typography>
           );
         } else if (params.row.schoolName !== "HOS") {
           return (
@@ -353,9 +381,9 @@ function CounterSummarySchoolIndex() {
       type: 'number',
       valueGetter: (value, row) => (Number((row?.INRCASH - row?.payment) % 1 !== 0 ? (row?.INRCASH - row?.payment)?.toFixed(2) : (row?.INRCASH - row?.payment)) || 0),
       renderCell: (params) => {
-        if (params.row.id === "last-row") {
+        if (params.row.schoolName == "TOTAL") {
           return (
-            <Typography color="#fff" variant="subtitle2">{(Number((params.row?.INRCASH - params.row?.payment) % 1 !== 0 ? (params.row?.INRCASH - params.row?.payment)?.toFixed(2) : (params.row?.INRCASH - params.row?.payment)) || 0)}</Typography>
+            <Typography variant="subtitle2">{(Number((params.row?.INRCASH - params.row?.payment) % 1 !== 0 ? (params.row?.INRCASH - params.row?.payment)?.toFixed(2) : (params.row?.INRCASH - params.row?.payment)) || 0)}</Typography>
           );
         } else if (params.row.schoolName !== "HOS") {
           return (
@@ -382,8 +410,8 @@ function CounterSummarySchoolIndex() {
     {
       field: "total", headerName: "Total", flex: 1,
       hideable: false,
-      type:"number",
-      renderCell:(params)=>(params.row.total || 0)
+      type: "number",
+      renderCell: (params) => (params.row.total || 0)
     },
   ];
 
@@ -458,22 +486,11 @@ function CounterSummarySchoolIndex() {
             backgroundColor: '#edeef6 !important',
             color: '#000 !important',
             fontWeight: "bold"
-          },
-          '& .forth-last-row': {
-            backgroundColor: '#edeef6 !important',
-            color: '#000 !important',
-            fontWeight: "bold"
-          },
-          '& .third-last-row': {
-            color: '#000 !important',
-            fontWeight: "bold"
           }
         }}>
           <GridIndex rows={rows} columns={columns} loading={values.loading}
             getRowClassName={(params) =>
-              params.id === rows[rows.length - 4]?.id ? 'forth-last-row' :
-                params.id === rows[rows.length - 3]?.id ? 'third-last-row' :
-                  params.id === rows[rows.length - 1]?.id ? 'last-row' : ''
+              params.id === rows[rows.length - 1]?.id ? 'last-row' : ''
             }
             getRowId={row => row.id}
             isRowSelectable={(params) => params.id != rows[rows.length - 1].id}

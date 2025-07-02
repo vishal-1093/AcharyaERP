@@ -1,8 +1,10 @@
 import { useState, useEffect, lazy } from "react";
-import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
+import { Box, Grid, CircularProgress, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs.js";
 import axios from "../../services/Api.js";
+const LazyLoadImageComponent = lazy(() => import("../../components/LazyLoadImage.jsx"));
 const CustomAutocomplete = lazy(() =>
   import("../../components/Inputs/CustomAutocomplete.jsx")
 );
@@ -11,8 +13,12 @@ const logos = require.context("../../assets", true);
 const style = makeStyles((theme) => ({
   main: {
     height: "230px",
-    boxShadow:
-      "0px 8px 8px 0px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+    transition: 'transform 0.3s ease-in-out',
+    '&:hover': {
+      transform: 'scale(1.1)',
+    },
+    backgroundColor: "#eceff1",
+    cursor: "pointer"
   },
   loaderCenter: {
     display: "flex",
@@ -34,6 +40,7 @@ const EmployeeReport = () => {
   const [{ schoolId, schoolList, deptId, deptList, empList, loading }, setState] = useState(initialState);
   const setCrumbs = useBreadcrumbs();
   const boxStyle = style();
+   const navigate = useNavigate();
 
   useEffect(() => {
     setCrumbs([]);
@@ -48,7 +55,7 @@ const EmployeeReport = () => {
 
   const getSchoolData = async () => {
     try {
-      const res = await axios.get(`/api/institute/school`);
+      const res = await axios.get(`/api/institute/schoolWithWebStatus`);
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
@@ -62,11 +69,12 @@ const EmployeeReport = () => {
 
   const getDeptData = async (schoolId) => {
     try {
-      const res = await axios.get(`/api/fetchdept1/${schoolId}`);
+      const res = await axios.get(`/api/fetchDeptWithWebStatus/${schoolId}`);
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          deptList: res.data.data.map((ele) => ({ value: ele.dept_id, label: ele.dept_name }))
+          deptList: res.data.data.map((ele) => ({ value: ele.dept_id, label: ele.dept_name })),
+          empList: []
         }))
       }
     } catch (error) {
@@ -86,7 +94,6 @@ const EmployeeReport = () => {
       setLoading(true);
       const res = await axios.get(`api/employee/getEmployeeAttachmentWithDetails?school_id=${schoolId}&dept_id=${deptValueId}`);
       if (res.status == 200 || res.status == 201) {
-        console.log("res========", res)
         setLoading(false)
         setState((prevState) => ({
           ...prevState,
@@ -98,11 +105,12 @@ const EmployeeReport = () => {
     }
   };
 
+  const onHandleSubmit = (empDetails) => {
+    navigate("/employee-report-view",{state:{empDetails:empDetails,schoolId:schoolId}})
+  };
+
   const getCapsName = (str) => {
-    return str
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ')
+    return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
   };
 
   return (
@@ -135,26 +143,21 @@ const EmployeeReport = () => {
         </Grid>
       </Grid>
       {!loading ? <Box mt={1} mb={2}>
-        <Grid container rowSpacing={3} columnSpacing={{ xs: 3 }}>
+        <Grid mt={1} container rowSpacing={3} columnSpacing={{ xs: 3 }}>
           {empList.map((employee, index) => (<Grid item xs={12} md={2} key={index}>
-            <Box className={boxStyle.main}>
-              {employee?.webphoto ? (
-                <img
-                  src={employee?.webphoto}
-                  alt={`${employee.employee_name} photo`}
-                  style={{ width: "100%", height: (employee.employee_name.length > 24 || employee.designation_name.length > 24) ? "160px" : "180px" }}
-                />
-              ) : (employee.gender == "M" && !employee?.webphoto ? <img
-                src={`${logos(`./maleplaceholderimage.jpeg`)}`}
+            <Box className={boxStyle.main} sx={{ boxShadow: 3 }} onClick={()=>onHandleSubmit(employee)}>
+              <LazyLoadImageComponent
+                key={employee?.webphoto}
+                src={employee?.webphoto}
+                defaultImage={employee.gender == "M" ? `${logos(`./maleplaceholderimage.jpeg`)}` :
+                  employee.gender == "F" ? `${logos(`./femalePlaceholderImage.jpg`)}` :
+                    `${logos(`./maleplaceholderimage.jpeg`)}`}
                 alt={`${employee.employee_name} photo`}
-                style={{ width: "100%", height: (employee.employee_name.length > 24 || employee.designation_name.length > 24) ? "160px" : "180px" }}
-              /> : (employee.gender == "F" && !employee?.webphoto ? <img
-                src={`${logos(`./femalePlaceholderImage.jpg`)}`}
-                alt={`${employee.employee_name} photo`}
-                style={{ width: "100%", height: (employee.employee_name.length > 24 || employee.designation_name.length > 24) ? "160px" : "180px" }}
-              /> : <></>))}
-              <Typography sx={{ textAlign: "center", fontWeight: '500' }}>{employee.phdStatus === "holder" ? `Dr. ${getCapsName(employee.employee_name)}` : getCapsName(employee.employee_name)}</Typography>
-              <Typography sx={{ textAlign: "center" }}>{employee.designation_name}</Typography>
+                width={"100%"}
+                height={employee.employee_name?.length > 30 || employee.designation_name?.length > 35 ? "160px" :
+                  "180px"} />
+              <Typography variant="subtitle2" sx={{ textAlign: "center" }}>{employee.phd_status === "holder" ? `Dr. ${getCapsName(employee.employee_name)}` : getCapsName(employee.employee_name)}</Typography>
+              <Typography variant="subtitle2" sx={{ textAlign: "center", padding: "2px" }}>{employee.designation_name}</Typography>
             </Box>
           </Grid>
           ))}
