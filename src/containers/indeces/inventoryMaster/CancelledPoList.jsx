@@ -66,11 +66,14 @@ function CancelledPoList() {
 
   const columns = [
     {
-      field: "createdDate",
+      field: "created_date",
       headerName: "Created Date",
       flex: 1,
+      // type: "date",
       valueGetter: (value, row) =>
-        moment(row.createdDate).format("DD-MM-YYYY"),
+        row.created_date
+          ? moment(row.created_date).format("DD-MM-YYYY")
+          : "",
     },
     {
       field: "createdUsername",
@@ -82,6 +85,7 @@ function CancelledPoList() {
       field: "Print",
       headerName: "Print PO",
       flex: 1,
+      type: "actions",
       renderCell: (params) => {
         return (
           <IconButton

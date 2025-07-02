@@ -123,7 +123,7 @@ function UploadPhoto({ empId, documentViewAccess, setBackDropLoading }) {
       console.error(err);
       setAlertMessage({
         severity: "error",
-        message: "Something went wrong while uploading the document !!",
+        message: "Something went wrong! Unable to find the Image !!",
       });
       setAlertOpen(true);
     } finally {
@@ -189,35 +189,39 @@ function UploadPhoto({ empId, documentViewAccess, setBackDropLoading }) {
               />
             )}
           </Grid>
-          {(roleId == 1 || roleId == 5 || roleId === 6) && <Grid item xs={12} md={12}>
-            <CustomFileInput
-              name="document"
-              label="File"
-              helperText="PDF"
-              file={values.document}
-              handleFileDrop={handleFileDrop}
-              handleFileRemove={handleFileRemove}
-              checks={checks.document}
-              errors={errorMessages.document}
-            />
-          </Grid>}
-          {(roleId == 1 || roleId == 5 || roleId === 6) && <Grid item xs={12} md={3} align="right">
-            <Button
-              variant="contained"
-              onClick={uploadPhoto}
-              disabled={loading || !requiredFieldsValid()}
-            >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                "Upload"
-              )}
-            </Button>
-          </Grid>}
+          {(roleId == 1 || roleId == 5 || roleId === 6) && (
+            <Grid item xs={12} md={12}>
+              <CustomFileInput
+                name="document"
+                label="File"
+                helperText="PDF"
+                file={values.document}
+                handleFileDrop={handleFileDrop}
+                handleFileRemove={handleFileRemove}
+                checks={checks.document}
+                errors={errorMessages.document}
+              />
+            </Grid>
+          )}
+          {(roleId == 1 || roleId == 5 || roleId === 6) && (
+            <Grid item xs={12} md={3} align="right">
+              <Button
+                variant="contained"
+                onClick={uploadPhoto}
+                disabled={loading || !requiredFieldsValid()}
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  "Upload"
+                )}
+              </Button>
+            </Grid>
+          )}
         </Grid>
       </CardContent>
     </Card>

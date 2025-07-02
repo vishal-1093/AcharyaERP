@@ -169,7 +169,8 @@ function HostelBedForm() {
   const getBedDetialForBlock = async () => {
     await axios
       .get(
-        `/api/hostel/hostelBedsByHostelBlockId?hostelBlockId=${state}`
+        `/api/hostel/hostelBedsByHostelBlockId?hostelBlockId=${state.hostel_block_id
+        }${state?.room_type ? `&roomTypeId=${state?.room_type}` : ""}`
       )
       .then((res) => {
         if (Object.keys(res.data.data).length === 0) {

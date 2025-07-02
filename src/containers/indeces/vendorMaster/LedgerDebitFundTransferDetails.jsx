@@ -6,15 +6,17 @@ import {
 import axios from "../../../services/Api.js";
 import { useLocation, useNavigate } from 'react-router-dom';
 import moment from "moment";
+import useAlert from "../../../hooks/useAlert.js";
 
 function LedgerDebitFundTransferDetail() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
-   created_date: false
+    created_date: false
   });
   const location = useLocation()
   const queryValues = location.state;
+   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     getData();
@@ -39,6 +41,11 @@ function LedgerDebitFundTransferDetail() {
       })
       .catch((err) => {
         setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: "Something went wrong.",
+        });
+        setAlertOpen(true);
         console.error(err);
       });
   };
@@ -61,17 +68,17 @@ function LedgerDebitFundTransferDetail() {
       headerName: "Created Date",
       flex: 1,
       align: "center",
-      renderCell:(params)=>{
+      renderCell: (params) => {
         return params?.row?.created_date ? moment(params?.row?.created_date).format("DD-MM-YYYY") : ""
       }
     },
-     {
+    {
       field: "type",
       headerName: "Type",
       flex: 1,
       align: "center"
     },
-     {
+    {
       field: "remarks",
       headerName: "Remarks",
       flex: 1,

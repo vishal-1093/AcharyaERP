@@ -15,6 +15,7 @@ import moment from "moment";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs.js";
+import useAlert from "../../../hooks/useAlert.js";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -46,6 +47,7 @@ function LedgerDebitReceiptDetail() {
     school_name_short: false,
     bank_name: false,
   });
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const location = useLocation();
   const queryValues = location.state;
   const classes = useStyles();
@@ -77,6 +79,11 @@ function LedgerDebitReceiptDetail() {
       })
       .catch((err) => {
         setLoading(false);
+         setAlertMessage({
+          severity: "error",
+          message: "Something went wrong.",
+        });
+        setAlertOpen(true);
         console.error(err);
       });
   };

@@ -28,6 +28,7 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PrintIcon from '@mui/icons-material/Print';
 import LedgerDayTransactionPdf from './LedgerDayTransactionPdf';
 import { BlobProvider } from '@react-pdf/renderer';
+import useAlert from '../../../hooks/useAlert';
 
 
 
@@ -59,6 +60,7 @@ const LedgerDayTransaction = () => {
         month: queryValues?.month,
         month_name: queryValues?.month_name
     })
+    const { setAlertMessage, setAlertOpen } = useAlert();
 
     useEffect(() => {
         if (currMonth?.month) {
@@ -98,14 +100,17 @@ const LedgerDayTransaction = () => {
                 const rowData = []
                 let runningBalance = data?.openingBalance || 0;
                 data?.vendorDetails?.length > 0 && data?.vendorDetails?.forEach(el => {
-                    runningBalance += (el?.debit || 0) - (el?.credit || 0);
+                    const balance = getClosingBalance(queryValues?.ledgerType, el?.debit, el?.credit)
+                   // runningBalance += (el?.debit || 0) - (el?.credit || 0);
+                   runningBalance += balance 
                     rowData.push({
                         credit: el?.credit,
                         debit: el?.debit,
                         month: el?.month,
                         month_name: el?.month_name,
                         created_date: el?.created_date,
-                        cumulativeBalance: runningBalance < 0 ? `${Math.abs(runningBalance.toFixed(2))} Cr` : runningBalance === 0 ? 0 : `${runningBalance.toFixed(2)} Dr`
+                        // cumulativeBalance: runningBalance < 0 ? `${Math.abs(runningBalance.toFixed(2))} Cr` : runningBalance === 0 ? 0 : `${runningBalance.toFixed(2)} Dr`
+                        cumulativeBalance: formatDrCr(runningBalance, queryValues?.ledgerType),
                     })
                 });
                 const totalCumulativeBalance = Number(data?.openingBalance) + Number(data?.totalCredit) - Number(data?.totalDebit)
@@ -113,7 +118,8 @@ const LedgerDayTransaction = () => {
                     vendorDetails: rowData,
                     totalCredit: data?.totalCredit,
                     totalDebit: data?.totalDebit,
-                    openingBalance: data?.openingBalance < 0 ? `${Math.abs(data?.openingBalance)} Cr` : data?.openingBalance === 0 ? 0 : `${data?.openingBalance} Dr`,
+                    // openingBalance: data?.openingBalance < 0 ? `${Math.abs(data?.openingBalance)} Cr` : data?.openingBalance === 0 ? 0 : `${data?.openingBalance} Dr`,
+                    openingBalance: formatDrCr(data?.openingBalance, queryValues?.ledgerType),
                     // totalCumulativeBalance: totalCumulativeBalance.toFixed(2),
                     schoolName: data?.schoolName
                 });
@@ -121,6 +127,11 @@ const LedgerDayTransaction = () => {
             })
             .catch((err) => {
                 setLoading(false)
+                setAlertMessage({
+                    severity: "error",
+                    message: "Something went wrong.",
+                });
+                setAlertOpen(true);
                 console.error(err)
             });
     };
@@ -152,13 +163,24 @@ const LedgerDayTransaction = () => {
     const handleCellClick = (row, type) => {
         const selectedDate = moment(row?.created_date).format("DD-MM-YYYY")
         const queryParams = { ...queryValues, date: row?.created_date, month: currMonth?.month, month_name: currMonth?.month_name, selectedDate }
-        if (type === 'debit') {
-            navigate('/Accounts-ledger-day-transaction-debit', { state: queryParams })
+        if (queryValues?.ledgerType === "VENDOR") {
+            if (type === 'debit') {
+                navigate('/vendor-day-transaction-debit', { state: queryParams })
+            } else {
+                navigate('/vendor-day-transaction-credit', { state: queryParams })
+            }
+        } else if (queryValues?.ledgerType === 'INFLOW') {
+            if (type === 'credit') {
+                navigate('/ledger-inflow-day-transaction-credit', { state: queryParams })
+            }
         } else {
-            navigate('/Accounts-ledger-day-credit-transaction', { state: queryParams })
+            if (type === 'debit') {
+                navigate('/Accounts-ledger-day-transaction-debit', { state: queryParams })
+            } else {
+                navigate('/Accounts-ledger-day-credit-transaction', { state: queryParams })
+            }
         }
     }
-
 
     const formatCurrency = (value, decimals = 2) => {
         if (value === null || value === undefined || value === '') return `0.00`;
@@ -184,61 +206,97 @@ const LedgerDayTransaction = () => {
         });
     };
 
+    const formatDrCr = (value, ledgerType) => {
+        const absVal = Math.abs(value);
+
+        if (value === 0) return "0";
+
+        if (ledgerType === "VENDOR" || ledgerType === "INFLOW") {
+            return value < 0 ? `${absVal} Dr` : `${absVal} Cr`;
+        } else if (ledgerType === "CASHORBANK") {
+            return value > 0 ? `${absVal} Dr` : `${absVal} Cr`;
+        } else {
+            return value;
+        }
+    };
+
+    const getClosingBalance = (ledgerType, debit, credit) => {
+        switch (ledgerType) {
+            case 'CASHORBANK':
+                return (debit || 0) - (credit || 0);
+                break;
+            case 'VENDOR':
+            case 'INFLOW':
+                return (credit || 0) - (debit || 0);
+                break;
+            default:
+                return (debit || 0) - (credit || 0);
+        }
+    }
+
     return (
         <Paper elevation={0} sx={{
-            p: 1,
+            p: 0,
             width: '100%',
             borderRadius: 2,
             backgroundColor: 'background.paper',
+            //   boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.05)',
             boxShadow: 'none',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center'
+            gap: 0
         }}>
             <Box sx={{
+                p: 2,
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                mb: 1,
-                width: '100%'
+                width: '100%',
+                flexWrap: 'wrap',
+                gap: 2,
+                // borderBottom: '1px solid',
+                // borderColor: 'divider'
             }}>
                 <CustomBreadCrumbs crumbs={breadCrumbs} />
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    flexWrap: 'wrap'
+                }}>
                     <Button
-                        // size="small"
                         variant="outlined"
                         startIcon={<ArrowBackIcon />}
                         onClick={() => handlePreviousMonthOB(currMonth?.month)}
                         sx={{
-                            backgroundColor: '#f5f5f5',
-                            '&:hover': {
-                                backgroundColor: '#e0e0e0',
-                            },
+                            backgroundColor: 'background.default',
+                            '&:hover': { backgroundColor: 'action.hover' },
                             fontWeight: 500,
-                            color: '#424242',
+                            color: 'text.primary',
+                            minWidth: 100,
+                            borderColor: 'divider'
                         }}
                         disabled={currMonth?.month === MONTH_LIST_OPTION[0]?.value}
                     >
                         Prev
                     </Button>
                     <Button
-                        // size="small"
-                        variant="outlined"
+                        variant="contained"
                         endIcon={<ArrowForwardIcon />}
                         onClick={() => handleNextMonthOB(currMonth?.month)}
                         sx={{
-                            backgroundColor: '#e3f2fd',
-                            '&:hover': {
-                                backgroundColor: '#bbdefb',
-                            },
                             fontWeight: 500,
-                            color: '#1976d2',
+                            minWidth: 100,
+                            textTransform: 'none',
+                            boxShadow: 'none',
+                            '&:hover': { boxShadow: 'none' }
                         }}
                         disabled={currMonth?.month === MONTH_LIST_OPTION[MONTH_LIST_OPTION?.length - 1]?.value}
                     >
                         Next
                     </Button>
-                    {/* <BlobProvider
+                    <BlobProvider
                         document={
                             <LedgerDayTransactionPdf
                                 rows={rows}
@@ -259,82 +317,113 @@ const LedgerDayTransaction = () => {
                                     boxShadow: 'none'
                                 }}
                             >
-                                {loading ? 'Preparing PDF...' : 'Print'}
+                                Print
                             </Button>
                         )}
-                    </BlobProvider> */}
+                    </BlobProvider>
                 </Box>
             </Box>
-            <Box sx={{ width: '70%', mb: 1 }}>
-                <TableContainer>
-                    <Table size="small">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell colSpan={5} sx={{
-                                    fontSize: '18px !important',
-                                    padding: '8px 10px !important',
-                                    textAlign: 'center',
-                                    backgroundColor: '#376a7d',
-                                    color: '#fff'
-                                }}>
-                                    {rows?.schoolName}
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-                    </Table>
-                </TableContainer>
-            </Box>
+
             <Box sx={{
+                p: 2,
+                backgroundColor: '#376a7d',
+                color: 'white',
+                borderTopLeftRadius: 6,
+                borderTopRightRadius: 6,
                 width: '70%',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: 2,
-                mb: 1,
-                p: 1,
-                backgroundColor: '#f9f9f9',
-                borderRadius: 1
+                margin: "auto"
             }}>
-                <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    {`${queryValues?.voucherHeadName || ""} Ledger for FY ${queryValues?.fcYear} as on ${moment().format('DD-MM-YYYY')}`}
+                <Typography variant="h5" sx={{ fontWeight: 600, textAlign: 'center' }}>
+                    {rows?.schoolName}
                 </Typography>
-                <Box sx={{
-                    display: 'flex',
-                    gap: 1,
+                <Typography variant="subtitle1" sx={{ textAlign: 'center', mt: 0.5 }}>
+                    {`${queryValues?.voucherHeadName} Ledger for FY ${queryValues?.fcYear}`}
+                </Typography>
+                <Typography variant="body1" sx={{
+                    textAlign: 'center',
+                    opacity: 0.9,
+                    mt: 0.5,
+                    fontSize: '0.875rem'
                 }}>
-                    <Typography variant="body1" sx={{ mr: 2 }}>
+                    {`As on ${moment().format('DD-MM-YYYY')}`}
+                </Typography>
+            </Box>
+
+            <Box sx={{
+                // width: '100%',
+                width: '70%',
+                margin: "auto",
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                p: 2,
+                backgroundColor: 'background.default',
+                borderBottom: '1px solid',
+                // borderColor: 'divider'
+                borderLeft: '1px solid',
+                borderRight: '1px solid',
+                borderColor: 'divider'
+            }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body1" sx={{
+                        fontWeight: 500,
+                        color: 'text.secondary'
+                    }}>
                         Opening Balance:
                     </Typography>
-                    <Typography variant="body1" fontWeight={600}>
+                    <Typography variant="body1" sx={{
+                        fontWeight: 700,
+                        color: 'text.primary'
+                    }}>
                         {formatCurrency(rows?.openingBalance)}
                     </Typography>
                 </Box>
             </Box>
+
             <Box sx={{
+                // width: '100%',
+                overflow: 'hidden',
+                borderLeft: '1px solid',
+                borderRight: '1px solid',
+                borderColor: 'divider',
                 width: '70%',
-                border: '1px solid #e0e0e0',
-                borderRadius: 1,
-                overflow: 'hidden'
+                margin: "auto"
             }}>
                 {loading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
-                        <CircularProgress />
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        minHeight: 300,
+                        p: 2
+                    }}>
+                        <CircularProgress size={24} />
                     </Box>
                 ) : (
-                    <TableContainer sx={{
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        borderRadius: 1,
-                        // mb: 2
-                    }}>
-                        <Table size="small">
+                    <TableContainer>
+                        <Table size="small" sx={{
+                            minWidth: 650,
+                            '& .MuiTableCell-root': {
+                                py: '8px',
+                                lineHeight: 1.4
+                            }
+                        }}>
                             <TableHead>
-                                <TableRow sx={{ bgcolor: 'grey.100' }}>
-                                    <TableCell align="center" sx={{ fontWeight: 600 }}>Date</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 600 }}>Debit</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 600 }}>Credit</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 600 }}>Closing Balance</TableCell>
+                                <TableRow sx={{
+                                    backgroundColor: '#f8fafc',
+                                    '& th': {
+                                        fontWeight: 600,
+                                        color: '#2c3e50',
+                                        borderBottom: '1px solid',
+                                        borderTop: '1px solid',
+                                        borderColor: 'divider',
+                                        py: '10px'
+                                    }
+                                }}>
+                                    <TableCell align="center">Date</TableCell>
+                                    <TableCell align="right">Debit</TableCell>
+                                    <TableCell align="right">Credit</TableCell>
+                                    <TableCell align="right">Balance</TableCell>
                                 </TableRow>
                             </TableHead>
 
@@ -344,9 +433,17 @@ const LedgerDayTransaction = () => {
                                         <TableRow
                                             key={index}
                                             hover
-                                            sx={{ '&:hover': { bgcolor: 'action.hover' } }}
+                                            sx={{
+                                                '&:hover': { backgroundColor: 'rgba(55, 106, 125, 0.04)' },
+                                                '& td': {
+                                                    borderBottom: '1px solid',
+                                                    borderColor: 'divider'
+                                                }
+                                            }}
                                         >
-                                            <TableCell align="center">{moment(row?.created_date).format('DD-MM-YYYY')}</TableCell>
+                                            <TableCell align="center">
+                                                {row?.created_date ? moment(row?.created_date).format('DD-MM-YYYY') : ''}
+                                            </TableCell>
                                             <TableCell align="right">
                                                 {row?.debit > 0 ? (
                                                     <Typography
@@ -354,6 +451,8 @@ const LedgerDayTransaction = () => {
                                                         sx={{
                                                             color: 'primary.main',
                                                             cursor: 'pointer',
+                                                            fontWeight: 500,
+                                                            fontSize: '13px',
                                                             '&:hover': { textDecoration: 'none' }
                                                         }}
                                                     >
@@ -370,6 +469,8 @@ const LedgerDayTransaction = () => {
                                                         sx={{
                                                             color: 'primary.main',
                                                             cursor: 'pointer',
+                                                            fontWeight: 500,
+                                                            fontSize: '13px',
                                                             '&:hover': { textDecoration: 'none' }
                                                         }}
                                                     >
@@ -379,35 +480,57 @@ const LedgerDayTransaction = () => {
                                                     formatCurrency(row.credit)
                                                 )}
                                             </TableCell>
-                                            <TableCell align="right" sx={{ fontWeight: 600 }}>
+                                            <TableCell align="right" sx={{
+                                                fontWeight: 500,
+                                                color: 'black',
+                                                fontSize: '13px',
+                                            }}>
                                                 {formatCurrency(row?.cumulativeBalance || 0)}
                                             </TableCell>
                                         </TableRow>
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
-                                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                                <ReceiptLongIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
-                                                <Typography color="text.secondary">No transactions this month</Typography>
+                                        <TableCell colSpan={4} align="center" sx={{ py: 4 }}> {/* Reduced py */}
+                                            <Box sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: 1
+                                            }}>
+                                                <ReceiptLongIcon sx={{
+                                                    fontSize: 40,
+                                                    color: 'text.disabled'
+                                                }} />
+                                                <Typography variant="body1" color="text.secondary">
+                                                    No transactions this month
+                                                </Typography>
                                             </Box>
                                         </TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
+
                             {rows?.vendorDetails?.length > 0 && (
                                 <TableFooter>
-                                    <TableRow sx={{ bgcolor: 'grey.100' }}>
-                                        <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '12px' }}>Total</TableCell>
-                                        <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '12px' }}>
+                                    <TableRow sx={{
+                                        backgroundColor: '#f8fafc',
+                                        '& td': {
+                                            fontWeight: 600,
+                                            borderTop: '1px solid',
+                                            borderBottom: '1px solid',
+                                            borderColor: 'divider',
+                                            py: '10px'
+                                        }
+                                    }}>
+                                        <TableCell align="center" sx={{ color: 'black', fontWeight: '500', fontSize: '13px' }}>Total</TableCell>
+                                        <TableCell align="right" sx={{ color: 'black', fontWeight: '500', fontSize: '13px' }}>
                                             {formatCurrency(rows?.totalDebit)}
                                         </TableCell>
-                                        <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '12px' }}>
+                                        <TableCell align="right" sx={{ color: 'black', fontWeight: '500', fontSize: '13px' }}>
                                             {formatCurrency(rows?.totalCredit)}
                                         </TableCell>
-                                        <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '12px' }}>
-                                            {/* {formatCurrency(rows?.totalCumulativeBalance)} */}
-                                        </TableCell>
+                                        <TableCell align="right"></TableCell>
                                     </TableRow>
                                 </TableFooter>
                             )}
@@ -416,7 +539,7 @@ const LedgerDayTransaction = () => {
                 )}
             </Box>
         </Paper>
-    );
+    )
 };
 
 export default LedgerDayTransaction;

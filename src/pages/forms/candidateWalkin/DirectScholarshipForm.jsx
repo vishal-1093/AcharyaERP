@@ -122,6 +122,10 @@ function DirectScholarshipForm() {
           ac_year_id: acyearId,
           program_specilaization_id: programSplId,
         };
+
+        console.log(postData);
+        return false;
+
         const candidateRes = await axios.post(
           "/api/student/Candidate_Walkin1",
           postData

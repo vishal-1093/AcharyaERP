@@ -30,6 +30,22 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
       .join(" ");
   }
 
+  const convertToRupeesAndPaise = (amount) => {
+    const [rupees, paise] = Number(amount)?.toFixed(2)?.split(".");
+
+    let result = "";
+    if (parseInt(rupees) > 0) {
+      result += numberToWords.toWords(parseInt(rupees)) + " rupees";
+    }
+    if (parseInt(paise) > 0) {
+      if (result) result += " and ";
+      result += numberToWords.toWords(parseInt(paise)) + " paise";
+    }
+    if (!result) result = "zero rupees";
+
+    return result;
+  };
+
   return (
     <Container>
       {/* Watermark Logo */}
@@ -292,11 +308,10 @@ const DraftPaymentVoucherView = ({ voucherData }) => {
                     <strong>
                       {" "}
                       {toUpperCamelCaseWithSpaces(
-                        numberToWords.toWords(
-                          Number(voucherData?.[0]?.debit_total ?? "")
+                        convertToRupeesAndPaise(
+                          Number(voucherData?.[0]?.debit_total ?? 0)
                         )
                       )}{" "}
-                      rupees
                     </strong>
                   </Typography>
                 </TableCell>

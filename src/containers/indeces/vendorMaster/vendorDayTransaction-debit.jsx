@@ -1,12 +1,7 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import {
-    Button,
-    Grid,
     IconButton,
-    tooltipClasses,
-    Tooltip,
-    styled,
     Typography,
     Breadcrumbs,
     Box,
@@ -18,6 +13,7 @@ import moment from "moment";
 import PrintIcon from "@mui/icons-material/Print";
 import { makeStyles } from "@mui/styles";
 import { useLocation, useNavigate } from "react-router-dom";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 const useStyles = makeStyles((theme) => ({
     table: {
@@ -53,30 +49,57 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.primary.main,
         textDecoration: "none",
         cursor: "pointer",
-        "&:hover": { textDecoration: "underline" },
+        "&:hover": { textDecoration: "none" },
     },
+    breadcrumbsContainer: {
+        position: "relative",
+        marginBottom: 10,
+        width: "fit-content",
+        zIndex: theme.zIndex.drawer - 1,
+    }
 }));
 
-function LedgerCreditPaymentDetail() {
+function VendorDayDebitTransaction() {
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(false);
     const [columnVisibilityModel, setColumnVisibilityModel] = useState({
         approved_by: false,
         dept_name: false,
         // created_date: false,
+        shool_short_name:false,
         online: false,
         created_username: false,
         created_name: false
     });
- 
+    const [breadCrumbs, setBreadCrumbs] = useState([])
+    const setCrumbs = useBreadcrumbs();
     const { setAlertMessage, setAlertOpen } = useAlert();
     const classes = useStyles();
     const navigate = useNavigate();
     const location = useLocation()
     const queryValues = location.state;
 
+    const maxLength = 200;
+
     useEffect(() => {
         getData();
+        setCrumbs([])
+        if (queryValues?.isBRSTrue) {
+            setBreadCrumbs([
+                { name: "Bank Balance", link: "/bank-balance" },
+                { name: "BRS", link: "/institute-bank-balance", state: { bankGroupId: queryValues?.bankGroupId } },
+                { name: "Monthly Transaction", link: "/Accounts-ledger-monthly-detail", state: queryValues },
+                { name: 'Daily Summary', link: "/Accounts-ledger-day-transaction", state: queryValues },
+                { name: `${queryValues?.voucherHeadName || ""} FY ${queryValues?.fcYear} as on ${moment().format('DD-MMMM-YYYY')}` },
+            ]);
+        } else {
+            setBreadCrumbs([
+                { name: "Ledger", link: "/Accounts-ledger", state: queryValues },
+                { name: "Monthly Transaction", link: "/Accounts-ledger-monthly-detail", state: queryValues },
+                { name: 'Daily Summary', link: "/Accounts-ledger-day-transaction", state: queryValues },
+                { name: `${queryValues?.voucherHeadName || ""} FY ${queryValues?.fcYear} as on ${moment().format('DD-MMMM-YYYY')}` },
+            ])
+        }
     }, []);
 
     const getRowClassName = (params) => {
@@ -87,22 +110,18 @@ function LedgerCreditPaymentDetail() {
 
     const getData = async () => {
         setLoading(true);
-        let params = {
-            page: 0,
-            page_size: 1000000,
-            sort: 'created_date',
-            date_range: 'custom',
-            start_date: queryValues?.date,
-            end_date: queryValues?.date,
-            school_id: queryValues?.schoolId,
-            bank_id: queryValues?.bankId,
-            active:true
-        };
-        const baseUrl = '/api/finance/fetchAllPaymentVoucher'
+        const { voucherHeadId, fcYearId, schoolId, month, date } = queryValues
+        const params = {
+            ...(voucherHeadId && { voucherHeadNewId: voucherHeadId }),
+            ...(fcYearId && { fcYearId }),
+            ...(schoolId && { schoolId }),
+            ...(date && { date })
+        }
+        const baseUrl = '/api/finance/getAllDebitDetailsOfVendor'
         await axios
             .get(baseUrl, { params })
             .then((response) => {
-                const filteredData = response?.data?.data?.Paginated_data?.content
+                const filteredData = response?.data?.data
                 setRows(filteredData || []);
                 setLoading(false);
             })
@@ -122,47 +141,24 @@ function LedgerCreditPaymentDetail() {
             field: "Print",
             headerName: "Print",
             renderCell: (params) =>
-                params.row.type === "FUND-TRANSFER" ? (
                     <IconButton
                         color="primary"
-                        onClick={() => navigate(`/fund-transfer-pdf/${params.row.id}`, { state: { query: queryValues } })}
+                        onClick={() => navigate(`/payment-voucher-pdf/${params?.row?.payment_voucher_id}`, { state: { query: queryValues } })}
                     >
                         <PrintIcon sx={{ fontSize: 17 }} />
                     </IconButton>
-                ) : params.row.type === "INTER-COLLEGE" ? (
-                    <IconButton
-                        color="primary"
-                        onClick={() =>
-                            navigate(`/contra-voucher-pdf-auto/${params.row.id}`, { state: { query: queryValues } })
-                        }
-                    >
-                        <PrintIcon sx={{ fontSize: 17 }} />
-                    </IconButton>
-                ) : (
-                    <IconButton
-                        color="primary"
-                        onClick={() => navigate(`/payment-voucher-pdf/${params.row.id}`, { state: { query: queryValues } })}
-                    >
-                        <PrintIcon sx={{ fontSize: 17 }} />
-                    </IconButton>
-                ),
         },
-        { field: "school_name_short", headerName: "School", flex: 1, align: 'center' },
+        { field: "shool_short_name", headerName: "School", flex: 1, align: 'center' },
         { field: "voucher_no", headerName: "Voucher No", flex: 1, align: 'center' },
         { field: "type", headerName: "Type", flex: 1 },
         {
-            field: "pay_to",
-            headerName: "Pay to",
-            flex: 1,
-            valueGetter: (row, value) => value.pay_to ?? value.school_name_short,
-        },
-        {
-            field: "debit_total",
+            field: "credit",
             headerName: "Amount",
             flex: 0.8,
             headerAlign: "right",
             align: "right",
         },
+         { field: "remarks", headerName: "Remarks", flex: 1 },
         { field: "dept_name", headerName: "Dept", flex: 1, hide: true },
         { field: "created_name", headerName: "Created By", flex: 1 },
         {
@@ -179,12 +175,18 @@ function LedgerCreditPaymentDetail() {
             flex: 1,
             valueGetter: (value, row) => (value == 1 ? "Online" : ""),
         },
-        { field: "remarks", headerName: "Remarks", flex: 1 },
+          {
+            field: "pay_to",
+            headerName: "Pay to",
+            flex: 1,
+            valueGetter: (row, value) => value.pay_to ?? value.school_name_short,
+        },
     ];
 
     return (
         <>
             <Box sx={{ position: "relative", width: "100%" }}>
+                <CustomBreadCrumbs crumbs={breadCrumbs} />
                 <Box sx={{ position: "absolute", width: "100%", marginTop: "10px" }}>
                     <GridIndex
                         rows={rows}
@@ -193,6 +195,7 @@ function LedgerCreditPaymentDetail() {
                         columnVisibilityModel={columnVisibilityModel}
                         setColumnVisibilityModel={setColumnVisibilityModel}
                         getRowClassName={getRowClassName}
+                        getRowId={(row, index) => row?.payment_voucher_id}
                     />
                 </Box>
             </Box>
@@ -200,4 +203,40 @@ function LedgerCreditPaymentDetail() {
     );
 }
 
-export default LedgerCreditPaymentDetail;
+export default VendorDayDebitTransaction;
+
+const CustomBreadCrumbs = ({ crumbs = [] }) => {
+    const navigate = useNavigate()
+    const classes = useStyles()
+    if (crumbs.length <= 0) return null
+
+    return (
+        <Box className={classes.breadcrumbsContainer}>
+            <Breadcrumbs
+                style={{ fontSize: "1.15rem" }}
+                separator={<NavigateNextIcon fontSize="small" />}
+            >
+                {crumbs?.map((crumb, index) => {
+                    const isLast = index === crumbs.length - 1;
+                    return (
+                        <span key={index}>
+                            {!isLast ? (
+                                <Typography
+                                    onClick={() => navigate(crumb.link, { state: crumb.state })}
+                                    className={classes.link}
+                                    fontSize="inherit"
+                                >
+                                    {crumb.name}
+                                </Typography>
+                            ) : (
+                                <Typography color="text.primary" fontSize="inherit">
+                                    {crumb.name}
+                                </Typography>
+                            )}
+                        </span>
+                    );
+                })}
+            </Breadcrumbs>
+        </Box>
+    )
+}

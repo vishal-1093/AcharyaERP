@@ -140,7 +140,7 @@ const BRSTransactionDetail = () => {
     const parseDate = (raw) => {
         if (!raw) return '';
         const f1 = moment(raw, 'YYYY-MM-DD HH:mm:ss.SSS', true);
-        if (f1.isValid()) return f1.format('DD-MM-YYYY');
+        if (f1.isValid()) return f1.format('DD-MM-YYYY HH:mm:ss');
 
         const f2 = moment(raw, 'DD/MM/YYYY', true);
         if (f2.isValid()) return f2.format('DD-MM-YYYY');
@@ -173,7 +173,7 @@ const BRSTransactionDetail = () => {
         }
         return items.slice(startIndex, endIndex);
     };
-    
+
     return (
         <Box sx={{
             width: '100%',
@@ -208,7 +208,7 @@ const BRSTransactionDetail = () => {
                             startIcon={<PrintIcon />}
                             sx={{ mt: 2 }}
                         >
-                            {loading ? 'Preparing PDF...' : 'Print PDF'}
+                        Print PDF
                         </Button>
                     )}
                 </BlobProvider>
@@ -221,7 +221,7 @@ const BRSTransactionDetail = () => {
                 maxWidth: '800px',
                 margin: '10px auto',
             }}>
-                <Box sx={{
+                {/* <Box sx={{
                     p: 1.5,
                     backgroundColor: 'rgba(239, 83, 80, 0.08)',
                     borderLeft: '4px solid #ff5252',
@@ -235,14 +235,14 @@ const BRSTransactionDetail = () => {
                         gap: 1,
                         color: '#d32f2f'
                     }}>
-                        <InfoOutlinedIcon fontSize="small" color="error" /> 
+                        <InfoOutlinedIcon fontSize="small" color="error" />
                         <Box component="span" sx={{ fontWeight: 500 }}>
                             Note:
                         </Box>
                         The cashbook ledger balance and receipt/payment transactions are fetched from ERP automatically in real-time.
                         Please provide the bank balance as per the passbook for reconciliation.
                     </Typography>
-                </Box>
+                </Box> */}
                 <Box sx={{
                     p: 2,
                     backgroundColor: '#376a7d',
@@ -319,10 +319,10 @@ const BRSTransactionDetail = () => {
                                                 <TableBody>
                                                     {getPaginatedData('chqIssued').map((item) => (
                                                         <TableRow key={item?.id} hover>
-                                                            <TableCell>{item?.vochar_no}</TableCell>
-                                                            <TableCell>{item?.vochar_date ? moment(item?.vochar_date).format("DD-MM-YYYY") : ""}</TableCell>
+                                                            <TableCell>{item?.voucher_no}</TableCell>
+                                                            <TableCell>{item?.created_date ? moment(item?.created_date).format("DD-MM-YYYY") : ""}</TableCell>
                                                             <TableCell>{item?.pay_to}</TableCell>
-                                                            <TableCell align="right">{item?.amount}</TableCell>
+                                                            <TableCell align="right">{item?.credit}</TableCell>
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>
@@ -404,7 +404,7 @@ const BRSTransactionDetail = () => {
                                                     {getPaginatedData('chqDeposited').map((item) => (
                                                         <TableRow key={item?.id} hover>
                                                             <TableCell>{item?.dd_number}</TableCell>
-                                                            <TableCell>{item?.dd_date ? moment(item?.dd_date).format("DD-MM-YYYY") : ""}</TableCell>
+                                                            <TableCell>{item?.created_date  ? moment(item?.dd_date).format("DD-MM-YYYY") : ""}</TableCell>
                                                             <TableCell>{item?.bank_name}</TableCell>
                                                             <TableCell align="right">{item?.dd_amount}</TableCell>
                                                         </TableRow>
@@ -478,20 +478,30 @@ const BRSTransactionDetail = () => {
                                             <TableHead>
                                                 <TableRow sx={{ backgroundColor: '#f1f5f9' }}>
                                                     <TableCell sx={{ width: 100, minWidth: '100px' }} align="center">TRN Date</TableCell>
-                                                    <TableCell sx={{ width: 140, minWidth: '140px' }} align="center">TRN No</TableCell>
+                                                    <TableCell sx={{ width: 150, minWidth: '140px' }} align="center">TRN No</TableCell>
                                                     <TableCell sx={{ width: 140, minWidth: '140px' }} align="center">Order Id</TableCell>
-                                                    <TableCell sx={{ width: 80, minWidth: '80px' }} align="center">AUID</TableCell>
-                                                    <TableCell align="center" sx={{ width: 100, minWidth: '100px' }}>Amount</TableCell>
+                                                    <TableCell sx={{ width: 70, minWidth: '70px' }} align="center">AUID</TableCell>
+                                                    <TableCell align="center" sx={{ width: 80, minWidth: '80px' }}>Amount</TableCell>
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
                                                 {getPaginatedData('directCredits').map((item) => (
                                                     <TableRow key={item?.index} hover>
                                                         <TableCell align="center">{parseDate(item?.transaction_date)}</TableCell>
-                                                        <TableCell>{item?.cheque_dd_no}</TableCell>
+                                                        <TableCell
+                                                            sx={{
+                                                                maxWidth: 200,     
+                                                                whiteSpace: 'normal',  
+                                                                wordBreak: 'break-word',   
+                                                                lineHeight: 1.4,           
+                                                                fontSize: '13px',
+                                                            }}
+                                                        >
+                                                            {item?.cheque_dd_no}
+                                                        </TableCell>
                                                         <TableCell>{item?.order_id}</TableCell>
                                                         <TableCell>{item?.auid}</TableCell>
-                                                        <TableCell align="center">{item?.amount}</TableCell>
+                                                        <TableCell align="center">{item?.balance}</TableCell>
                                                     </TableRow>
                                                 ))}
                                             </TableBody>
@@ -564,6 +574,28 @@ const BRSTransactionDetail = () => {
                             )?.toFixed(2) || 0}
                         </Typography>
                     </Box>
+                </Box>
+                <Box sx={{
+                    p: 1.5,
+                    backgroundColor: 'rgba(239, 83, 80, 0.08)',
+                    borderLeft: '4px solid #ff5252',
+                    mt: 2,
+                    mb: 1,
+                    borderRadius: '0 4px 4px 0'
+                }}>
+                    <Typography variant="body2" sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        color: '#d32f2f'
+                    }}>
+                        <InfoOutlinedIcon fontSize="small" color="error" />
+                        <Box component="span" sx={{ fontWeight: 500 }}>
+                            Note:
+                        </Box>
+                        The cashbook ledger balance and receipt/payment transactions are fetched from ERP automatically in real-time.
+                        Please provide the bank balance as per the passbook for reconciliation.
+                    </Typography>
                 </Box>
             </Paper>
         </Box>

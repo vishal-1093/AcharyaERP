@@ -49,8 +49,7 @@ function PhotoUpload({
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message:
-          "Something went wrong! Unable to find the Student Attachment !!",
+        message: "Something went wrong! Unable to find the Image !!",
       });
       setAlertOpen(true);
       setImageLoading(false);

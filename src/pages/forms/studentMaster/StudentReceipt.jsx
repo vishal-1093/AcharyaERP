@@ -780,7 +780,7 @@ function StudentReceipt() {
           values.receivedIn === "USD"
             ? Math.round(Number(values.receivedAmount * inrValue.inr))
             : Math.round(Number(values.receivedAmount)),
-        bank_id: bankImportedDataById?.deposited_bank_id,
+        bank_id: bankImportedDataById?.deposited_bank_id ?? values.bankId,
       };
 
       const bit = {
