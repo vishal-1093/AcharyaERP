@@ -2078,6 +2078,10 @@ const SendWhatsApp = lazy(() => import("./pages/indeces/SendWhatsApp.jsx"));
 
 const EmployeeReport = lazy(() => import("./pages/indeces/EmployeeReport.jsx"));
 
+const EmployeeReportView = lazy(() =>
+  import("./pages/indeces/EmployeeReportView.jsx")
+);
+
 const Health = lazy(() => import("./pages/Health.jsx"));
 const SalarySheetMaster = lazy(() =>
   import("./pages/indeces/SalarySheetMaster.jsx")
@@ -10384,6 +10388,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeReport />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/employee-report-view"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeReportView />
               </Suspense>
             }
           />

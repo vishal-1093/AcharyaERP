@@ -42,6 +42,7 @@
     "react-export-table-to-excel": "^1.0.6",
     "react-icons": "^4.4.0",
     "react-image-file-resizer": "^0.4.8",
+    "react-lazy-load-image-component": "^1.6.3",
     "react-multi-date-picker": "^4.4.1",
     "react-number-to-words": "^1.0.5",
     "react-pdf-html": "^2.1.3",
