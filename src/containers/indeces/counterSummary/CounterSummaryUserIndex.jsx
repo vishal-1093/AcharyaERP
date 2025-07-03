@@ -79,8 +79,11 @@ function CounterSummaryUserIndex() {
             "closing": grandTotalClosing,
           };
           const pdfRows = res.data.data;
-          const list = [...res.data.data, totalRow];
-          setRows(list.map((li, index) => ({ ...li, id: index + 1 })));
+          const data = res.data.data;
+          if(data?.length > 0) {
+            const list = [...res.data.data, totalRow];
+            setRows(list.map((li, index) => ({ ...li, id: index + 1 })));
+          }
           setValues((prevState) => ({
             ...prevState,
             pdfRow:pdfRows,
