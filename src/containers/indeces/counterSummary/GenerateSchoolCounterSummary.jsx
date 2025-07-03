@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
 
 
 export const GenerateSchoolCounterSummary = (
-  data, startDate, endDate, cashTotal, ddTotal, onlineTotal, paymentTotal, closingTotal,usdCashTotal
+  data, startDate, endDate, cashTotal, ddTotal, onlineTotal, paymentTotal, closingTotal, usdCashTotal
 ) => {
 
   const DispayRow = ({ children }) => (
@@ -53,7 +53,8 @@ export const GenerateSchoolCounterSummary = (
     align,
     padding,
     customWidth = 1,
-    labelType
+    labelType,
+    fontSize
   }) => (
     <View
       style={{
@@ -64,13 +65,11 @@ export const GenerateSchoolCounterSummary = (
         borderColor: "black",
         outline: "none",
         padding: "2px",
-        fontSize: 9,
-        fontWeight: type == "h" ? "heavy" : "",
-        fontFamily: type == "h" ? "Times-Bold" : "",
+        fontSize: fontSize || 9,
         marginRight: right === 0 ? 1 : 0,
         backgroundColor: type == "h" ? "#33495E" : "",
         color: type == "h" ? "#fff" : "",
-        height:"30px"
+        height: "30px"
       }}
     >
       {labelType == "text" ? <Text style={{
@@ -206,7 +205,7 @@ export const GenerateSchoolCounterSummary = (
               <DisplayCells
                 key={i}
                 label={(obj?.schoolName)}
-                style="Times-Roman"
+                style={(obj?.schoolName?.toLowerCase() == "total" || obj?.schoolName?.toLowerCase() == "nrc" || obj?.schoolName?.toLowerCase() == "hos") ? "Times-Bold" : "Times-Roman"}
                 right={1}
                 bottom={1}
                 align="left"
@@ -215,9 +214,9 @@ export const GenerateSchoolCounterSummary = (
               />
               <DisplayCells
                 key={i}
-                label={Number((obj.INRDD % 1 !== 0 || (obj.INRONLINE % 1 !== 0) || 
-                (obj.INRCASH % 1 !== 0) || (obj.USDCASH % 1 !== 0)) ? (obj.INRDD + obj.INRONLINE + obj.INRCASH + obj.USDCASH)?.toFixed(2) : (obj.INRDD + obj.INRONLINE + obj.INRCASH + obj.USDCASH) || 0)}
-                style="Times-Roman"
+                label={Number((obj.INRDD % 1 !== 0 || (obj.INRONLINE % 1 !== 0) ||
+                  (obj.INRCASH % 1 !== 0) || (obj.USDCASH % 1 !== 0)) ? (obj.INRDD + obj.INRONLINE + obj.INRCASH + obj.USDCASH)?.toFixed(2) : (obj.INRDD + obj.INRONLINE + obj.INRCASH + obj.USDCASH) || 0)}
+                style={(obj?.schoolName?.toLowerCase() == "total" || obj?.schoolName?.toLowerCase() == "nrc" || obj?.schoolName?.toLowerCase() == "hos") ? "Times-Bold" : "Times-Roman"}
                 right={1}
                 bottom={1}
                 align="left"
@@ -227,7 +226,7 @@ export const GenerateSchoolCounterSummary = (
               <DisplayCells
                 key={i}
                 label={Number((obj.INRDD % 1 !== 0) ? (obj.INRDD)?.toFixed(2) : (obj.INRDD) || 0)}
-                style="Times-Roman"
+                style={(obj?.schoolName?.toLowerCase() == "total" || obj?.schoolName?.toLowerCase() == "nrc" || obj?.schoolName?.toLowerCase() == "hos") ? "Times-Bold" : "Times-Roman"}
                 right={1}
                 bottom={1}
                 align="right"
@@ -238,7 +237,7 @@ export const GenerateSchoolCounterSummary = (
               <DisplayCells
                 key={i}
                 label={Number((obj.INRONLINE % 1 !== 0) ? (obj.INRONLINE)?.toFixed(2) : (obj.INRONLINE) || 0)}
-                style="Times-Roman"
+                style={(obj?.schoolName?.toLowerCase() == "total" || obj?.schoolName?.toLowerCase() == "nrc" || obj?.schoolName?.toLowerCase() == "hos") ? "Times-Bold" : "Times-Roman"}
                 right={1}
                 bottom={1}
                 align="right"
@@ -249,7 +248,7 @@ export const GenerateSchoolCounterSummary = (
               <DisplayCells
                 key={i}
                 label={Number((obj.INRCASH % 1 !== 0) ? (obj.INRCASH)?.toFixed(2) : (obj.INRCASH) || 0)}
-                style="Times-Roman"
+                style={(obj?.schoolName?.toLowerCase() == "total" || obj?.schoolName?.toLowerCase() == "nrc" || obj?.schoolName?.toLowerCase() == "hos") ? "Times-Bold" : "Times-Roman"}
                 right={1}
                 bottom={1}
                 align="right"
@@ -260,7 +259,7 @@ export const GenerateSchoolCounterSummary = (
               <DisplayCells
                 key={i}
                 label={Number((obj.USDCASH % 1 !== 0) ? (obj.USDCASH)?.toFixed(2) : (obj.USDCASH) || 0)}
-                style="Times-Roman"
+                style={(obj?.schoolName?.toLowerCase() == "total" || obj?.schoolName?.toLowerCase() == "nrc" || obj?.schoolName?.toLowerCase() == "hos") ? "Times-Bold" : "Times-Roman"}
                 right={1}
                 bottom={1}
                 align="right"
@@ -271,7 +270,7 @@ export const GenerateSchoolCounterSummary = (
               <DisplayCells
                 key={i}
                 label={Number((obj?.payment % 1 !== 0) ? (obj.payment)?.toFixed(2) : (obj.payment) || 0)}
-                style="Times-Roman"
+                style={(obj?.schoolName?.toLowerCase() == "total" || obj?.schoolName?.toLowerCase() == "nrc" || obj?.schoolName?.toLowerCase() == "hos") ? "Times-Bold" : "Times-Roman"}
                 right={1}
                 bottom={1}
                 align="right"
@@ -281,7 +280,7 @@ export const GenerateSchoolCounterSummary = (
               <DisplayCells
                 key={i}
                 label={Number((obj?.INRCASH) - (obj?.payment)) % 1 !== 0 ? ((obj?.INRCASH) - (obj?.payment))?.toFixed(2) : ((obj?.INRCASH) - (obj?.payment)) || 0}
-                style="Times-Roman"
+                style={(obj?.schoolName?.toLowerCase() == "total" || obj?.schoolName?.toLowerCase() == "nrc" || obj?.schoolName?.toLowerCase() == "hos") ? "Times-Bold" : "Times-Roman"}
                 right={1}
                 bottom={1}
                 align="right"
@@ -291,7 +290,7 @@ export const GenerateSchoolCounterSummary = (
               <DisplayCells
                 key={i}
                 label={Number((obj?.INRCASH + obj?.INRDD + obj?.INRONLINE + obj?.USDCASH) % 1 !== 0 ? (obj?.INRCASH + obj?.INRDD + obj?.INRONLINE + obj?.USDCASH)?.toFixed(2) : (obj?.INRCASH + obj?.INRDD + obj?.INRONLINE + obj?.USDCASH)) || 0}
-                style="Times-Roman"
+                style={(obj?.schoolName?.toLowerCase() == "total" || obj?.schoolName?.toLowerCase() == "nrc" || obj?.schoolName?.toLowerCase() == "hos") ? "Times-Bold" : "Times-Roman"}
                 right={1}
                 bottom={1}
                 align="right"
@@ -309,25 +308,28 @@ export const GenerateSchoolCounterSummary = (
             bottom={1}
             align="center"
             labelType="text"
+            fontSize="10"
           />
           <DisplayCells
-            label={"Grand TOTAL"}
+            label={"GRAND TOTAL"}
             style="Times-Bold"
             right={1}
             bottom={1}
             align="left"
             customWidth={3}
             labelType="text"
+            fontSize="10"
           />
           <DisplayCells
-            label={Number((ddTotal% 1 !== 0 || (onlineTotal % 1 !== 0) || 
-                (cashTotal % 1 !== 0) || (usdCashTotal % 1 !== 0)) ? (ddTotal+ onlineTotal + cashTotal + usdCashTotal)?.toFixed(2) : (ddTotal + onlineTotal + cashTotal + usdCashTotal) || 0)}
+            label={Number((ddTotal % 1 !== 0 || (onlineTotal % 1 !== 0) ||
+              (cashTotal % 1 !== 0) || (usdCashTotal % 1 !== 0)) ? (ddTotal + onlineTotal + cashTotal + usdCashTotal)?.toFixed(2) : (ddTotal + onlineTotal + cashTotal + usdCashTotal) || 0)}
             style="Times-Bold"
             right={1}
             bottom={1}
             align="left"
             customWidth={3}
             labelType="text"
+            fontSize="10"
           />
           <DisplayCells
             label={Number(ddTotal % 1 !== 0 ? ddTotal?.toFixed(2) : ddTotal) || 0}
@@ -338,6 +340,7 @@ export const GenerateSchoolCounterSummary = (
             padding="15px"
             customWidth={2}
             labelType="text"
+            fontSize="10"
           />
           <DisplayCells
             label={Number(onlineTotal % 1 !== 0 ? onlineTotal?.toFixed(2) : onlineTotal) || 0}
@@ -348,8 +351,9 @@ export const GenerateSchoolCounterSummary = (
             padding="15px"
             customWidth={3}
             labelType="text"
+            fontSize="10"
           />
-          
+
           <DisplayCells
             label={Number(cashTotal % 1 !== 0 ? cashTotal?.toFixed(2) : cashTotal) || 0}
             style="Times-Bold"
@@ -359,9 +363,10 @@ export const GenerateSchoolCounterSummary = (
             padding="15px"
             customWidth={3}
             labelType="text"
+            fontSize="10"
           />
 
-            <DisplayCells
+          <DisplayCells
             label={Number(usdCashTotal % 1 !== 0 ? usdCashTotal?.toFixed(2) : usdCashTotal) || 0}
             style="Times-Bold"
             right={1}
@@ -370,6 +375,7 @@ export const GenerateSchoolCounterSummary = (
             padding="15px"
             customWidth={3}
             labelType="text"
+            fontSize="10"
           />
 
           <DisplayCells
@@ -380,6 +386,7 @@ export const GenerateSchoolCounterSummary = (
             align="right"
             customWidth={3}
             labelType="text"
+            fontSize="10"
           />
 
           <DisplayCells
@@ -390,6 +397,7 @@ export const GenerateSchoolCounterSummary = (
             align="right"
             customWidth={4}
             labelType="text"
+            fontSize="10"
           />
           <DisplayCells
             label={Number((cashTotal + ddTotal + onlineTotal + usdCashTotal) % 1 !== 0 ? (cashTotal + ddTotal + onlineTotal + usdCashTotal)?.toFixed(2) : (cashTotal + ddTotal + onlineTotal + usdCashTotal)) || 0}
@@ -399,6 +407,7 @@ export const GenerateSchoolCounterSummary = (
             align="right"
             customWidth={4}
             labelType="text"
+            fontSize="10"
           />
         </DispayRow>
       </View>
@@ -409,12 +418,12 @@ export const GenerateSchoolCounterSummary = (
     try {
       const HallTicketCopy = (
         <Document title={`INSTITUTE RECEIPT SUMMARY`}>
-            <Page
-              size="A4"
-              style={{ ...styles.pageLayout }}
-            >
-              <ReportData listData={data} cashTotal={cashTotal} ddTotal={ddTotal} onlineTotal={onlineTotal} paymentTotal={paymentTotal} closingTotal={closingTotal} />
-            </Page>
+          <Page
+            size="A4"
+            style={{ ...styles.pageLayout }}
+          >
+            <ReportData listData={data} cashTotal={cashTotal} ddTotal={ddTotal} onlineTotal={onlineTotal} paymentTotal={paymentTotal} closingTotal={closingTotal} />
+          </Page>
         </Document>
       );
       const blob = await pdf(HallTicketCopy).toBlob();
