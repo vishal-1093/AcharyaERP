@@ -3403,7 +3403,6 @@ const IncentiveApplication = () => {
                         <CustomMonthYearPicker
                           name="financeMonthYear"
                           label="Month Year"
-                          minDate={new Date()}
                           value={financeMonthYear}
                           handleChangeAdvance={handleDatePicker}
                           helperText=""

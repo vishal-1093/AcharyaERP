@@ -5,7 +5,6 @@ import {
   Button,
   Grid,
   Typography,
-  IconButton,
   Tooltip,
   tooltipClasses,
 } from "@mui/material";
@@ -85,12 +84,12 @@ function CounterSummarySchoolIndex() {
     try {
       const res = await axios.get(`/api/institute/fetchAllOrgDetail?page=0&page_size=10000&sort=org_type`);
       if (res.status == 200 || res.status == 201) {
-        const orgNameLists = res.data.data.Paginated_data.content?.reverse()?.map(li => li.org_name);
+        const orgNameLists = res.data.data.Paginated_data.content?.map(li => li.org_name)?.sort();
         //Make hostel element in last
         const hostelObj = orgNameLists.find(obj => obj?.toLowerCase()?.includes("hostel"));
-        orgNameLists[orgNameLists.length - 2] = orgNameLists[orgNameLists.length - 1];
-        orgNameLists[orgNameLists.length - 1] = hostelObj;
-        getSchoolList(orgNameLists, indexList);
+        const filtered = orgNameLists.filter((ele) => !ele.toLowerCase().includes("hostel"));
+        const list = [...filtered, hostelObj]
+        getSchoolList(list, indexList);
       }
     } catch (error) {
       console.log(error)
@@ -109,6 +108,7 @@ function CounterSummarySchoolIndex() {
 
     setLoading(false);
     const aitOrgNameSchoolList = schoolList.filter((obj) => obj.orgName.toLowerCase().includes("acharya institutes"));
+    const withoutAitOrgNameSchoolList = schoolList.filter((obj) => !obj.orgName.toLowerCase().includes("acharya institutes"));
     const totalCash = aitOrgNameSchoolList.reduce((sum, acc) => sum + acc.INRCASH, 0);
     const totalUsdCash = aitOrgNameSchoolList.reduce((sum, acc) => sum + acc.USDCASH, 0);
     const totalDD = aitOrgNameSchoolList.reduce((sum, acc) => sum + acc.INRDD, 0);
@@ -126,7 +126,7 @@ function CounterSummarySchoolIndex() {
       "closing": totalClosing,
     };
 
-    if (aitOrgNameSchoolList.length > 1) {
+    if (aitOrgNameSchoolList.length > 0 && withoutAitOrgNameSchoolList.length > 0) {
       schoolList.splice(aitOrgNameSchoolList.length, 0, totalRow)
     };
 
@@ -147,10 +147,11 @@ function CounterSummarySchoolIndex() {
       "closing": grandTotalClosing,
     };
     const pdfRows = schoolList;
-    if (schoolList.length > 1) {
+    if (schoolList.length > 0) {
       const list = [...schoolList, grandTotalRow];
       setRows(list.map((li, index) => ({ ...li, id: index + 1 })));
     };
+
     setValues((prevState) => ({
       ...prevState,
       pdfRow: pdfRows,
@@ -382,6 +383,10 @@ function CounterSummarySchoolIndex() {
       valueGetter: (value, row) => (Number((row?.INRCASH - row?.payment) % 1 !== 0 ? (row?.INRCASH - row?.payment)?.toFixed(2) : (row?.INRCASH - row?.payment)) || 0),
       renderCell: (params) => {
         if (params.row.schoolName == "TOTAL") {
+          return (
+            <Typography variant="subtitle2">{(Number((params.row?.INRCASH - params.row?.payment) % 1 !== 0 ? (params.row?.INRCASH - params.row?.payment)?.toFixed(2) : (params.row?.INRCASH - params.row?.payment)) || 0)}</Typography>
+          );
+        } else if (params.row.schoolName == "NRC") {
           return (
             <Typography variant="subtitle2">{(Number((params.row?.INRCASH - params.row?.payment) % 1 !== 0 ? (params.row?.INRCASH - params.row?.payment)?.toFixed(2) : (params.row?.INRCASH - params.row?.payment)) || 0)}</Typography>
           );
