@@ -49,7 +49,7 @@ function PhotoUpload({
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: "Something went wrong! Unable to find the Image !!",
+        message: "Something went wrong! Unable to find the Image!!",
       });
       setAlertOpen(true);
       setImageLoading(false);
@@ -166,7 +166,7 @@ function PhotoUpload({
         setAlertMessage({
           severity: "error",
           message:
-            "Some thing went wrong !! unable to  uploaded the Staff Attachment",
+            "Something went wrong !! unable to  uploaded the Image!!",
         });
         setAlertOpen(true);
       });
