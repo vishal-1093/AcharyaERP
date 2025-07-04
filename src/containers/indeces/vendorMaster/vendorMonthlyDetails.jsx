@@ -79,13 +79,21 @@ const VendorMonthlyDetails = () => {
   }, [currFcYear?.fcYearId])
 
   const getData = async () => {
-    const { voucherHeadId, fcYearId, schoolId } = queryValues
-    const baseUrl = "/api/finance/getLedgerSummaryMonthlyWise"
-    const params = {
+    const { voucherHeadId, fcYearId, schoolId, ledgerType, isTotalRow } = queryValues
+    const baseUrl = isTotalRow ? "api/finance/getMonthWiseSummary" : "/api/finance/getLedgerSummaryMonthlyWise"
+    let params = {}
+    if(isTotalRow){
+      params={
+      ...(voucherHeadId && { voucherHeadNewId: voucherHeadId }),
+      ...(fcYearId && { fcYearId: currFcYear?.fcYearId }),
+      }
+     }else{
+       params={
       ...(voucherHeadId && { voucherHeadNewId: voucherHeadId }),
       ...(fcYearId && { fcYearId: currFcYear?.fcYearId }),
       ...(schoolId && { schoolId })
-    }
+      }
+     }
     setLoading(true)
     await axios
       .get(baseUrl, { params })
@@ -99,6 +107,7 @@ const VendorMonthlyDetails = () => {
             month_name: el?.month_name,
             school_id: el?.school_id,
             month: el?.month,
+            year: queryValues?.ledgerType ? el?.year : "",
             openingBalance: formatDrCr(el?.openingBalance, queryValues?.ledgerType),
             closingBalance: formatDrCr(el?.closingBalance, queryValues?.ledgerType),
           })
@@ -130,11 +139,15 @@ const VendorMonthlyDetails = () => {
   };
 
   const handleRowClick = (row) => {
-    const { month, month_name } = row
-    const query = { ...queryValues, fcYear: currFcYear?.fcYear, fcYearId: currFcYear?.fcYearId, month, month_name }
-    if (queryValues?.ledgerType !== 'EARNINGS') {
+    const { month, month_name, year } = row
+    const query = { ...queryValues, fcYear: currFcYear?.fcYear, fcYearId: currFcYear?.fcYearId, month, month_name, year: year || ""  }
+    if (queryValues?.isTotalRow) {
+      navigate('/Accounts-ledger-monthly-institute-transaction', { state: query })
+    }else{
+      if (queryValues?.ledgerType !== "EARNINGS") {
       navigate('/Accounts-ledger-day-transaction', { state: query })
     }
+  }
   };
 
   const handlePreviousOpeningBalance = () => {
@@ -228,6 +241,7 @@ const VendorMonthlyDetails = () => {
       return value;
     }
   };
+
 
   return (
 
@@ -341,10 +355,10 @@ const VendorMonthlyDetails = () => {
               color: 'white',
             }}>
               <Typography variant="h5" sx={{ fontWeight: 600, textAlign: 'center' }}>
-                {rows?.schoolName}
+                {queryValues?.isTotalRow ? queryValues?.voucherHeadName : rows?.schoolName}
               </Typography>
               <Typography variant="subtitle1" sx={{ textAlign: 'center' }}>
-                {`${queryValues?.voucherHeadName} Ledger for FY ${currFcYear?.fcYear}`}
+                {queryValues?.isTotalRow ? `FY ${currFcYear?.fcYear}`  :`${queryValues?.voucherHeadName} Ledger for FY ${currFcYear?.fcYear}`}
               </Typography>
               <Typography variant="body1" sx={{ textAlign: 'center', opacity: 0.9 }}>
                 {`As on ${moment().format('DD-MM-YYYY')}`}
