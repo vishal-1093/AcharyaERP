@@ -388,7 +388,7 @@ function PrintIndex() {
           setAlertMessage({
             severity: "error",
             message:
-              "Something went wrong! Unable to find the Student Attachment !!",
+              "Something went wrong! Unable to find the Image!!",
           });
         }
         setAlertOpen(true);

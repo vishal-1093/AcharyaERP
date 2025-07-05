@@ -41,7 +41,7 @@ function PhotoUpload({ empId, empImagePath, handleAddPhotoModal, getData }) {
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: "Something went wrong! Unable to find the Employee Attachment !!",
+        message: "Something went wrong! Unable to find the Image!!",
       });
       setAlertOpen(true);
       setImageLoading(false);
@@ -158,7 +158,7 @@ function PhotoUpload({ empId, empImagePath, handleAddPhotoModal, getData }) {
         setAlertMessage({
           severity: "error",
           message:
-            "Something went wrong! Unable to upload the Employee Attachment.",
+            "Something went wrong! Unable to upload the Image!!",
         });
         setAlertOpen(true);
       });

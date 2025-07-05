@@ -21,6 +21,8 @@ import moment from "moment";
 import LinkIcon from "@mui/icons-material/Link";
 import ModalWrapper from "../../../components/ModalWrapper";
 import QRCode from "react-qr-code";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -35,8 +37,24 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     textAlign: "justify",
   },
 }));
+const filterLists = [
+  { label: "1 Month", value: "1MONTH" },
+  { label: "6 Months", value: "6MONTHS" },
+  { label: "Current Year", value: "1YEAR" },
+  { label: "Custom Date", value: "custom" },
+];
+const initialValues = {
+  requestType: null,
+  filterList: filterLists,
+  filter: filterLists[2].value,
+  startDate: "",
+  endDate: "",
+  school_Id: "",
+  fee_payment_window_id: ""
+};
 
 function FeePaymentWindowIndex() {
+  const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -49,14 +67,15 @@ function FeePaymentWindowIndex() {
   const [qrData, setQrData] = useState([]);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
+  const [isLoading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const domainUrl = window.location.port
     ? window.location.protocol +
-      "//" +
-      window.location.hostname +
-      ":" +
-      window.location.port
+    "//" +
+    window.location.hostname +
+    ":" +
+    window.location.port
     : window.location.protocol + "//" + window.location.hostname;
 
   const columns = [
@@ -130,7 +149,7 @@ function FeePaymentWindowIndex() {
       renderCell: (params) => (
         <Typography
           variant="subtitle2"
-          onClick={() => handleTotalAmountHistory(params?.row)}
+          onClick={() => handleHistory(params?.row)}
           sx={{
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -335,21 +354,62 @@ function FeePaymentWindowIndex() {
       })
       .catch((err) => console.error(err));
   };
-  const handleTotalAmountHistory = async (params) => {
-    setHistoryOpen(true);
+
+  useEffect(() => {
+    handleTotalAmountHistory();
+  }, [values?.filter, values.fee_payment_window_id]);
+
+  useEffect(() => {
+    const hasBothDates = values.startDate && values.endDate;
+
+    if (values.fee_payment_window_id && hasBothDates) {
+      handleTotalAmountHistory();
+    }
+  }, [values.startDate, values.endDate]);
+
+  const handleTotalAmountHistory = async () => {
+    setLoading(true);
+    if (!values.fee_payment_window_id) return;
+
+    const requestData = {
+      fee_payment_window_id: values.fee_payment_window_id,
+      ...(values.startDate && {
+        fromDate: moment(values.startDate).format("YYYY-MM-DD"),
+      }),
+      ...(values.endDate && {
+        toDate: moment(values.endDate).format("YYYY-MM-DD"),
+      }),
+      ...(values.filter && values.filter !== "custom" && values.filter !== "1YEAR" && {
+        filter: values.filter,
+      }),
+    };
+    const queryString = new URLSearchParams(requestData).toString();
+
     try {
       const response = await axios.get(
-        `/api/finance/getBulkPayTransaction?fee_payment_window_id=${params.id}`
+        `/api/finance/getBulkPayTransaction?${queryString}`
       );
+
       const data = response.data.data.sort(
         (a, b) => new Date(b.transaction_date) - new Date(a.transaction_date)
       );
+      setLoading(false);
       setHistoryData(data);
     } catch (err) {
       console.error(err);
+      setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleHistory = (params) => {
+    setHistoryOpen((pev) => !pev)
+    setValues((prev) => ({
+      ...prev,
+      fee_payment_window_id: params.id,
+    }));
+  };
   const handleActive = async (params) => {
     const id = params.row.id;
     setModalOpen(true);
@@ -378,21 +438,21 @@ function FeePaymentWindowIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        })
+        title: "Deactivate",
+        message: "Do you want to make it Inactive?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      })
       : setModalContent({
-          title: "Activate",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ],
-        });
+        title: "Activate",
+        message: "Do you want to make it Active?",
+        buttons: [
+          { name: "No", color: "primary", func: () => { } },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ],
+      });
   };
 
   const handleView = async (params) => {
@@ -413,7 +473,13 @@ function FeePaymentWindowIndex() {
     setQrOpen(true);
     setQrData(params.row);
   };
-
+  const handleChangeAdvance = async (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+      ...(name === "filter" && { startDate: "", endDate: "" })
+    }));
+  };
   return (
     <>
       <CustomModal
@@ -456,17 +522,72 @@ function FeePaymentWindowIndex() {
       </Box>
       <ModalWrapper
         open={historyOpen}
-        setOpen={setHistoryOpen}
+        setOpen={() => {
+          setHistoryOpen((prev) => !prev);
+          setValues((prev) => ({
+            ...prev,
+            startDate: "",
+            endDate: "",
+            filter: filterLists[2].value,
+          }));
+        }}
         title={
           historyData[0]?.voucher_head
             ? `Collected Amount For ${historyData[0].voucher_head}`
             : "Collected Amount"
         }
       >
+        <Box>
+          {/* <FormWrapper> */}
+          <Grid
+            container
+            justifyContent="flex-end"
+            rowSpacing={2}
+            columnSpacing={4}
+            mb={2}
+          >
+            <Grid item xs={12} md={2}>
+              <CustomAutocomplete
+                name="filter"
+                label="Filter"
+                value={values.filter}
+                options={values.filterList || []}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+
+            {values.filter === "custom" && (
+              <>
+                <Grid item xs={12} md={2}>
+                  <CustomDatePicker
+                    name="startDate"
+                    label="From Date"
+                    value={values.startDate}
+                    handleChangeAdvance={handleChangeAdvance}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={2}>
+                  <CustomDatePicker
+                    name="endDate"
+                    label="To Date"
+                    value={values.endDate}
+                    handleChangeAdvance={handleChangeAdvance}
+                    disabled={!values.startDate}
+                    required
+                  />
+                </Grid>
+              </>
+            )}
+          </Grid>
+          {/* </FormWrapper> */}
+        </Box>
         <GridIndex
           rows={historyData}
           columns={amountHistoryColumns}
           getRowId={(row) => row?.razor_pay_transaction_id}
+          loading={isLoading}
         />
       </ModalWrapper>
     </>

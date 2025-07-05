@@ -1,11 +1,12 @@
 import { useState, useEffect, lazy } from "react";
 import {
-  Box, Grid, Button
+  Box, Grid, Button,Typography
 } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs.js";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import { makeStyles } from "@mui/styles";
 import FormGroup from "@mui/material/FormGroup";
 import useAlert from "../../hooks/useAlert.js";
 import axios from "../../services/Api.js";
@@ -20,6 +21,18 @@ const GridIndex = lazy(() => import("../../components/GridIndex.jsx"));
 const CustomFileInput = lazy(() =>
   import("../../components/Inputs/CustomFileInput.jsx")
 );
+
+const style = makeStyles((theme) => ({
+  main: {
+    padding:"20px",
+    transition: 'transform 0.3s ease-in-out',
+    '&:hover': {
+      transform: 'scale(1.1)',
+    },
+    backgroundColor: "#eceff1",
+    cursor: "pointer"
+  }
+}));
 
 const yearLists = [
   { label: "1/0", value: "1/0" },
@@ -49,6 +62,11 @@ const semLists = [
   { label: "6/12", value: "6/12" }
 ];
 
+const recipientTypeLists = [
+  {label: "Students", value: "STUDENT"},
+  {label: "Staff", value: "STAFF"},
+];
+
 const initialState = {
   acYear: null,
   acYearList: [],
@@ -64,9 +82,7 @@ const initialState = {
   yearSem: "",
   yearSemLists: [],
   whatsappTemplate: null,
-  whatsappTemplateList: [],
   feeAdmissionCategory: null,
-  feeAdmissionCategoryList: [],
   programSpecilizationDetail: null,
   studentList: [],
   checked: false,
@@ -76,16 +92,18 @@ const initialState = {
   commencementId: null,
   commencementList: [],
   attachment: null,
-  fileUrl: null
+  fileUrl: null,
+  recipientType: null
 };
 
 const SendWhatsApp = () => {
   const [{ acYear, acYearList, schoolId, loading, schoolList, programId, programmList, programSpecializationId, programmeSpecializationList, yearSem, yearSemLists,
     whatsappTemplate, whatsappTemplateList, feeAdmissionCategory, feeAdmissionCategoryList, studentList, checked, dateAndTemplateDetail, isPreviewModalOpen, commencementId, commencementList, content,
-    attachment, fileUrl
+    attachment, fileUrl,recipientType
   }, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+  const boxStyle = style();
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
 
   useEffect(() => {
@@ -272,7 +290,7 @@ const SendWhatsApp = () => {
       if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          whatsappTemplateList: res.data.data.map((ele) => ({ value: ele.whatsappTemplateId, label: ele.templateName, content: ele.content }))
+          whatsappTemplateList: res.data.data.map((ele) => ({ value: ele.whatsappTemplateId, label: ele.templateName, content: ele.content,recipientType:ele.recipientType }))
         }))
       }
     } catch (error) {
@@ -411,7 +429,6 @@ const SendWhatsApp = () => {
         }
       )
         .then((res) => {
-          console.log("res=========", res)
           const file = new Blob([res.data], { type: "application/pdf" });
           const url = URL.createObjectURL(file);
           setState((prevState) => ({
@@ -438,14 +455,48 @@ const SendWhatsApp = () => {
     }));
   };
 
+  const handleCard= (cardObj) => {
+    console.log("obj===========",cardObj);
+    setState((prevState) => ({
+      ...prevState,
+      recipientType: cardObj.recipientType,
+    }));
+  };
+
   return (
     <Box
       sx={{
-        position: "relative"
+        position: "relative",
+        marginLeft:"20px"
       }}
     >
-      <FormWrapper>
+
+      <Box mt={2} mb={2}>
+        <Grid container rowSpacing={3} columnSpacing={{ xs: 3 }}>
+          {whatsappTemplateList.map((li, index) => (<Grid item xs={12} md={3} key={index}>
+            <Box className={boxStyle.main} sx={{ boxShadow: 2 }} onClick={() =>handleCard(li)}>
+              <Typography variant="subtitle2" sx={{ textAlign: "center"}}>{(li.label)?.toUpperCase()}</Typography>
+              <Box p={2} sx={{marginTop:"10px",borderRadius:"10px",backgroundColor:"#fff"}}>
+              <Typography variant="subtitle2" sx={{ textAlign: "justify" }}>{li.content ? (li.content)?.replace('{{lastdate}}',"DD-MM-YYYY") : ""}</Typography>
+              </Box>
+            </Box>
+          </Grid>
+          ))}
+        </Grid>
+      </Box>
+
+            <FormWrapper>
         <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
+                  <Grid item xs={12} md={2}>
+          <CustomAutocomplete
+            name="recipientType"
+            value={recipientType || ""}
+            label="Recipient Type"
+            handleChangeAdvance={handleChangeAdvance}
+            options={recipientTypeLists || []}
+            required
+          />
+        </Grid>
           <Grid item xs={12} md={2}>
             <CustomAutocomplete
               name="acYear"
@@ -547,7 +598,7 @@ const SendWhatsApp = () => {
               Submit
             </Button>
           </Grid>
-          <Grid item xs={12} md={whatsappTemplate == 2 ? 1 : 3} align="right">
+          <Grid item xs={12} md={1} align="right">
             <Button
               variant="contained"
               disableElevation
@@ -560,13 +611,13 @@ const SendWhatsApp = () => {
         </Grid>
       </FormWrapper>
 
-      <Box sx={{ position: "absolute", width: "100%" }}>
+      {studentList?.length > 0 && <Box sx={{ position: "absolute", width: "100%" }}>
         <GridIndex rows={studentList}
           columns={columns}
           columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel}
           loading={loading} />
-      </Box>
+      </Box>}
       <ModalWrapper
         title="WhatsApp Template"
         maxWidth={whatsappTemplate == 1 ? 500 : 700}
