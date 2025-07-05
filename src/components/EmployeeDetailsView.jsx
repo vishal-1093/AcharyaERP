@@ -408,6 +408,7 @@ function EmployeeDetailsView() {
 
           const { encryptedEmployeeDetails } = res.data.data;
           const decryptData = decryptEncryptedData(encryptedEmployeeDetails);
+
           setData(decryptData);
           setJobDetailsData({
             gender: decryptData.gender,
