@@ -221,14 +221,14 @@ function PrintIndex() {
           setAlertMessage({
             severity: "error",
             message:
-              "Something went wrong! Unable to find the Employee Attachment !!",
+              "Something went wrong! Unable to find the Image!!",
           });
           setAlertOpen(true);
           continue;
         } else {
           setAlertMessage({
             severity: "error",
-            message: "Something went wrong! Unable to find the Employee Attachment !!",
+            message: "Something went wrong! Unable to find the Image!!",
           });
         }
         setAlertOpen(true);
