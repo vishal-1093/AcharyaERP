@@ -123,7 +123,7 @@ const VendorMonthlyDetails = () => {
           totalDebit: data?.totalDebit,
           // openingBalance: data?.openingBalance,
           schoolName: data?.schoolName,
-          closingBalance: data?.closingBalance
+          closingBalance: formatCurrency(data?.closingBalance)
         });
         setLoading(false)
       })

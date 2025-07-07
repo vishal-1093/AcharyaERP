@@ -159,7 +159,7 @@ const LedgerMonthlyInstTransaction = () => {
     const formatDrCr = (value, ledgerType) => {
         const absVal = Math.abs(value);
 
-        if (value === 0) return "0";
+        if (value === 0) return "0.00";
 
         if (ledgerType === "VENDOR" || ledgerType === "INFLOW") {
             return value < 0 ? `${absVal} Dr` : `${absVal} Cr`;
