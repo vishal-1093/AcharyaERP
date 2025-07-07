@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  Button,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -141,7 +143,6 @@ const AttendanceTable = () => {
   const [data, setData] = useState([]);
   const [acYearOptions, setAcyearOptions] = useState([]);
   const [SectionOptions, setSectionOptions] = useState([]);
-  const [batchOptions, setBatchOptions] = useState([]);
   const [programOptions, setprogramOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [values, setValues] = useState({
@@ -150,15 +151,23 @@ const AttendanceTable = () => {
     program: "",
     sem: "",
     section: "",
-    batch: "",
-    batchSec: "Section",
   });
+  const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    getData();
+    getacyear();
+    getSchoolDetails();
   }, []);
+
+  useEffect(() => {
+    getPrograms();
+  }, [values.schoolId]);
+
+  useEffect(() => {
+    getsection();
+  }, [values.academicYear, values.program, values.sem]);
 
   const getSchoolDetails = async () => {
     await axios
@@ -225,6 +234,24 @@ const AttendanceTable = () => {
     }
   };
 
+  const getsection = async () => {
+    if (values.academicYear && values.program && values.sem) {
+      await axios
+        .get(
+          `/api/academic/sectionDetailsByAcademicYearAndSpecializationId/${values.academicYear}/${values.program}/${values.sem}`
+        )
+        .then((res) => {
+          setSectionOptions(
+            res.data.data.map((obj) => ({
+              value: obj.section_id,
+              label: obj.section_name,
+            }))
+          );
+        })
+        .catch((error) => console.error(error));
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setValues((prevValues) => ({
@@ -245,6 +272,8 @@ const AttendanceTable = () => {
       (program) => program.value === values.program
     );
 
+    setLoading(true);
+
     try {
       const response = await axios.get(
         `/api/student/overallAttendanceInYearOrSem/${values.academicYear}/${selectedProgram.program_assignment_id}/${selectedProgram.program_id}/${selectedProgram.value}/${values.section}/${values.sem}`
@@ -252,30 +281,20 @@ const AttendanceTable = () => {
 
       if (response.data.data.length > 0) {
         setData(response.data.data);
+      } else {
+        setData([]);
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Box padding={2}>
       <Grid container rowSpacing={1.5} columnSpacing={2}>
-        {/* <Grid item xs={12} md={2.4}>
-              <CustomSelect
-                name="batchSec"
-                value={values.batchSec}
-                label="Batch/Section"
-                items={[
-                  { label: "Batch", value: "Batch" },
-                  { label: "Section", value: "Section" },
-                ]}
-                handleChange={handleChange}
-                disabled={Data.length > 0}
-              />
-            </Grid> */}
-
-        <Grid item xs={12} md={2.4}>
+        <Grid item xs={12} md={2}>
           <CustomSelect
             name="academicYear"
             label="Academic Year*"
@@ -286,7 +305,7 @@ const AttendanceTable = () => {
         </Grid>
 
         <>
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={2}>
             <CustomAutocomplete
               name="schoolId"
               label="School*"
@@ -296,7 +315,7 @@ const AttendanceTable = () => {
             />
           </Grid>
 
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={2}>
             <CustomAutocomplete
               name="program"
               label="Program Major*"
@@ -304,18 +323,10 @@ const AttendanceTable = () => {
               options={programOptions}
               handleChangeAdvance={handleChangeAdvance}
             />
-            {/* <CustomSelect
-                  name="program"
-                  label="Program Major*"
-                  value={values.program}
-                  items={programOptions}
-                  handleChange={handleChange}
-                  disabled={Data.length > 0}
-                /> */}
           </Grid>
         </>
 
-        <Grid item xs={12} md={2.4}>
+        <Grid item xs={12} md={2}>
           <CustomSelect
             name="sem"
             value={values.sem}
@@ -332,7 +343,7 @@ const AttendanceTable = () => {
           />
         </Grid>
 
-        <Grid item xs={12} md={2.4}>
+        <Grid item xs={12} md={2}>
           <CustomSelect
             name="section"
             label="Section"
@@ -341,45 +352,68 @@ const AttendanceTable = () => {
             handleChange={handleChange}
           />
         </Grid>
-      </Grid>
 
-      <TableContainer
-        component={Paper}
-        sx={{
-          mt: 1,
-          borderRadius: 3,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-          fontFamily: `"Inter", "Roboto", "Segoe UI", sans-serif`,
-        }}
-      >
-        <Table>
-          <TableHead sx={{ backgroundColor: "#f0f4f8" }}>
-            <TableRow>
-              <TableCell />
-              <TableCell sx={{ fontWeight: 700, color: "#2e3a59" }}>
-                AUID
-              </TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "#2e3a59" }}>
-                USN
-              </TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "#2e3a59" }}>
-                Student Name
-              </TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "#2e3a59" }}>
-                Year/Sem
-              </TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "#2e3a59" }}>
-                Overall Attendance
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((student, idx) => (
-              <Row key={idx} student={student} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+        <Grid item xs={12} md={2}>
+          <Button
+            color="success"
+            variant="contained"
+            sx={{ borderRadius: 2 }}
+            onClick={getData}
+          >
+            {loading ? (
+              <CircularProgress
+                size={25}
+                color="blue"
+                style={{ margin: "2px 13px" }}
+              />
+            ) : (
+              <strong>{"Submit"}</strong>
+            )}
+          </Button>
+        </Grid>
+
+        <Grid item xs={12}>
+          {data?.length > 0 && (
+            <TableContainer
+              component={Paper}
+              sx={{
+                mt: 1,
+                borderRadius: 3,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                fontFamily: `"Inter", "Roboto", "Segoe UI", sans-serif`,
+              }}
+            >
+              <Table>
+                <TableHead sx={{ backgroundColor: "#f0f4f8" }}>
+                  <TableRow>
+                    <TableCell />
+                    <TableCell sx={{ fontWeight: 700, color: "#2e3a59" }}>
+                      AUID
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: "#2e3a59" }}>
+                      USN
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: "#2e3a59" }}>
+                      Student Name
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: "#2e3a59" }}>
+                      Year/Sem
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: "#2e3a59" }}>
+                      Overall Attendance
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.map((student, idx) => (
+                    <Row key={idx} student={student} />
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </Grid>
+      </Grid>
     </Box>
   );
 };
