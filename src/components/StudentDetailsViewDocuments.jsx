@@ -372,6 +372,7 @@ const StudentDetailsViewDocuments = ({
           setValues((prev) => ({
             ...prev,
             academicDocuments: "",
+            photo: ""
           }));
           setAlertMessage({
             severity: "success",
@@ -563,14 +564,17 @@ const StudentDetailsViewDocuments = ({
                     </Grid>}
                     <Grid item xs={12} md={4}></Grid>
 
-                    <Grid item xs={12} md={4}>
-                      <img
-                        src={Image}
-                        alt="Uploaded"
-                        height={200}
-                        width={200}
-                      />
-                    </Grid>
+                    {Image && (
+                      <Grid item xs={12} md={4}>
+                        <img
+                          src={Image}
+                          alt="Uploaded"
+                          height={200}
+                          width={200}
+                          style={{ objectFit: "cover", borderRadius: 4 }}
+                        />
+                      </Grid>
+                    )}
                   </Grid>
                 </CardContent>
               </Card>
@@ -741,24 +745,24 @@ const StudentDetailsViewDocuments = ({
                                 <Box display="flex" alignItems="center" gap={1} mb={1}>
                                   {isPdf ? (
                                     <PictureAsPdfIcon sx={{ color: "#d32f2f", fontSize: 28 }} />
-                                  ) 
-                                  // : isImg ? (
-                                  //   <Box
-                                  //     component="img"
-                                  //     src={file?.attachments_file_path}
-                                  //     alt="thumbnail"
-                                  //     sx={{
-                                  //       width: 32,
-                                  //       height: 32,
-                                  //       objectFit: "cover",
-                                  //       borderRadius: 1,
-                                  //       border: "1px solid #ccc",
-                                  //     }}
-                                  //   />
-                                  // ) 
-                                  : (
-                                    <InsertPhotoIcon sx={{ color: "#1976d2", fontSize: 28 }} />
-                                  )}
+                                  )
+                                    // : isImg ? (
+                                    //   <Box
+                                    //     component="img"
+                                    //     src={file?.attachments_file_path}
+                                    //     alt="thumbnail"
+                                    //     sx={{
+                                    //       width: 32,
+                                    //       height: 32,
+                                    //       objectFit: "cover",
+                                    //       borderRadius: 1,
+                                    //       border: "1px solid #ccc",
+                                    //     }}
+                                    //   />
+                                    // ) 
+                                    : (
+                                      <InsertPhotoIcon sx={{ color: "#1976d2", fontSize: 28 }} />
+                                    )}
                                   <Box>
                                     <Typography variant="body2" fontWeight={500} noWrap>
                                       {file.attachments_subcategory_name}
