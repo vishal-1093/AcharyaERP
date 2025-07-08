@@ -178,17 +178,12 @@ function StudentDetailsIndex() {
   }, [pathname, tab]);
 
   useEffect(() => {
-    if(roleShortName === "SAA" && pathname.toLowerCase() === "/student-master"){
     getData();
-    }
   }, [
-    paginationData.page,
-    paginationData.pageSize,
-  ]);
+    values.acyearId,
+    tab,
+  ])
 
-useEffect(() => {
-    getData();
-  }, [values.acyearId,tab,filterString,]);
 
   useEffect(() => {
     getProgram();
@@ -310,8 +305,10 @@ useEffect(() => {
       }));
 
       let params = {
-        page,
-        page_size: pageSize,
+        // page,
+        // page_size: pageSize, // remove pagination
+        page: 0,
+        page_size: 1000000,
         sort: "created_date",
         ac_year_id: acyearId,
         ...(schoolId && { school_id: schoolId }),
@@ -333,16 +330,12 @@ useEffect(() => {
           params = {
             ...params,
             page: 0,
-            page_size: 100000,
-            userId: userID,
           };
           break;
 
         case "/student-master-inst":
           params = {
             ...params,
-            page: 0,
-            page_size: 100000,
           };
           break;
 
@@ -353,9 +346,7 @@ useEffect(() => {
               : "/api/student/studentDetailsByDept";
           params = {
             ...params,
-            page: 0,
-            pageSize: 100000,
-            // pageSize: params.page_size,
+            pageSize: params.page_size,
             acYearId: params.ac_year_id,
             dept_id: deptID,
           };
@@ -367,8 +358,6 @@ useEffect(() => {
           params = {
             ...params,
             fee_admission_category_id: 2,
-            page: 0,
-            page_size: 100000,
           };
           break;
 
@@ -1240,13 +1229,13 @@ useEffect(() => {
         <GridIndex
           rows={paginationData.rows}
           columns={columns}
-          rowCount={paginationData.total}
-          page={paginationData.page}
-          pageSize={paginationData.pageSize}
+          // rowCount={paginationData.total}
+          // page={paginationData.page}
+          // pageSize={paginationData.pageSize}
           handleOnPageChange={handleOnPageChange}
           handleOnPageSizeChange={handleOnPageSizeChange}
           loading={paginationData.loading}
-          handleOnFilterChange={handleOnFilterChange}
+          // handleOnFilterChange={handleOnFilterChange}
           getRowClassName={getRowClassName}
           columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel}

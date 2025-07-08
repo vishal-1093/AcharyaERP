@@ -530,7 +530,7 @@ const StudentDetailsViewDocuments = ({
                         </ul>
                       </div>
                     </Grid>
-                    {(roleId == 1 || roleId == 5 || roleId === 6) && <Grid item xs={12} md={4}>
+                     <Grid item xs={12} md={4}>
                       <CustomFileInput
                         name="photo"
                         label="3x4 rasm"
@@ -561,7 +561,7 @@ const StudentDetailsViewDocuments = ({
                           )}
                         </Typography>
                       </Button>
-                    </Grid>}
+                    </Grid>
                     <Grid item xs={12} md={4}></Grid>
 
                     {Image && (
