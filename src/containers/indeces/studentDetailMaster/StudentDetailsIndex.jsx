@@ -178,14 +178,17 @@ function StudentDetailsIndex() {
   }, [pathname, tab]);
 
   useEffect(() => {
+    if(roleShortName === "SAA" && pathname.toLowerCase() === "/student-master"){
     getData();
+    }
   }, [
     paginationData.page,
     paginationData.pageSize,
-    filterString,
-    values.acyearId,
-    tab,
   ]);
+
+useEffect(() => {
+    getData();
+  }, [values.acyearId,tab,filterString,]);
 
   useEffect(() => {
     getProgram();
@@ -329,6 +332,8 @@ function StudentDetailsIndex() {
         case "/student-master-user":
           params = {
             ...params,
+            page: 0,
+            page_size: 100000,
             userId: userID,
           };
           break;
@@ -336,6 +341,8 @@ function StudentDetailsIndex() {
         case "/student-master-inst":
           params = {
             ...params,
+            page: 0,
+            page_size: 100000,
           };
           break;
 
@@ -346,7 +353,9 @@ function StudentDetailsIndex() {
               : "/api/student/studentDetailsByDept";
           params = {
             ...params,
-            pageSize: params.page_size,
+            page: 0,
+            pageSize: 100000,
+            // pageSize: params.page_size,
             acYearId: params.ac_year_id,
             dept_id: deptID,
           };
@@ -358,6 +367,8 @@ function StudentDetailsIndex() {
           params = {
             ...params,
             fee_admission_category_id: 2,
+            page: 0,
+            page_size: 100000,
           };
           break;
 
@@ -1241,7 +1252,7 @@ function StudentDetailsIndex() {
           setColumnVisibilityModel={setColumnVisibilityModel}
         />
       </Box>
-      <PdfUploadModal  imageOpen={imageOpen} setImageUploadOpen={setImageUploadOpen} rowData={rowData} />
+      <PdfUploadModal imageOpen={imageOpen} setImageUploadOpen={setImageUploadOpen} rowData={rowData} />
     </>
   );
 }
