@@ -155,6 +155,13 @@ const FinancePage = lazy(() =>
   import("./pages/forms/chartsDashboard/finance/index")
 );
 const HRMPage = lazy(() => import("./pages/forms/chartsDashboard/hrm/index"));
+
+const MISDashboard = lazy(() => import("./pages/forms/misDashboard/index.js"));
+const AcademicOverviewPage = lazy(() => import("./pages/forms/misDashboard/academicOverview/index"));
+const AdmissionReportPage = lazy(()=> import("./pages/forms/misDashboard/admission/index"))
+const JoiningRelieveReportPage = lazy(()=> import("./pages/forms/misDashboard/JoiningRelieve/index.jsx"))
+const FinanceReportPage = lazy(()=> import("./pages/forms/misDashboard/finance/index.jsx"))
+
 const AdmissionPage = lazy(() =>
   import("./pages/forms/chartsDashboard/admission/index")
 );
@@ -2260,6 +2267,31 @@ function RouteConfig() {
               }
             />
           ))}
+          <Route
+            exact
+            path={"/mis-dashboard"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MISDashboard />
+              </Suspense>
+            }
+          />
+          {[
+            { path: "/mis-dashboard/academic-overview", comp: <AcademicOverviewPage /> },
+             { path: "/mis-dashboard/admission-report", comp: <AdmissionReportPage /> },
+             { path: "/mis-dashboard/joining-relieve-report", comp: <JoiningRelieveReportPage /> },
+              { path: "/mis-dashboard/finance-report", comp: <FinanceReportPage /> },
+          ].map((obj) => (
+            <Route
+              exact
+              key={obj.path}
+              path={obj.path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>{obj.comp}</Suspense>
+              }
+            />
+          ))}
+
           <Route
             exact
             path={"/intl/frro"}
