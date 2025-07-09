@@ -84,12 +84,21 @@ const LedgerMonthlyInstTransaction = () => {
     }, [currMonth?.month])
 
     const getData = async () => {
-        const { voucherHeadId, fcYearId, schoolId, year } = queryValues
-        const baseUrl = "/api/finance/getMonthAndSchoolWiseSummary"
-        const params = {
+        const { voucherHeadId, fcYearId, schoolId, year, ledgerType } = queryValues
+        const baseUrl = ledgerType === 'EARNINGS' ? "/api/finance/getMonthAndSchoolWiseSummary" : "/api/finance/getMonthlyLedger"
+        let params = {}
+        if(ledgerType === 'EARNINGS'){
+             params = {
             ...(voucherHeadId && { voucherHeadNewId: voucherHeadId }),
             ...(year && { year }),
+            ...(currMonth?.month && { month: currMonth?.month })
+        }
+        }else{
+              params = {
+            ...(voucherHeadId && { voucherHeadNewId: voucherHeadId }),
             ...(currMonth?.month && { month: currMonth?.month }),
+            ...(fcYearId && { fcYearId })
+        }
         }
         setLoading(true)
         await axios

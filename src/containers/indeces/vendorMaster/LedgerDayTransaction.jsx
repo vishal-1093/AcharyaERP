@@ -219,9 +219,9 @@ const LedgerDayTransaction = () => {
 
         if (value === 0) return "0.00";
 
-        if (ledgerType === "VENDOR" || ledgerType === "INFLOW" || ledgerType === "ASSETS" || ledgerType === "EXPENDITURE") {
+        if (ledgerType === "VENDOR" || ledgerType === "INFLOW") {
             return value < 0 ? `${absVal} Dr` : `${absVal} Cr`;
-        } else if (ledgerType === "CASHORBANK") {
+        } else if (ledgerType === "CASHORBANK" || ledgerType === "ASSETS" || ledgerType === "EXPENDITURE") {
             return value > 0 ? `${(absVal)} Dr` : `${(absVal)} Cr`;
         } else {
             return value;
