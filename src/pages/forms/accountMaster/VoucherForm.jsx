@@ -340,7 +340,7 @@ function VoucherForm() {
               name="type"
               value={values.type}
               items={[
-                { value: "ASSETS", label: "Assets" },
+                { value: "ASSETS/ADVANCE", label: "Assets/Advance" },
                 { value: "EXPENDITURE", label: "Expenditure" },
               ]}
               handleChange={handleChange}
