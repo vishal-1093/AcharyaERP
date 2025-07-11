@@ -80,6 +80,10 @@ function VendorDayCreditTransaction() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    getData()
+    if(queryValues?.ledgerType === 'ASSETS/ADVANCE' || queryValues?.ledgerType === 'EXPENDITURE'){
+      return
+    }else{
     setCrumbs([{ name: "" }]);
     if (queryValues?.isBRSTrue) {
       setBreadCrumbs([
@@ -97,9 +101,8 @@ function VendorDayCreditTransaction() {
         { name: `${queryValues?.voucherHeadName || ""} FY ${queryValues?.fcYear} as on ${moment().format('DD-MMMM-YYYY')}` },
       ])
     }
-    getData()
+  }
   }, []);
-
 
   const getData = async () => {
     setLoading(true);
@@ -196,7 +199,11 @@ function VendorDayCreditTransaction() {
   return (
     <>
       <Box sx={{ position: "relative", width: "100%" }}>
-        <CustomBreadCrumbs crumbs={breadCrumbs} />
+        {(queryValues?.ledgerType === 'ASSETS/ADVANCE' || queryValues?.ledgerType === 'EXPENDITURE') ? (
+        <></>
+        ):(
+           <CustomBreadCrumbs crumbs={breadCrumbs} />
+        )}
         <Box sx={{ position: "absolute", width: "100%", marginTop: "10px" }}>
           <GridIndex
             rows={rows}
@@ -208,7 +215,6 @@ function VendorDayCreditTransaction() {
             getRowId={(row) => row?.journal_voucher_id}
           />
         </Box>
-
       </Box>
     </>
   );
