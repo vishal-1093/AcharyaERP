@@ -7,6 +7,7 @@ import { makeStyles } from "@mui/styles";
 import moment from "moment";
 
 const JournalVoucher = lazy(() => import("./vendorDayTransaction-credit"));
+
 const FeeReceipt = lazy(() => import("./AssetsAndExpenditureFeeReceipt")
 );
 

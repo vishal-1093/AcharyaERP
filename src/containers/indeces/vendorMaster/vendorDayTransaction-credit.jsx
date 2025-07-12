@@ -75,6 +75,7 @@ function VendorDayCreditTransaction() {
   const setCrumbs = useBreadcrumbs();
   const location = useLocation()
   const queryValues = location.state;
+  const pathname = location.pathname;
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
   const navigate = useNavigate();
@@ -168,7 +169,7 @@ function VendorDayCreditTransaction() {
     { field: "school_name_short", headerName: "School", flex: 1, align: "center" },
     { field: "dept_name", headerName: "Dept", flex: 1 },
     {
-      field: "credit",
+      field: pathname === ("/ledger-assets-day-transaction-debit" || "/ledger-expenditure-day-transaction-debit") ? "debit" : "credit",
       headerName: "Amount",
       flex: 0.8,
       headerAlign: "right",
@@ -192,7 +193,7 @@ function VendorDayCreditTransaction() {
     fcYearId
   ) => {
     navigate(`/generate-journalvoucher-pdf/${journalVoucherNumber}`, {
-      state: { schoolId, fcYearId, isLedger: true, ...queryValues },
+      state: { schoolId, fcYearId, isLedger: true, path:pathname, ...queryValues },
     });
   };
 

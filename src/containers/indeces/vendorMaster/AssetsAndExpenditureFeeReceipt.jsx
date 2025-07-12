@@ -40,12 +40,11 @@ function AssetsAndExpenditureReceiptDetail() {
   const [loading, setLoading] = useState(false);
   const [columnVisibilityModel, setColumnVisibilityModel] = useState({
     fee_template_name: false,
-    inr1: false,
     created_username: false,
-    paid_year: false,
     cheque_dd_no: false,
     school_name_short: false,
     bank_name: false,
+    created_date: false
   });
   const { setAlertMessage, setAlertOpen } = useAlert();
   const location = useLocation();
@@ -92,39 +91,10 @@ function AssetsAndExpenditureReceiptDetail() {
       hideable: false,
       renderCell: (params) => "BULK"},
     {
-      field: "student_name",
+      field: "from_name",
       headerName: "Name",
       flex: 1,
-      hideable: false,
-      renderCell: (params) => {
-        return params.row.student_name && params.row.student_name ? (
-          <HtmlTooltip title={params.row.student_name}>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-              {params.row.student_name ? params.row.student_name : ""}
-            </Typography>
-          </HtmlTooltip>
-        ) : (
-          <HtmlTooltip title={params.row.bulk_user_name}>
-            <Typography
-              variant="subtitle2"
-              color="textSecondary"
-              sx={{ fontSize: 13, cursor: "pointer" }}
-            >
-              {params.row.bulk_user_name ? params.row.bulk_user_name : ""}
-            </Typography>
-          </HtmlTooltip>
-        );
-      },
-      valueGetter: (value, row) =>
-        row?.student_name
-          ? row.student_name
-          : row?.bulk_user_name
-          ? row.bulk_user_name
-          : "N/A",
+      hideable: false
     },
     {
       field: "school_name_short",
@@ -169,9 +139,9 @@ function AssetsAndExpenditureReceiptDetail() {
       hideable: false,
       type: "number",
       valueGetter: (value, row) => {
-        return row.inr_value % 1 !== 0
-          ? row.inr_value?.toFixed(2)
-          : row.inr_value;
+        return row?.amount !== 0
+          ? row.amount?.toFixed(2)
+          : "";
       },
     },
     {
@@ -186,6 +156,7 @@ function AssetsAndExpenditureReceiptDetail() {
           ? `${row.bank_short_name}-${row.inter_school_short_name}`
           : null,
     },
+     { field: "remarks", headerName: "Remarks", flex: 1 },
 
     {
       field: "cheque_dd_no",
@@ -222,7 +193,7 @@ function AssetsAndExpenditureReceiptDetail() {
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
   ];
-
+  
   return (
     <Box sx={{ position: "relative" }}>
       <Box sx={{ position: "absolute", width: "100%", marginTop: "10px" }}>
@@ -232,7 +203,7 @@ function AssetsAndExpenditureReceiptDetail() {
           loading={loading}
           columnVisibilityModel={columnVisibilityModel}
           setColumnVisibilityModel={setColumnVisibilityModel}
-          getRowId={(row, index) => row?.id}
+          getRowId={(row, index) => row?.bulk_fee_receipt_id}
           getRowClassName={(params) => {
             return params.row.active === false ? `${classes.inactiveRow}` : "";
           }}

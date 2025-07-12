@@ -6,8 +6,8 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
 
-const PaymentVoucher = lazy(() => import("./vendorDayTransaction-credit"));
-const JournalVoucher = lazy(() => import("./LedgerCreditPaymentDetails")
+const PaymentVoucher = lazy(() => import("./vendorDayTransaction-debit"));
+const JournalVoucher = lazy(() => import("./vendorDayTransaction-credit")
 );
 
 const breadcrumbStyles = makeStyles((theme) => ({
