@@ -248,3 +248,204 @@ export default function AdmissionReportDaily() {
         </Grid>
     );
 }
+
+
+
+// import React, { useEffect, useState } from "react";
+// import Grid from "@mui/material/Grid";
+// import FormControl from "@mui/material/FormControl";
+// import InputLabel from "@mui/material/InputLabel";
+// import Select from "@mui/material/Select";
+// import MenuItem from "@mui/material/MenuItem";
+// import Typography from "@mui/material/Typography";
+// import Stack from "@mui/material/Stack";
+// import Box from "@mui/material/Box";
+// import FormControlLabel from "@mui/material/FormControlLabel";
+// import axios from "../../../../services/Api.js";
+// import GridIndex from "../../../../components/GridIndex.jsx";
+// import useBreadcrumbs from "../../../../hooks/useBreadcrumbs.js";
+// import Highcharts from "highcharts";
+// import HighchartsReact from "highcharts-react-official";
+// import { IOSSwitch } from "../../chartsDashboard/IOSSwitch.js";
+
+// const ChartOptions = [
+//     { value: "column", label: "Column" },
+//     { value: "bar", label: "Bar" },
+//     { value: "line", label: "Line" },
+//     { value: "pie", label: "Pie" },
+// ];
+
+// export default function AdmissionReportDaily() {
+//     const [tableColumns, setTableColumns] = useState([]);
+//     const [tableRows, setTableRows] = useState([]);
+//     const [chartData, setChartData] = useState({});
+//     const [selectedChart, setSelectedChart] = useState("column");
+//     const [isTableView, setIsTableView] = useState(true);
+//     const [loading, setLoading] = useState(false);
+//     const setCrumbs = useBreadcrumbs();
+
+//     useEffect(() => {
+//         setCrumbs([
+//             { name: "MIS-Dashboard", link: "/mis-dashboard" },
+//             { name: "Academic Overview" },
+//         ]);
+//         fetchAdmissionData();
+//     }, []);
+
+//     const fetchAdmissionData = async () => {
+//         setLoading(true);
+//         try {
+//             const { data } = await axios.get(`/api/admissionCategoryReport/getDatewiseAdmissionReport`);
+//             updateTableAndChart(data);
+//         } catch (err) {
+//             console.error(err);
+//         }
+//         setLoading(false);
+//     };
+
+//     const updateTableAndChart = (data) => {
+//         const years = [
+//             data.prevYear[0].prevAcademicYear,
+//             data.currentYear[0].currentAcademicYear
+//         ];
+
+//         let institutesSet = new Set();
+//         data.prevYear.slice(1).forEach(item => institutesSet.add(item.school_name_short));
+//         data.currentYear.slice(1).forEach(item => institutesSet.add(item.school_name_short));
+//         const institutes = Array.from(institutesSet);
+
+//         let yearData = {};
+//         data.prevYear.slice(1).forEach(item => {
+//             if (!yearData[years[0]]) yearData[years[0]] = {};
+//             yearData[years[0]][item.school_name_short] = item.admitted;
+//         });
+//         data.currentYear.slice(1).forEach(item => {
+//             if (!yearData[years[1]]) yearData[years[1]] = {};
+//             yearData[years[1]][item.school_name_short] = item.admitted;
+//         });
+
+//         const rows = [];
+//         let totals = { id: "Total", year: "Total" };
+//         institutes.forEach(inst => totals[inst] = 0);
+
+//         let i = 0;
+//         for (const year of years) {
+//             let row = { id: i++, year };
+//             institutes.forEach(inst => {
+//                 row[inst] = yearData[year]?.[inst] || 0;
+//                 totals[inst] += row[inst];
+//             });
+//             row.Total = institutes.reduce((acc, inst) => acc + (row[inst] || 0), 0);
+//             rows.push(row);
+//         }
+//         totals.Total = institutes.reduce((acc, inst) => acc + totals[inst], 0);
+//         rows.push(totals);
+
+//         setTableColumns([
+//             { field: "year", headerName: "Year", flex: 1, headerClassName: "header-bg" },
+//             ...institutes.map(inst => ({
+//                 field: inst,
+//                 headerName: inst,
+//                 type: "number",
+//                 flex: 1,
+//                 headerClassName: "header-bg",
+//                 align: 'center'
+//             })),
+//             { field: "Total", headerName: "Total", type: "number", flex: 1, headerClassName: "header-bg", cellClassName: "last-column", align: 'center' }
+//         ]);
+//         setTableRows(rows);
+
+//         const datasets = years.map((year, idx) => {
+//             const color = idx % 2 === 0 ? "rgba(118, 185, 0, 0.6)" : "rgba(232, 63, 51, 0.6)";
+//             return {
+//                 name: year,
+//                 data: institutes.map(inst => yearData[year]?.[inst] || 0),
+//                 color
+//             };
+//         });
+
+//         setChartData({
+//             categories: institutes,
+//             series: datasets
+//         });
+//     };
+
+//     const buildHighChartOptions = () => ({
+//         chart: { type: selectedChart },
+//         title: { text: "Admission Report - Daily" },
+//         xAxis: { categories: chartData.categories || [], crosshair: true },
+//         yAxis: { min: 0, title: { text: "Admissions Count" }},
+//         tooltip: {
+//             headerFormat: "<b>{point.key}</b><table>",
+//             pointFormat: "<tr><td style='color:{series.color}'>{series.name}: </td>" +
+//                 "<td style='text-align: right'><b>{point.y}</b></td></tr>",
+//             footerFormat: "</table>",
+//             shared: true,
+//             useHTML: true
+//         },
+//         plotOptions: {
+//             column: { pointPadding: 0.2, borderWidth: 0 },
+//             bar: { dataLabels: { enabled: true }},
+//             line: { dataLabels: { enabled: true }},
+//             pie: { allowPointSelect: true, cursor: 'pointer', dataLabels: { enabled: true }}
+//         },
+//         series: chartData.series || []
+//     });
+
+//     return (
+//         <Grid container spacing={3}>
+//             <Grid item xs={12}>
+//                 <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
+//                     <Grid item xs={12} sm="auto">
+//                         <Stack direction="row" spacing={1} alignItems="center">
+//                             <Typography variant="body1">Chart view</Typography>
+//                             <FormControlLabel
+//                                 control={
+//                                     <IOSSwitch
+//                                         ischecked={isTableView}
+//                                         handlechange={() => setIsTableView(!isTableView)}
+//                                     />
+//                                 }
+//                                 label="Table view"
+//                                 labelPlacement="end"
+//                             />
+//                         </Stack>
+//                     </Grid>
+//                     <Grid item xs={12} sm={6} md={4} lg={3}>
+//                         <FormControl size="small" fullWidth>
+//                             <InputLabel>Chart Type</InputLabel>
+//                             <Select
+//                                 size="small"
+//                                 value={selectedChart}
+//                                 label="Chart Type"
+//                                 onChange={(e) => setSelectedChart(e.target.value)}
+//                             >
+//                                 {ChartOptions.map((obj, index) => (
+//                                     <MenuItem key={index} value={obj.value}>{obj.label}</MenuItem>
+//                                 ))}
+//                             </Select>
+//                         </FormControl>
+//                     </Grid>
+//                 </Grid>
+//             </Grid>
+
+//             <Grid item xs={12}>
+//                 {isTableView ? (
+//                     <GridIndex
+//                         rows={tableRows}
+//                         columns={tableColumns}
+//                         loading={loading}
+//                         getRowId={row => row.id}
+//                         isRowSelectable={(params) => params?.row?.year !== "Total"}
+//                         getRowClassName={(params) => params?.row?.year === "Total" ? "last-row" : ""}
+//                     />
+//                 ) : (
+//                     <Box p={3}>
+//                         {chartData.series && <HighchartsReact highcharts={Highcharts} options={buildHighChartOptions()} />}
+//                     </Box>
+//                 )}
+//             </Grid>
+//         </Grid>
+//     );
+// }
+
