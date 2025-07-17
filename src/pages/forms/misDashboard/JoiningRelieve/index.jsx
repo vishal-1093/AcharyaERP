@@ -8,12 +8,12 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import axios from "../../../../services/Api.js";
 import GridIndex from "../../../../components/GridIndex.jsx";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs.js";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { IOSSwitch } from "../../chartsDashboard/IOSSwitch.js";
+import axiosNoToken from "../../../../services/ApiWithoutToken.js";
 
 const ChartOptions = [
     { value: "column", label: "Column" },
@@ -42,7 +42,7 @@ export default function JoiningRelieveReport() {
     const getRelievingData = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`api/admissionCategoryReport/getEmployeeJoiningAndRelievingReport`);
+            const response = await axiosNoToken.get(`api/admissionCategoryReport/getEmployeeJoiningAndRelievingReport`);
             updateTableAndChart(response.data);
         } catch (err) {
             console.error(err);

@@ -52,7 +52,14 @@ const FacultyFeedbackReportCourseForm = () => {
     }, [])
 
     useEffect(() => {
-        getYearSemData()
+       if(values?.acYearId && pathname === "/FacultyFeedbackMaster-course")
+       getYearSemDataByAcademicYear()
+    }, [values?.acYearId])
+
+     useEffect(() => {
+       // getYearSemData()
+        if(userID && pathname !== "/FacultyFeedbackMaster-course")
+       getYearSemDataByEmployee()
     }, [userID])
 
     useEffect(() => {
@@ -189,11 +196,33 @@ const FacultyFeedbackReportCourseForm = () => {
         return true;
     };
 
-    const getYearSemData = async () => {
+    const getYearSemDataByAcademicYear = async () => {
+          await axios
+            .get(`/api/student/getFeedbackAnswersYearSemDetails?ac_year_id=${values?.acYearId}`)
+            .then((res) => {
+                setYearSemOptions(
+                    res?.data?.data?.map((obj) => ({
+                        value: `${obj?.year}/${obj?.sem}`,
+                        label: `${obj?.year}/${obj?.sem}`,
+                    }))
+                )
+            })
+            .catch((err) => {
+                console.error(err)
+                setAlertMessage({
+                    severity: "error",
+                    message: "Something went wrong, Please try again!!",
+                });
+                setAlertOpen(true);
+            })
+    };
+
+   const getYearSemDataByEmployee = async () => {
         const dept_id = values?.departmentId ? values?.departmentId : departmentID
         const employeeIDs = await getAllEmployee(dept_id)
          setEmployeeIds(employeeIDs)
          const empIds = employeeIDs ?.length > 0  ? employeeIDs.join(',') : ""
+         if(empIds){
         await axios
             .get(`/api/student/getFeedbackYearSemDetailsData?employee_id=${empIds}`)
             .then((res) => {
@@ -212,6 +241,7 @@ const FacultyFeedbackReportCourseForm = () => {
                 });
                 setAlertOpen(true);
             })
+        }
     };
 
     const handleSubmit = async() => {

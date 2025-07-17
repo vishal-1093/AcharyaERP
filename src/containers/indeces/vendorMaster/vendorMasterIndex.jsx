@@ -108,11 +108,19 @@ const dateTypes = [
     },
     {
         value: 2,
-        label: "Month"
+        label: "Monthly"
+    },
+     {
+        value: 3,
+        label: "Quaterly"
+    },
+     {
+        value: 4,
+        label: "Half-Yearly"
     },
     {
-        value: 3,
-        label: "Year"
+        value: 5,
+        label: "Yearly"
     },
 ]
 
@@ -822,7 +830,7 @@ function VendorMasterIndex() {
     //                                 fontFamily: 'inherit'
     //                             },
     //                             '& .MuiDataGrid-columnHeaders': {
-    //                                 backgroundColor: '#2c3e50',
+    //                                 backgroundColor: '#376a7d',
     //                                 color: '#fff',
     //                                 borderTopLeftRadius: '8px',
     //                                 borderTopRightRadius: '8px',
@@ -865,7 +873,7 @@ function VendorMasterIndex() {
     //                             },
     //                             '& .last-row': {
     //                                 fontWeight: 700,
-    //                                 backgroundColor: "#2c3e50 !important",
+    //                                 backgroundColor: "#376a7d !important",
     //                                 color: "#fff !important",
     //                                 '& .MuiDataGrid-cell': {
     //                                     borderBottom: 'none',
@@ -875,7 +883,7 @@ function VendorMasterIndex() {
     //                             },
     //                             '& .header-bg': {
     //                                 fontWeight: "bold",
-    //                                 backgroundColor: "#2c3e50 !important",
+    //                                 backgroundColor: "#376a7d !important",
     //                                 color: "#fff !important"
     //                             },
     //                             '& .MuiDataGrid-columnSeparator': {
@@ -989,7 +997,7 @@ function VendorMasterIndex() {
     //                                         handleChangeAdvance={handleFilterChange}
     //                                     />
     //                                 ) : <></>}
-    //                                 {selectedVoucher?.dateType === 'Month' ? (
+    //                                 {selectedVoucher?.dateType === 'Monthly' ? (
     //                                     <CustomMonthYearPicker
     //                                         name="date"
     //                                         label="Month"
@@ -998,6 +1006,14 @@ function VendorMasterIndex() {
     //                                         handleChangeAdvance={handleFilterChange}
     //                                     />
     //                                 ) : <></>}
+    //                                 {selectedVoucher?.dateType === 'Quaterly' || selectedVoucher?.dateType === 'Half-Yearly' || selectedVoucher?.dateType === 'Yearly' ? (
+    //                                  <CustomTextField
+    //                                     label={selectedVoucher?.dateType}
+    //                                     name="date"
+    //                                     value={filters?.date}
+    //                                     handleChange={handleChange}
+    //                                 /> 
+    //                                 ):<></>}
     //                             </Box>
     //                         )}
     //                     </Box>

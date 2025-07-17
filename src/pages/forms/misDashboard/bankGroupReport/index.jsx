@@ -8,12 +8,12 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import axios from "../../../../services/Api.js";
 import GridIndex from "../../../../components/GridIndex.jsx";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs.js";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { IOSSwitch } from "../../chartsDashboard/IOSSwitch.js";
+import axiosNoToken from "../../../../services/ApiWithoutToken.js";
 
 const ChartOptions = [
     { value: "column", label: "Column" },
@@ -34,7 +34,7 @@ export default function BankGroupReport() {
     useEffect(() => {
         setCrumbs([
             { name: "MIS-Dashboard", link: "/mis-dashboard" },
-            { name: "Bank Balance Report" },
+            { name: "Bank Balance" },
         ]);
         fetchBankBalanceData();
     }, []);
@@ -42,7 +42,7 @@ export default function BankGroupReport() {
     const fetchBankBalanceData = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`/api/admissionCategoryReport/getBankReportGroupwise`);
+            const response = await axiosNoToken.get(`/api/admissionCategoryReport/getBankReportGroupwise`);
             const data = response?.data?.data || [];
             updateTableAndChart(data);
         } catch (err) {
@@ -54,9 +54,9 @@ export default function BankGroupReport() {
     const updateTableAndChart = (data) => {
         const rows = data.map((item, index) => ({
             id: index,
-            bankGroup: item.bank_group_name || "Unknown",
+            bankGroup: item.bank_group_name || "",
             balance: item.bank_balance || 0,
-            amountFormatted: item.totalAmount || "0.000 cr."
+            amountFormatted: item.totalAmount || "0.00 cr."
         }));
 
         const totalBalance = data.reduce((sum, d) => sum + (d.bank_balance || 0), 0);
@@ -71,9 +71,9 @@ export default function BankGroupReport() {
         setTableRows(rows);
 
         setTableColumns([
-            { field: "bankGroup", headerName: "Bank Group Name", flex: 1, headerClassName: "header-bg" },
-            { field: "balance", headerName: "Balance", type: "number", flex: 1, headerClassName: "header-bg", align: 'center' },
-            { field: "amountFormatted", headerName: "Total Amount (Rs)", flex: 1, headerClassName: "header-bg", align: 'center' },
+            { field: "bankGroup", headerName: "Bank Group Name", flex: 1, headerClassName: "header-bg", align: 'center' },
+            // { field: "balance", headerName: "Balance", type: "number", flex: 1, headerClassName: "header-bg", align: 'center' },
+            { field: "amountFormatted", headerName: "Bank Balance (Rs)", flex: 1, headerClassName: "header-bg", align: 'center' },
         ]);
 
         setChartData({

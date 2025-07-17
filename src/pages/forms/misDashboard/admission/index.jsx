@@ -8,13 +8,13 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import axios from "../../../../services/Api.js";
 import GridIndex from "../../../../components/GridIndex.jsx";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs.js";
 import { useLocation } from "react-router-dom";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { IOSSwitch } from "../../chartsDashboard/IOSSwitch.js";
+import axiosNoToken from "../../../../services/ApiWithoutToken.js";
 
 const ChartOptions = [
     { value: "column", label: "Column" },
@@ -38,14 +38,14 @@ export default function AdmissionReportYearly() {
         fetchYearlyAdmissionReportData();
         setCrumbs([
             { name: "MIS-Dashboard", link: "/mis-dashboard" },
-            { name: "Admission" },
+            { name: "Category-wise Admission" },
         ]);
     }, [currAcYearId]);
 
     const fetchYearlyAdmissionReportData = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${currAcYearId}`);
+            const response = await axiosNoToken.get(`api/admissionCategoryReport/getAdmissionCategoryReportAcademicYearWise?acYearId=${currAcYearId}`);
             const { data } = response?.data;
             updateTableAndChart(data || []);
         } catch (err) {
@@ -55,7 +55,7 @@ export default function AdmissionReportYearly() {
     };
 
     const updateTableAndChart = (data) => {
-        const getCategoryName = (item) => item.feeAdmissionType || item.fee_admission_category_type || "Unknown";
+        const getCategoryName = (item) => item.feeAdmissionType || item.fee_admission_category_type || "";
 
         const rows = data?.map((item, index) => ({
             id: index,
@@ -177,16 +177,16 @@ export default function AdmissionReportYearly() {
                         name: "Total",
                         // colorByPoint: true,
                         data: [
-                            { name: "Intake", y: chartData.intake?.reduce((a, b) => a + b, 0), color: "#4e79a7" },
-                            { name: "Admitted", y: chartData.admitted?.reduce((a, b) => a + b, 0), color: "#f28e2b" },
-                            { name: "Vacant", y: chartData.vacant?.reduce((a, b) => a + b, 0), color: "#e15759" }
+                            { name: "Intake", y: chartData.intake?.reduce((a, b) => a + b, 0), color: "#3498db" },
+                            { name: "Admitted", y: chartData.admitted?.reduce((a, b) => a + b, 0), color: "#e74c3c" },
+                            { name: "Vacant", y: chartData.vacant?.reduce((a, b) => a + b, 0), color: "#2ecc71" }
                         ]
                     }
                 ]
                 : [
-                    { name: "Intake", data: chartData.intake, color: "#4e79a7" },
-                    { name: "Admitted", data: chartData.admitted, color: "#f28e2b" },
-                    { name: "Vacant", data: chartData.vacant, color: "#e15759" }
+                    { name: "Intake", data: chartData.intake, color: "#3498db" },
+                    { name: "Admitted", data: chartData.admitted, color: "#e74c3c" },
+                    { name: "Vacant", data: chartData.vacant, color: "#2ecc71" }
                 ]
         };
     };
