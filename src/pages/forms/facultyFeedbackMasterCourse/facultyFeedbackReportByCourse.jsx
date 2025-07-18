@@ -89,7 +89,7 @@ function FacultyFeedbackReportByCourse() {
 
     const getAllFacultySubject = () => {
         // setLoading(true)
-        const { year, sem, employee_id, acYear, ...query } = queryParams
+        const { year, sem, employee_id, acYear, school_id, ...query } = queryParams
         const yearAndSem = query?.yearSem && query?.yearSem?.split("/")
         const selectedYear = yearAndSem?.length > 0 ? yearAndSem[0] : ""
         const selectedSem = yearAndSem?.length > 0 ? yearAndSem[1] : ""
@@ -257,7 +257,7 @@ function FacultyFeedbackReportByCourse() {
                             <TableCell
                                 colSpan={2 + (column?.length || 0)}
                                 sx={{
-                                    backgroundColor: "primary.main",
+                                    backgroundColor: "#376a7d",
                                     color: "headerWhite.main",
                                     textAlign: "center",
                                 }}
@@ -355,7 +355,7 @@ function FacultyFeedbackReportByCourse() {
                             <TableCell
                                 colSpan={4 + sectionKeys?.length}
                                 sx={{
-                                    backgroundColor: "primary.main",
+                                    backgroundColor: "#376a7d",
                                     color: "headerWhite.main",
                                     textAlign: "center",
                                 }}
